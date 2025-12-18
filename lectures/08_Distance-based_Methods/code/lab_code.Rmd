@@ -1,0 +1,67 @@
+---
+title: "Spatial Analysis: 08"
+author: "Tzai-Hung Wen"
+date: '2025-04-28'
+output:
+  html_notebook:
+    toc: true
+    toc_depth: 6
+    toc_float: true
+---
+
+## F(d) & K(d) Functions
+
+### 1. creating PPP format
+
+```{r, message=FALSE}
+rm(list = ls())
+library(sf)
+library(tmap)
+library(spatstat)
+
+# setwd("C:/data")
+schools_sf <- st_read("./Data/Schools.shp")
+county_sf <- st_read("./Data/TainanCounty.shp")
+
+Coord <- st_coordinates(schools_sf)
+Windows <- as.owin(county_sf)
+schools_ppp <- as.ppp(Coord, Windows)
+plot(schools_ppp)
+```
+
+### 2. creating F(d) functions
+
+```{r}
+RND<- rpoint(100, win= Windows)
+nndist1 <- nncross(RND, schools_ppp)
+F = ecdf(nndist1[,1]) 
+
+RND2<- rpoint(400, win= Windows)
+nndist2 <- nncross(RND, RND2)
+F_RND <- ecdf(nndist2[,1]) 
+
+plot(F, main="F function", col = "red", xlim=c(0,5000))
+lines(F_RND, col = "gray")
+
+CI_F <- envelope(schools_ppp, fun=Fest, nsim=99, n=1) 
+plot(CI_F)
+```
+
+### 3.1 creating K(d) functions
+
+```{r}
+k <- Kest(schools_ppp)
+plot(k, main="K function", xlim=c(0,5000))
+CI_K<- envelope(schools_ppp, fun=Kest, nsim=99, n=1) 
+plot(CI_K)
+
+```
+### 3.2 creating L(d) functions
+
+```{r}
+L <- Lest(schools_ppp)
+plot(L, main="L function", xlim=c(0,5000))
+CI_L<- envelope(schools_ppp, fun=Lest, nsim=99, n=1) 
+plot(CI_L, .-r~r)
+```
+

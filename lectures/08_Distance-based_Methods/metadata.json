@@ -1,0 +1,17 @@
+{
+  "unit_id": 8,
+  "topic": "距離基礎方法",
+  "description": "在本單元中，學生將學習距離基礎的方法，包括如何計算空間資料之間的距離以及如何利用這些距離進行分析。透過提供的作業、實驗程式碼及教材，學生將能掌握相關的 GIS 技術，並應用於實際案例，如學校與其他地理特徵的距離分析。",
+  "tags": [
+    "距離分析",
+    "Distance Analysis",
+    "空間資料",
+    "Spatial Data",
+    "GIS技術",
+    "GIS Techniques",
+    "地理資訊系統",
+    "Geographic Information System"
+  ],
+  "source_folder": "08_Distance-based_Methods",
+  "file_count": 57
+}

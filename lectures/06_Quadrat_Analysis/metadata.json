@@ -1,0 +1,17 @@
+{
+  "unit_id": 6,
+  "topic": "區劃分析",
+  "description": "在本單元中，學生將深入了解區劃分析的基本原理與應用，透過分析空間資料來評估地理分佈的特徵。課程將涵蓋相關的理論知識，並透過提供的範例與作業，幫助學生掌握如何使用 R 語言進行實際的數據分析，並運用 GIS 軟體進行空間資料的視覺化展示。",
+  "tags": [
+    "區劃分析",
+    "Quadrat Analysis",
+    "空間統計",
+    "Spatial Statistics",
+    "地理資訊系統",
+    "Geographic Information System",
+    "數據分析",
+    "Data Analysis"
+  ],
+  "source_folder": "06_Quadrat_Analysis",
+  "file_count": 56
+}

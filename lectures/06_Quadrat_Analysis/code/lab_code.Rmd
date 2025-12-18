@@ -1,0 +1,99 @@
+---
+title: "Spatial Analysis: 06"
+author: "Tzai-Hung Wen"
+date: '2025-04-14'
+output:
+  html_notebook:
+    toc: true
+    toc_depth: 6
+    toc_float: true
+---
+
+# Quadrat Analysis in R 
+
+<h3> Loading packages and sample data </h3>
+
+```{r, message=FALSE}
+rm(list = ls())
+library(sf)
+library(ggplot2)
+library(tidyverse)
+library(tmap)
+
+
+setwd("C:/Wen_Files/GIS_data/")
+schools_sf <- st_read("./Schools.shp")
+schools_lyr <- tm_shape(schools_sf) + tm_dots(fill = "red") + tm_layout(frame = F)
+
+```
+
+<h3> Step 1: Buidlding fishnet </h3>
+
+```{r}
+grid <- st_make_grid(schools_sf, 5000,
+                     crs = st_crs(schools_sf),
+                     what = "polygons", square = TRUE)
+
+n <- length(lengths(grid))
+
+grid_sf <- st_sf(index = 1:n, grid)
+head(grid_sf)
+names(grid_sf) <- c("grd_id","grid")
+
+grd_bg <- tm_shape(grid_sf) + tm_polygons("grey90")
+schools_lyr <- tm_shape(schools_sf) + tm_dots(fill = "red") + tm_layout(frame = F)
+grd_bg + schools_lyr
+```
+
+<h3> Step 2: Quadrat counting </h3>
+
+```{r}
+new_sf <- st_intersection(grid_sf, schools_sf)
+head(new_sf)
+
+quad_sf <- summarise(group_by(new_sf, grd_id), count = length(grd_id))
+
+grid_sf$count <- 0
+grid_sf$count[quad_sf$grd_id] <- quad_sf$count  # using [grd_id] as the index
+
+grid_lyr <- tm_shape(grid_sf) + 
+            tm_polygons("count", palette = "Greens", style = "jenks", n=7, title = "No. of points")
+grid_lyr + schools_lyr
+```
+
+<h3> Step 3: VMR test </h3>
+
+```{r}
+mean <- mean(grid_sf$count)
+var<- var(grid_sf$count)
+
+vmr <- var/mean
+se<- sqrt((2/(n-1)))
+
+t <- (vmr-1)/se
+pvalue <- pt(t,df=n-1,lower.tail = F)
+```
+
+# Using quadrat.test() 
+
+```{r}
+library(spatstat)
+
+bnd<-st_bbox(schools_sf)
+x.coor<-schools_sf$X_coor
+y.coor<-schools_sf$Y_coor
+x.range<-c(bnd[1],bnd[3]) 
+y.range<-c(bnd[2],bnd[4])
+schools_pp1 <- ppp(x.coor,y.coor,x.range,y.range)
+
+# Chi-squared test
+quadrat.test(schools_pp1, nx=11, ny=11,
+             alternative=c("two.sided"),
+             method="Chisq")
+
+# Monte Carlo test of CSR
+quadrat.test(schools_pp1, nx=11, ny=11,
+             alternative=c("two.sided"),
+             method="MonteCarlo", nsim=999)
+```
+

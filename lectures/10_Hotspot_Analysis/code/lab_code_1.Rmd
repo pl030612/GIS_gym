@@ -1,0 +1,136 @@
+---
+title: "Spatial Analysis: 10"
+author: "Tzai-Hung Wen"
+date: '2025-05-19'
+output:
+  html_notebook:
+    toc: true
+    toc_depth: 6
+    toc_float: true
+---
+
+## Hotspot Analysis
+
+### 0. Loading R packages and data
+```{r, message=FALSE, warning=FALSE}
+rm(list = ls())
+library(spdep)
+library(sf)
+library(tmap)
+
+# setwd("C:/Data")
+TWPOP_sf <- st_read("./Data/Popn_TWN2.shp",options = "encoding=Big5" )
+
+ID<- TWPOP_sf$COUNTY_ID
+Sel<- ID == "65000" | ID == "63000" 
+NorthTW_sf<- TWPOP_sf[Sel,]
+
+Popn<-NorthTW_sf$A15A64_CNT
+NorthTW_sf$Density <- Popn * 10^6 / st_area(NorthTW_sf)
+
+NorthTW_lyr <- tm_shape(NorthTW_sf) + 
+  tm_polygons("Density", palette = "OrRd", style = "jenks", title = "Popn Density")
+
+
+```
+
+### 1. Spatial Neighbors 
+```{r}
+TWN_nb<-poly2nb(NorthTW_sf) #QUEEN = TRUE
+TWN_nb_w<- nb2listw(TWN_nb, zero.policy=T) # default: style = "W" (row standardised)
+```
+
+### 2. Global Moran I
+```{r}
+Density <- NorthTW_sf$Density
+Density <- as.vector(Density)
+M <- moran.test(Density, listw=TWN_nb_w, zero.policy=T)
+
+IDs <-NorthTW_sf$TOWN
+moran.plot (Density, TWN_nb_w, labels=IDs , xlab="Popn", ylab="SL Popn")
+```
+
+### 3. Local Moran
+```{r, warning=FALSE}
+LISA.Popn <- localmoran(Density, TWN_nb_w, zero.policy=T, conditional = TRUE)
+# ?localmoran
+
+LISA.Popn2 <- localmoran_perm(Density, TWN_nb_w, zero.policy=T)
+
+NorthTW_sf$z.li <- LISA.Popn[,4]
+NorthTW_sf$pvalue <- LISA.Popn[,5]
+
+tm_shape(NorthTW_sf) + 
+  tm_polygons("z.li", palette = "OrRd", style = "jenks", title = "Local Moran")
+
+tm_shape(NorthTW_sf) + 
+  tm_polygons("pvalue", palette = "-OrRd", style = "jenks", title = "p-value")
+
+# export to Rdata / shapefile
+save(NorthTW_sf, file="NorthTW.Rdata" )
+st_write(NorthTW_sf,"NorthTW.shp", delete_layer = TRUE)
+
+# Import from Rdata / shapefile
+load("NorthTW.Rdata")
+newsf <- st_read("NorthTW.shp")
+```
+
+### 4. Mapping Local Moran
+```{r}
+quadr <- attr(LISA.Popn, "quadr")$mean
+quadr <- factor(quadr, levels = c(levels(quadr), "NoSig"))
+NorthTW_sf$Type <- quadr
+head(NorthTW_sf)
+table(NorthTW_sf$Type)
+
+signif <- 0.05
+quadr[LISA.Popn[, 5]> signif] <- "NoSig"
+NorthTW_sf$Type <- quadr
+
+colors<- c( 'High-High' ='red', 'Low-Low'='blue', 
+            'High-Low'='lightpink', 'Low-High'='skyblue2', 'NoSig'='grey')
+
+tm_shape(NorthTW_sf) + tm_polygons("Type", palette = colors)
+```
+
+### 5. Local Gi*
+```{r}
+TWN_nb_in<-include.self(TWN_nb); summary(TWN_nb_in)
+
+TWN_nb_in_w<- nb2listw(TWN_nb_in, zero.policy=T)
+
+LG <-localG(Density, TWN_nb_in_w); LG
+
+LG2 <- localG_perm(Density, TWN_nb_in_w, zero.policy=T)
+
+# ?localG
+  
+NorthTW_sf$LG <- LG
+
+tm_shape(NorthTW_sf) + 
+  tm_polygons("LG", palette = "OrRd", style = "jenks", title = "Local Gi*")
+```
+
+### 6. Mapping Hotspots
+```{r}
+# using Local Gi*, p < 0.05
+
+cluster_type <- attr(LG, "cluster")
+cluster_type <- factor(cluster_type, 
+                       levels = c(levels(cluster_type), "NoSig"))
+NorthTW_sf$CLUSTER <- cluster_type
+head(NorthTW_sf)
+table(NorthTW_sf$CLUSTER)
+
+signif <- 0.05
+
+pvalue <- attr(LG,"internals")[,5]
+
+cluster_type[ pvalue > signif] <- "NoSig"
+NorthTW_sf$CLUSTER <- cluster_type
+
+
+colors <- c('High' ='red','Low' ='blue','NoSig' = 'lightgray')
+tm_shape(NorthTW_sf) + tm_polygons("CLUSTER", palette = colors)
+```
+

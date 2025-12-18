@@ -1,0 +1,109 @@
+---
+title: "Spatial Analysis: 07"
+author: "Tzai-Hung Wen"
+date: '2025-04-21'
+output:
+  html_notebook:
+    toc: true
+    toc_depth: 6
+    toc_float: true
+---
+
+## Nearest Neighbor Analysis
+
+### 1. Introducing PPP format
+
+```{r, message=FALSE}
+rm(list = ls())
+library(sf)
+library(tmap)
+library(ggplot2)
+library(spatstat)
+
+# setwd("C:/data")
+schools_sf <- st_read("./Data/Schools.shp")
+TN_BND_sf <- st_read("./Data/TainanCounty.shp")
+# head(county_sf)
+
+# method-1
+bnd <-st_bbox(schools_sf)
+x.coor<-schools_sf$X_coor
+y.coor<-schools_sf$Y_coor
+x.range<-c(bnd[1]-10,bnd[3]+10) 
+y.range<-c(bnd[2]-10,bnd[4]+10)
+schools_pp1 <- ppp(x.coor,y.coor,x.range,y.range)
+plot(schools_pp1)
+
+# method-2
+Coord <- st_coordinates(schools_sf)
+Windows <- as.owin(TN_BND_sf)
+schools_pp2 <- as.ppp(Coord, Windows)
+plot(schools_pp2)
+```
+
+
+### 2. Nearest neighbor distance
+
+```{r}
+# calculating the area
+x<-x.range[2]-x.range[1]
+y<-y.range[2]-y.range[1]
+sqr.area<- x*y
+
+nnd <- nndist(schools_pp1, k=1)
+d1<-mean(nnd) # Tainan School
+rd<- 0.5/sqrt(424/sqr.area)  # theoretical random pattern
+r.scale <- d1/rd
+
+```
+
+
+### 3. K-order Nearest Neighbor Distance
+
+```{r}
+mean(nndist(schools_pp1, k=2))
+
+ANN <- apply(nndist(schools_pp1, k=1:20),2,FUN=mean) # margin=2: columns
+xValue= 1:20
+yValue <- ANN
+df1 <- data.frame(xValue,yValue)
+ggplot(data=df1,aes(x=xValue, y=yValue))+ geom_line() + geom_point() + 
+      xlab("K-order NN") +  ylab("distance") +
+      ggtitle("Average K-order NN Distance")
+
+```
+
+
+### 4. G(d) function
+
+```{r}
+G = ecdf(nnd) 
+plot(G, main="G function", xlim=c(0,5000))
+
+```
+
+
+
+### 5. Comparing with a random pattern
+
+```{r}
+TN.Windows<-owin(xrange=x.range, yrange=y.range)
+nn1<-rpoint(424, win=TN.Windows)
+plot(nn1, pch=16, size=0.5)
+
+nnd1<-nndist(nn1, k=1)
+G1 = ecdf(nnd1) 
+plot(G, main="G function", xlim=c(0,5000))
+lines(G1,col='blue')
+```
+
+
+### 6. Generating Random Points
+
+```{r}
+Windows <- as.owin(TN_BND_sf)
+nn2<- rpoint(415, win = Windows)
+plot(nn2, pch=16, size=0.5) 
+
+```
+

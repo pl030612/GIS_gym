@@ -1,0 +1,116 @@
+---
+title: "Spatial Analysis: 04"
+author: "Tzai-Hung Wen"
+date: '2025-03-17'
+output:
+  html_notebook:
+    toc: true
+    toc_depth: 6
+    toc_float: true
+---
+# 0. CRS transform
+```{r}
+library(sf)
+
+Popn_TWN = st_read("./data/Popn_TWN2.shp",options="ENCODING=BIG5")
+st_crs(Popn_TWN)
+
+# EPSG:3826 TWD97-TM2 zone 121
+# EPSG:4326 WGS84
+
+Popn_TWN = st_transform(Popn_TWN, 4326) 
+st_crs(Popn_TWN)
+
+# Popn_TWN = st_transform(Popn_TWN, st_crs(TWN))
+
+```
+
+
+
+# 1. load data: tracts_sf
+```{r}
+rm(list = ls())
+
+library(sf)
+library(tmap)
+
+load("./data/Sample3.RData")
+
+head(tracts_sf)
+
+tm_shape(tracts_sf) + 
+  tm_polygons("HSE_UNITS", palette = "Greens", style = "jenks", title = "No. of houses") +
+  tm_layout(frame = F, legend.position = c(1,0.5))
+```
+
+# 2.Buidlding fishnet
+```{r}
+grid <- st_make_grid(tracts_sf, 5000,
+                     crs = st_crs(tracts_sf),
+                     what = "polygons", square = TRUE)
+
+n <- length(lengths(grid))
+
+grid_sf <- st_sf(index = 1:n, grid)
+head(grid_sf)
+names(grid_sf) <- c("grd_id","grid")
+
+grd_bg <- tm_shape(grid_sf) + tm_polygons("grey90")
+tracts <- tm_shape(tracts_sf) + tm_borders(col = "red")
+grd_bg + tracts
+```
+
+# 3. Spatial intersection
+```{r}
+new_sf <- st_intersection(grid_sf, tracts_sf)
+new_lyr <- tm_shape(new_sf) + tm_polygons("grey90")
+new_lyr
+```
+
+# 4. Field calculation
+```{r}
+head(new_sf)
+new_sf$new_area<-st_area(new_sf)
+new_sf$houses<- (new_sf$new_area / new_sf$AREA) * new_sf$HSE_UNITS
+```
+
+# 5. Grouping data
+
+## code example: pipes
+```{r}
+library(tidyverse)
+Popn_TWN = st_read("./data/Popn_TWN2.shp",options="ENCODING=BIG5")
+head(Popn_TWN)
+# Popn_County = group_by(Popn_TWN, COUNTY_ID)
+# plot(Popn_County)
+# Popn_County = summarise(Popn_County, OLD = sum(A65UP_CNT))
+# head(Popn_County)
+
+Popn_County = Popn_TWN %>% group_by(COUNTY_ID) %>% summarise(OLD = sum(A65UP_CNT))
+plot(Popn_County)
+head(Popn_County)
+```
+
+## using pipes for grouping data
+```{r}
+# new_sf <- summarise(group_by(new_sf, grd_id), count = sum(houses))
+
+new_sf <- new_sf %>% group_by(grd_id) %>% summarise(count = sum(houses))
+
+tm_shape(new_sf)+ tm_polygons("grey90")
+
+```
+
+# 6. Mapping grid_sf
+```{r}
+head(new_sf)
+head(grid_sf)
+grid_sf$houses <- 0
+grid_sf$houses[new_sf$grd_id] <- new_sf$count  # using [grd_id] as the index
+
+tm_shape(grid_sf) + 
+  tm_polygons("houses", palette = "Greens", style = "jenks", title = "No. of houses") +
+  tm_layout(frame = F, legend.position = c(1,0.5)) +
+  tm_shape(tracts_sf) + tm_borders(col = "red")
+```
+

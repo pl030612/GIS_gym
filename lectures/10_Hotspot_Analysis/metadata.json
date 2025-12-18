@@ -1,0 +1,17 @@
+{
+  "unit_id": 10,
+  "topic": "熱點分析",
+  "description": "在本單元中，學生將學習熱點分析的基本概念與方法，這是一種用於識別空間數據中高密度或高發生率區域的技術。透過實作與實驗，學生將運用 R 語言進行數據分析，並利用提供的數據集進行實際案例分析，進一步理解如何在 GIS 中應用熱點分析技術。",
+  "tags": [
+    "熱點分析",
+    "Hotspot Analysis",
+    "空間數據",
+    "Spatial Data",
+    "GIS",
+    "R 語言",
+    "數據分析",
+    "Data Analysis"
+  ],
+  "source_folder": "10_Hotspot_Analysis",
+  "file_count": 36
+}

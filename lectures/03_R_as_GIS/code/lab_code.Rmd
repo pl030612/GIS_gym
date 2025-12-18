@@ -1,0 +1,219 @@
+---
+title: "Spatial Analysis: 03"
+author: "Tzai-Hung Wen"
+date: '2025-03-10'
+output:
+  html_notebook:
+    toc: true
+    toc_depth: 6
+    toc_float: true
+---
+
+# Spatial Intersection: Point-In-Polygon
+
+```{r}
+rm(list = ls())
+
+library(sf)
+library(tmap)
+
+load("./data/Sample2.RData")
+```
+
+## 1.1 Tornado Damage Assessment 
+
+### Mapping
+```{r}
+us_bg <- tm_shape(us_states_sf) + tm_polygons("grey90")
+tornado <- tm_shape(torn_sf) + tm_dots(size = 0.04, shape = 1, fill_alpha = 0.5)
+us_border <- tm_shape(us_states_sf) + tm_borders(col = "black") + tm_layout(frame = F) 
+us_bg + tornado + us_border
+```
+### Checking CRS and data attribute
+```{r}
+st_crs(us_states_sf)
+head(torn_sf)
+summary(torn_sf)
+st_geometry(torn_sf)
+```
+
+### Attribute selection
+```{r}
+index <- us_states_sf$STATE_NAME == "Texas" | us_states_sf$STATE_NAME == "New Mexico" | 
+         us_states_sf$STATE_NAME == "Oklahoma" | us_states_sf$STATE_NAME == "Arkansas"  
+
+AoI_sf <- us_states_sf[index,]
+AoI_bg <- tm_shape(AoI_sf) + tm_polygons("grey90")
+AoI_bg 
+```
+
+### Clip
+```{r}
+torn_clip_sf <- torn_sf[AoI_sf,]
+torn_clip <- tm_shape(torn_clip_sf) + tm_dots(fill = "red", size = 0.04, fill_alpha = 0.5)
+AoI_bg + torn_clip
+
+head(torn_clip_sf)
+```
+
+### Point-In-Polygon: Using st_join()
+```{r}
+AoI_torn_sf <- st_join(torn_clip_sf, AoI_sf, join = st_within)
+head(AoI_torn_sf)
+
+AoI_torn_df <- as.data.frame(AoI_torn_sf)
+head(AoI_torn_df)
+summary(AoI_torn_df)
+```
+
+### Creating new data frame
+```{r}
+AoI_torn_df$STATE_NAME <- droplevels(AoI_torn_df$STATE_NAME) 
+newdf<- data.frame(Name = AoI_torn_df$STATE_NAME,Damage= AoI_torn_sf$DAMAGE)
+head(newdf)
+newdf$Damage <- as.integer(newdf$Damage)
+```
+
+### Crosstab analysis
+```{r}
+count<- table(newdf$Damage, newdf$Name)
+count
+
+count2<- xtabs(~ newdf$Damage + newdf$Nam )
+count2
+```
+
+## 1.2 Mapping Tornado Density 
+```{r}
+# (Counting Points in Polygons)
+
+points_sf_joined <- st_join(torn_sf, us_states_sf, join = st_within)
+head(points_sf_joined)
+
+table1 <- table(points_sf_joined$STATE_NAME)
+
+count_sf <- as.data.frame(table1)
+colnames(count_sf) <- c("STATE_NAME","Counts")
+head(count_sf)
+
+library(dplyr)
+us_states_sf<- left_join(us_states_sf, count_sf)
+head(us_states_sf)
+
+area1<-st_area(us_states_sf) # unit: foot
+
+library(units)
+area1<-set_units(area1, km^2)
+us_states_sf$AREA1 <- area1
+us_states_sf$Density <- us_states_sf$Counts / us_states_sf$AREA1
+head(us_states_sf)
+
+```
+```{r}
+library(pals) # collection of color palettes
+plot(us_states_sf["Density"], breaks = "jenks", nbreaks = 6, pal=brewer.reds(6))
+
+```
+
+# Buffer zone
+```{r}
+st_crs(places_sf)
+st_crs(places_sf)<- st_crs(blocks_sf)
+head(places_sf)
+
+block_bg <- tm_shape(blocks_sf) + tm_polygons("grey90")
+places_pts <- tm_shape(places_sf) + tm_dots(fill = "red", size = 0.5)
+
+block_bg + places_pts
+
+places_buf_sf <- st_buffer(places_sf, dist = 3000)
+summary(places_buf_sf)
+
+places_buf <- tm_shape(places_buf_sf) + tm_polygons("yellow")
+block_bg + places_buf + places_pts
+
+places_bufU_sf <- st_union(places_buf_sf)
+head(places_bufU_sf)
+
+places_bufU <- tm_shape(places_bufU_sf) + tm_polygons("yellow")
+block_bg + places_bufU + places_pts
+```
+
+# Distance Analysis
+
+## checking attribute table
+```{r}
+head(blocks_sf)
+```
+
+## using st_centroid()
+```{r}
+blocks_center_sf <- st_centroid(blocks_sf)
+blocks_center <- tm_shape(blocks_center_sf) + tm_dots(fill = "blue", size = 0.2)
+block_bg +blocks_center
+blocks_center + places_pts
+```
+
+## using st_distance()
+```{r}
+distance.matrix <- st_distance(blocks_center_sf, places_sf)
+library(units)
+distance.matrix<-set_units(distance.matrix, km)
+```
+
+## using apply()
+```{r}
+near_dist<- apply(distance.matrix, 1, mean)
+near_dist[1]
+
+xid<- which.min(near_dist)
+near_dist[xid]
+blocks_sf[xid,]
+blocks_sf$POP1990[xid]
+
+min_dist<- apply(distance.matrix, 1, min)
+sel_blocks<- min_dist < 1  # < 1 km
+sel_sf <- blocks_sf[sel_blocks,]
+sel_map <- tm_shape(sel_sf) + tm_polygons("yellow")
+block_bg + sel_map + places_pts
+```
+
+## using st_is_within_distance()
+```{r}
+d1<- set_units(1, km)
+sel_blocks = st_is_within_distance(blocks_center_sf, places_sf, dist = d1)
+class(sel_blocks)
+sel_blocks<- lengths(sel_blocks) > 0
+sel_sf <- blocks_sf[sel_blocks,]
+sel_map <- tm_shape(sel_sf) + tm_polygons("yellow")
+block_bg + sel_map + places_pts
+```
+
+## choose specific one place
+```{r}
+sel_blocks = st_is_within_distance(blocks_center_sf, places_sf[3,], dist = d1)
+sel_blocks <- lengths(sel_blocks) > 0
+sel_sf <- blocks_sf[sel_blocks,]
+sel_map <- tm_shape(sel_sf) + tm_polygons("yellow")
+block_bg + sel_map + places_pts
+
+TOTAL_POP <- sum(sel_sf$POP1990)
+TOTAL_WHITE <- sum(sel_sf$POP1990 * (sel_sf$P_WHITE/100) )
+```
+
+## accessibility analysis: using apply()
+```{r}
+eth<- as.data.frame(blocks_center_sf[,14:18])
+eth<- as.matrix(eth[,1:5])
+eth<- apply(eth, 2, function(x) (x*blocks_center_sf$POP1990))
+colnames(eth)<- c("White","Black","Native","Asian","Other")
+eth.access <- xtabs(eth~sel_blocks) 
+
+eth.access <- as.data.frame(eth.access)
+colnames(eth.access) <- c("Access","Eth5","Pop")
+
+library(ggplot2)
+ggplot(eth.access) + aes(fill=Access, y=Pop, x=Eth5) + 
+  geom_bar(position="stack", stat="identity")
+```
+

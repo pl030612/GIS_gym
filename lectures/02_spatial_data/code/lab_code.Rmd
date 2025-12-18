@@ -1,0 +1,235 @@
+---
+title: "Spatial Analysis:02"
+author: "Tzai-Hung Wen"
+date: '2025-03-03'
+output:
+  html_notebook:
+    toc: true
+    toc_depth: 6
+    toc_float: true
+---
+
+# Spatial Data Handling
+
+```{r}
+rm(list = ls()) # 清除任何現有的R物件之前執行批次工作的程式碼
+
+library(sf)
+library(tmap)
+library(pals) # collection of color palettes
+library(cartography) # classification methods
+
+#setwd("C:/Wen_Files/SA_2024")
+load("./data/Sample.RData")
+```
+
+# 0. sf format and coordinates
+```{r}
+class(blocks_sf)
+head(blocks_sf)
+```
+
+## Extracing as a new layer
+
+```{r}
+new_sf <- blocks_sf[,6]
+new2_sf <- blocks_sf[1:3,]
+```
+
+## Attribute table
+
+```{r}
+blocks_df <- as.data.frame(blocks_sf)
+class(blocks_df)
+head(blocks_df)
+```
+
+## Coordinate system
+
+```{r}
+st_crs(blocks_sf)
+```
+```{r}
+st_crs(roads_sf)
+```
+
+```{r}
+st_crs(roads_sf) <- st_crs(blocks_sf)
+st_crs(roads_sf)
+```
+### Taiwan Coordinate System
+```{r}
+TWCOUNTY <- st_read("./data/TaiwanCounty.shp", options="ENCODING=utf-8")
+st_crs(TWCOUNTY)
+```
+
+## Export/import shapefiles
+
+```{r}
+st_write(blocks_sf,"blocks.shp", delete_layer = TRUE)
+```
+
+#  1. Mapping Spatial Objects
+
+## using plot
+
+```{r}
+plot(blocks_sf)
+plot(blocks_sf["P_VACANT"], breaks = "jenks", nbreaks = 6)
+#(blocks_sf$P_VACANT ?)
+
+brewer.blues(6)
+plot(blocks_sf["P_VACANT"], breaks = "jenks", nbreaks = 6, pal=brewer.blues(6))
+```
+## using tmap package
+
+### quick tmap
+
+```{r}
+qtm(blocks_sf, fill="orange", style="natural")
+# colors()
+```
+### Qick tmap: choropleth
+```{r}
+qtm(blocks_sf, fill="P_VACANT", fill.title="Vacant %", title="My Map 1")
+```
+### Qick tmap: bubble map
+```{r}
+qtm(blocks_sf, symbols.size="P_VACANT", symbols.title.size="Vacant %", title="My Bubble Map")
+```
+### Overlay multiple plots
+```{r}
+lyr1 <- qtm(blocks_sf, fill="P_VACANT", fill.title="Vacant %", title="My Map 1")
+lyr_road <- tm_shape(roads_sf)+tm_lines(col="gray") # lines
+lyr_crimes <- tm_shape(breach_sf)+tm_dots(col="red", size= 0.1) # points
+
+# overlay multiple plots
+lyr1 + lyr_road + lyr_crimes
+```
+### Showing multiple plots/maps
+
+```{r}
+library(grid)
+# open a new plot page
+
+grid.newpage()
+# set up the layout
+pushViewport(viewport(layout=grid.layout(1,2)))
+
+# plot using the print command
+print(lyr1, vp=viewport(layout.pos.col = 1))
+print(lyr_road, vp=viewport(layout.pos.col = 2))
+
+# dev.off() # close plotting device
+
+```
+
+# 2. Attribute Query
+
+```{r}
+index <- (blocks_sf$P_VACANT > 10)
+newblocks_sf <- blocks_sf[index,]
+lyr3 <- qtm(newblocks_sf, fill="red", title="Vacant > 10%", style="natural")
+lyr_bg <- qtm(blocks_sf, fill="grey")
+lyr_bg + lyr3
+```
+
+# 3. Calculating Fields
+
+## create a field
+```{r}
+x <- st_area(blocks_sf) # unit: foot
+
+library(units)
+x2 <- set_units(x, km^2)
+blocks_sf$AREA1 <- x2
+colnames(blocks_sf)
+```
+## remove a field
+```{r}
+blocks_sf <- subset(blocks_sf, select = -c(AREA1))
+colnames(blocks_sf)
+```
+
+## calculating values
+```{r}
+x2 <- set_units(x, km^2)
+blocks_sf$AREA1 <- x2
+
+blocks_sf$POPDEN <- blocks_sf$POP1990 / blocks_sf$AREA1
+
+plot(blocks_sf["POPDEN"], breaks = "jenks", nbreaks = 6, pal= brewer.blues(6))
+qtm(blocks_sf, fill="POPDEN", fill.title="Population Density", title="Popn Map", style="natural")
+```
+# 4. Detailed Settings for Mapping
+```{r}
+breakv<- getBreaks(v = blocks_sf$P_OWNEROCC, nclass = 6, method = "jenks")
+# classification method:"fixed", "sd", "equal", "pretty", "quantile", "kmeans", 
+# "hclust", "bclust", "fisher", "jenks", "dpih", "q6", "geom", "arith", "em", "msd" 
+
+tm_shape(blocks_sf) +
+  tm_polygons("P_OWNEROCC", title = "Owner Occ", palette = "-GnBu", 
+              breaks = c(breakv), 
+              legend.hist = T) +
+  tm_scale_bar(width = 0.22) +
+  tm_compass(position = c(0.8, 0.08)) +
+  tm_layout(frame = F, title = "New Haven", 
+            title.size = 2, title.position = c(0.55, "top"), 
+            legend.hist.size = 0.5)
+```
+
+
+# 5. Statistical Plots
+
+## Histogram
+```{r}
+hist(blocks_sf$P_VACANT, breaks = 40, col = "grey", 
+     border = "red", 
+     main = "The histogram of vacant property percentages", 
+     xlab = "percentage vacant", xlim = c(0,40))
+```
+## using ggplot2: histogram
+```{r}
+library(ggplot2)
+blocks_df <- as.data.frame(blocks_sf)
+head(blocks_df)
+
+plot1<- ggplot(blocks_df) + aes(P_VACANT) +
+          geom_histogram(col = "red", fill = "grey", bins = 40) +
+          xlab("percentage vacant") +
+          labs(title = "The histogram of vacant property percentages")
+
+plot1
+```
+
+## Boxplot
+```{r}
+boxplot(blocks_sf$P_WHIT, blocks_sf$P_BLACK, names=c("White", "Black"), 
+        xlab="Race", ylab="Percentage")
+```
+
+## using ggplot2: boxplot
+```{r}
+library(reshape2)
+block_prop <- melt(blocks_df[, c("P_WHITE", "P_BLACK", "P_AMERI_ES")])
+head(block_prop)
+
+plot2 <- ggplot(block_prop) + 
+           aes(variable, value) +
+           geom_boxplot()
+
+plot2
+
+```
+## Showing map + plot
+
+```{r}
+grid.newpage()
+pushViewport(viewport(layout=grid.layout(1,2)))
+print(lyr1+lyr_crimes, vp=viewport(layout.pos.col = 1))
+print(plot2, vp=viewport(layout.pos.col = 2))
+
+#dev.off()
+
+```
+

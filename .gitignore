@@ -1,0 +1,99 @@
+# ============================
+#  🔒 SECURITY
+# ============================
+
+# Never upload your environment variables
+.env
+*.env
+
+# Private keys / tokens
+apikey.txt
+key.txt
+
+# ============================
+#  🧠 FAISS & Vector DB
+# ============================
+
+# Raw FAISS index files (optional: keep only the zipped version)
+faiss_db/
+GeoGIS_faiss_db/
+*.faiss
+*.npy
+*.index
+
+# ============================
+#  📝 Python Cache & Build
+# ============================
+
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pkl
+*.pickle
+*.db
+*.sqlite
+*.sqlite3
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Jupyter/Colab
+.ipynb_checkpoints/
+*.ipynb~
+
+# VSCode
+.vscode/
+.settings/
+
+# PyCharm
+.idea/
+
+# ============================
+#  📄 OS 自動產生的垃圾檔案
+# ============================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ============================
+#  📚 教材資料夾（可選）
+# ============================
+# 如果你不希望教材內容被 push，可以取消註解
+# lectures/
+# metadata/
+
+# ============================
+#  📦 壓縮檔與暫存
+# ============================
+
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.7z
+*.tmp
+*.log
+
+# ============================
+#  🧪 Test cache
+# ============================
+
+.pytest_cache/
+htmlcov/
+coverage.xml
+
+# ============================
+#  🌐 Streamlit Cloud
+# ============================
+
+.streamlit/secrets.toml

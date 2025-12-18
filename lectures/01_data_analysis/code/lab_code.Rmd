@@ -1,0 +1,260 @@
+---
+title: "Spatial Analysis: 01"
+author: "Tzai-Hung Wen"
+date: '2025-02-24'
+output:
+  html_notebook:
+    toc: true
+    toc_depth: 6
+    toc_float: true
+---
+
+# Hypothesis testing
+
+## 1. Comparing the means
+
+```{r}
+data <- read.csv("./data/Student.csv")
+head(data)
+
+aggregate(x = data$GPA,
+          by = list(data$Seat), 
+          FUN = mean)
+```
+
+## 2. Checking the distributions
+
+```{r}
+GPA_Back <- data[data$Seat == "Back", ]$GPA
+GPA_Front <- data[data$Seat == "Front", ]$GPA
+
+hist(GPA_Front)
+boxplot(GPA_Front, GPA_Back, names = c('Front','Back'))
+
+```
+
+## 3. t-test and inference
+
+```{r}
+t.test(GPA_Back, GPA_Front) # two tailed test
+```
+
+```{r}
+t.test(GPA_Back, GPA_Front, alternative="less") # one tailed test
+```
+
+```{r}
+t.test(GPA_Front, alternative="greater", mu = 3.2) # one tailed test
+```
+
+<hr>
+
+# Probability distributions
+
+## 1. Binominal distribution
+
+例題：某網購公司規定消費者在一週內(7 days)對於購買商品可全額退款。 根據過去記錄，平均每週會有2件退貨商品。 請繪製該公司在1個月內(30 days)退貨商品數量的機率分布圖(probability distribution function, PDF)。估計一個月的退貨商品數超過10件的機率。
+
+### random number generation
+
+```{r}
+
+p = 2/7
+n = 30
+
+GenNumbers <- function(){
+  x <- sample(1:7, 1, replace=T)
+  if (x <= 2) L = 1 else L = 0 
+
+  for (i in 1:29) {
+    x <- sample(1:7, 1, replace=T)
+    if (x <= 2) event = 1 else event = 0 
+    L = c(L, event)
+    sum_L = sum(L)
+  }
+  
+  return(sum_L)
+}
+
+```
+
+### generating distributions
+
+```{r}
+vector_a <- vector()
+
+for (i in 1:1000){
+  a <- GenNumbers()
+  vector_a <- c(vector_a, a)
+}
+
+hist(vector_a, freq = F)
+
+```
+
+### calculating probability
+
+```{r}
+count_GT10 <- length(vector_a[vector_a>10])
+Prob_GT10 <- count_GT10 / 1000
+```
+
+### using built-in functions
+
+dbinom(x, size, prob): prob density of x
+
+pbinom(x, size, prob): p(\<= x)
+
+qbinom(p, size, prob): quantile function
+
+rbinom(n, size, prob): generates random deviates
+
+```{r}
+# 一個月的退貨商品數超過10件的機率
+p = pbinom(10, size=30, prob= 2/7) # prob(X <=10)
+(pGT10 <- 1 - p)
+
+# 1個月內(30 days)退貨商品數量的機率分布圖(PDF)
+xlab <- vector()
+prob <- vector()
+for (i in 1:20){
+  xlab[i] <- toString(i)
+  prob[i] <- dbinom(i, size=30, prob= 2/7)
+}
+
+barplot(prob, names.arg = xlab, xlab="退貨商品數", ylab="機率" )
+
+```
+
+## 2. Normal distribution
+
+```{r}
+dnorm(35, mean=30, sd=5) # DF, P(x=35)
+pnorm(35, mean=30, sd=5) # CDF, P(x<=35)
+qnorm(0.05, mean=100, sd=15) # given prob. --> x
+rnorm(10, mean=100, sd=15)   # generates random deviates x
+
+```
+
+<hr>
+
+# Charts and graphics
+
+```{r}
+library(ggplot2)
+
+housing <- read.csv("./data/landdata.csv")
+head(housing)
+
+```
+
+## 1. Histogram
+
+```{r}
+hist(housing$Home.Value)
+ggplot(housing) + aes(x = Home.Value) + geom_histogram()
+
+```
+
+## 2. Scatterplot
+
+```{r}
+hp2001Q1 <- subset(housing, Date == 2001.25) 
+ggplot(hp2001Q1) + aes(y = Structure.Cost, x = Land.Value) + geom_point()
+ggplot(hp2001Q1) + aes(y = Structure.Cost, x = log(Land.Value)) + geom_point()
+
+# more complex
+seldata <-subset(hp2001Q1, region %in% c("South", "West"))
+# seldata2 <-subset(housing, Date == 2001.25 & region %in% c("South", "West"))
+ggplot(seldata) + aes(x=Structure.Cost, y=Land.Value, color=region) + geom_point()
+```
+
+```{r}
+p1 <- ggplot(hp2001Q1) + aes(x = log(Land.Value), y = Structure.Cost)
+
+p1 + geom_point()
+
+p2 <- p1 + geom_point(aes(color = Home.Value)) # setting dot color or size 
+p2
+
+p2 + geom_smooth()
+
+```
+
+## 3. Bar chart
+
+```{r}
+ggplot(housing) + aes(x=region) + geom_bar()
+
+# Stacked Bar Chart
+ggplot(housing) + aes(x=region, fill= as.factor(Qrtr)) + geom_bar() + 
+  labs(title = "Stacked Bar Chart", x = "REGION", y = "Counts")
+
+```
+
+```{r}
+# ?aggregate
+# aggregate(x, by, FUN...)
+housing.sum <- aggregate(housing["Home.Value"], housing["State"], FUN=mean)
+head(housing.sum)
+
+# ggplot(housing.sum) + aes(x=State, y=Home.Value) + geom_bar() # WRONG
+ggplot(housing.sum) + aes(x=State, y=Home.Value) + geom_bar(stat='identity')
+```
+
+## 4. Pie chart
+
+```{r}
+housing2.sum <- aggregate(housing["Home.Value"], housing["region"], FUN=length) 
+ggplot(housing2.sum) + aes(x=region, y=Home.Value) + geom_bar(stat='identity') + labs(y="Counts")
+ggplot(housing2.sum) + aes(x="", y=Home.Value, fill = factor(region)) + 
+  geom_bar(stat='identity',width=1) + coord_polar(theta = "y", start=0)
+
+```
+
+## 5. Box plot
+
+```{r}
+ggplot(housing) + aes(x = region, y= Home.Value) + geom_boxplot(fill = "green")+ 
+  scale_y_continuous("hoem value", breaks= seq(0,800000, by=100000))
+
+```
+
+## 6. Heat map
+
+```{r}
+
+ggplot(housing) + aes(x= Year, y= Qrtr) + geom_raster(aes(fill = Home.Value)) + 
+  scale_fill_continuous(name="Value", breaks = c(200000, 500000, 800000), 
+                        labels = c("200", "500", "800"), low='white', high='red')
+
+```
+
+## 7. Combined plots
+
+```{r}
+## Combine Scatter plot + marginal histogram/box plot
+## install.packages("ggExtra") 
+library(ggExtra)
+p1 <- ggplot(hp2001Q1) + aes(x = log(Land.Value), y = Structure.Cost)
+p1 + geom_point(size = 2, color="red")
+px<- p1 + geom_point(size = 2, color="red")
+ggMarginal(px, type = "histogram", fill="red")
+ggMarginal(px, type = "boxplot", fill="gray")
+```
+
+<hr>
+
+# Assignments
+
+## 1.機率分布
+
+(a).某一都市有10萬人口，假設流行一種新興疾病，每人每年被感染機率 p = 0.01， 沒有免疫與任何預防措施。請繪製該市的每年感染人數頻率分布圖。
+
+(b).該市衛生當局定義若某年的感染人數超過960人，該年則視為疫情爆發。 市長的任期是4年，若任期內爆發疫情事件，就必須辭職下台。 請評估市長在任期四年內，因疫情爆發而辭職的機率?
+
+## 2. 繪製統計圖表與統計檢定(Student.csv)
+
+(a). 比較不同性別(Gender)，其讀書時間(StudyHrs)是否有顯著差異？
+
+(b). 比較不同性別(Gender)，對於虔誠信仰宗教的比例(ReligImp)是否有顯著差異？

@@ -1,0 +1,242 @@
+---
+title: "Spatial Analysis: 05"
+author: "Tzai-Hung Wen"
+date: '2025-03-31'
+output:
+  html_notebook:
+    toc: true
+    toc_depth: 6
+    toc_float: true
+---
+# <h3> **Contents** </h3>
+
+<h5>
+*Using R package:aspace*
+
+**Measures of Centrality** <br>
+1.(Weighted) Mean center  <br>
+2.Median center <br>
+3.Central feature <br>
+
+**Measures of Dispersion** <br>
+1.Standard Distance <br>
+2.Weighted Std. Distance <br>
+3.Standard Deviational Ellipse <br> 
+
+</h5>
+ 
+# <h3> **0. Laoding Data** </h3>
+
+```{r, message = FALSE}
+rm(list = ls())
+library(sf)
+library(tmap)
+library(aspace) #install.packages("aspace")
+library(tidyverse)
+
+schools_sf = st_read("./data/Schools.shp",options="ENCODING=BIG5")
+head(schools_sf)
+schools_lyr <- tm_shape(schools_sf)+tm_dots(col="red", size= 0.1) + tm_layout(frame = F)
+
+```
+
+# <h3> **1. Data Preparation** </h3>
+<h5> (creating required fields)  </h5>
+```{r}
+
+# Generating no. of student in each school
+schools_sf$Students<-as.integer(runif(424,1000,10000))
+
+# Generating school type: cluster vs. isolation
+for (i in 1: 424) {
+  
+  if (schools_sf$NEAR_DIST[i]< 500) {
+    schools_sf$type[i]<- "Cluster"
+  } else schools_sf$type[i]<- "Isolation"
+  
+}
+
+index<- schools_sf$type == "Cluster"
+school_cluster <- schools_sf[index,]
+
+length(school_cluster)
+schools.c_lyr <- tm_shape(school_cluster)+tm_dots(col="red", size= 0.1) + tm_layout(frame = F)
+
+School_df <- data.frame(x=schools_sf$X_coor, y=schools_sf$Y_coor, 
+                       type=schools_sf$type, students=schools_sf$Students)
+```
+
+# <h3> **2. Mean Center** </h3>
+```{r}
+# calc_mnc() Mean Centre Calculator
+Mean.Center <- calc_mnc(id=1, weighted=FALSE, weights=NULL, points=School_df[,1:2])
+W.Mean.Center <- calc_mnc(id=1, weighted=TRUE, weights=School_df$students, points=School_df[,1:2])
+
+Mean.xcoor <- Mean.Center$LOCATIONS[2]
+Mean.ycoor <- Mean.Center$LOCATIONS[3]
+
+Mean.Center_sfg = st_point(c(Mean.xcoor, Mean.ycoor))
+Mean.Center_sfc = st_sfc(Mean.Center_sfg)
+Mean.Center_sf <- st_sf(Mean.Center_sfc)
+head(Mean.Center_sf) 
+
+# using pipe coding style
+Mean.Center.Coor <- c(Mean.xcoor, Mean.ycoor)
+Mean.Center_sf1 <- Mean.Center.Coor %>% st_point %>% st_sfc %>% st_sf 
+class(Mean.Center_sf1)
+
+st_crs(Mean.Center_sf1) <- st_crs(schools_sf)
+Mean.Center_lyr <- tm_shape(Mean.Center_sf1)+tm_dots(fill="blue", size=1)
+
+# Weighted Mean Center
+
+W.Mean.xcoor <- W.Mean.Center$LOCATIONS[2]
+W.Mean.ycoor <- W.Mean.Center$LOCATIONS[3]
+
+W.Mean.Center.Coor <- c(W.Mean.xcoor, W.Mean.ycoor)
+W.Mean.Center_sf <- W.Mean.Center.Coor %>% st_point %>% st_sfc %>% st_sf 
+st_crs(W.Mean.Center_sf) <- st_crs(schools_sf)
+W.Mean.Center_lyr <- tm_shape(W.Mean.Center_sf)+tm_dots(fill="green", size= 0.5)
+
+schools_lyr + Mean.Center_lyr + W.Mean.Center_lyr
+```
+
+
+# <h3> **3. Median Center** </h3>
+```{r}
+# calc_mdc(): Median Centre Calculator
+Median.Center <- calc_mdc(id=1,points=School_df[,1:2])
+
+Median.xcoor <- Median.Center$LOCATIONS[2]
+Median.ycoor <- Median.Center$LOCATIONS[3]
+
+Median.Center.Coor <- c(Median.xcoor, Median.ycoor)
+Median.Center_sf <- Median.Center.Coor %>% st_point %>% st_sfc %>% st_sf 
+st_crs(Median.Center_sf) <- st_crs(schools_sf)
+Median.Center_lyr <- tm_shape(Median.Center_sf)+tm_dots(fill = "green", size= 0.5)
+
+### Compare Mean vs. Median
+schools_lyr + Mean.Center_lyr + Median.Center_lyr
+```
+
+
+# <h3> **4. SDD: Standard Distance** </h3>
+<h5>*using plot_sdd*</h5>
+```{r}
+# calc_sdd(): Calculate the Standard Distance Deviation (Standard Distance)
+school.SDD <- calc_sdd(id=1, points=School_df[,1:2])
+plot_sdd(school.SDD, centre.col="red")
+
+```
+<h5>*using tmap*</h5>
+```{r}
+center.x<- school.SDD$ATTRIBUTES$CENTRE.x
+center.y<- school.SDD$ATTRIBUTES$CENTRE.y
+
+center.coor <- c(center.x, center.y)
+center_sf<- center.coor %>% st_point %>% st_sfc %>% st_sf 
+
+st_crs(center_sf) <-  st_crs(schools_sf)
+
+rad<- school.SDD$ATTRIBUTES$SDD.radius
+SD_sf<- st_buffer(center_sf, rad)
+SD_lyr <- tm_shape(SD_sf) + tm_borders(col = "blue")+tm_layout(frame = F)
+Center_lyr <-  tm_shape(center_sf) + tm_dots(fill="blue", size= 0.5)
+schools_lyr+ Center_lyr+ SD_lyr 
+
+# weighted SDD
+school.SDD2 <- calc_sdd(id=1, points = School_df[,1:2], 
+                       weighted = TRUE, weights=School_df$students)
+```
+
+
+
+# <h3> **5. SDE:Standard Deviational Ellipse** </h3>
+
+<h5>*using plot_sde*</h5>
+```{r}
+## SDE Center: sdeatt
+# calc_sde() Calculate the Standard Deviation Ellipse
+school.SDE<- calc_sde(id=1, points=School_df[,1:2])
+plot_sde(school.SDE)
+```
+
+<h5>*using tmap*</h5>
+
+```{r}
+## Creating SDE center
+
+SDE.center.x<- school.SDE$ATTRIBUTES$CENTRE.x
+SDE.center.y<- school.SDE$ATTRIBUTES$CENTRE.y
+SDE.center.coor <- c(SDE.center.x, SDE.center.y)
+SDE.center_sf <- SDE.center.coor %>% st_point %>% st_sfc %>% st_sf 
+st_crs(SDE.center_sf) <-  st_crs(schools_sf)
+SDE.center_lyr <- tm_shape(SDE.center_sf) + tm_dots(fill = "blue", size=0.5)+tm_layout(frame = F)
+
+## Creating SDE Polygon
+
+xcoor <- school.SDE$LOCATIONS$x
+ycoor <- school.SDE$LOCATIONS$y
+xy = data.frame(x=xcoor, y=ycoor)
+xys = st_as_sf(xy, coords=c("x","y"))
+st_crs(xys)<-st_crs(schools_sf)
+
+SDE_sfc <- st_cast(st_combine(xys),"POLYGON")
+SDE_sf <- st_sf(SDE_sfc)
+SDE_lyr <- tm_shape(SDE_sf) + tm_borders(col = "blue") +tm_layout(frame = F)
+
+schools_lyr + SDE.center_lyr + SDE_lyr
+```
+
+# <h3> **6. Central Feature** </h3>
+```{r}
+school.CF <- calc_cf(id=1, points=School_df[,1:2])
+
+CF.x<- school.CF$ATTRIBUTES$CF.x
+CF.y<- school.CF$ATTRIBUTES$CF.y
+CF.coor <- c(CF.x, CF.y)
+CF_sf <- CF.coor %>% st_point %>% st_sfc %>% st_sf 
+st_crs(CF_sf) <-  st_crs(schools_sf)
+CF_lyr <- tm_shape(CF_sf) + tm_dots(fill = "blue", size= 0.5) +tm_layout(frame = F)
+schools_lyr + CF_lyr
+```
+
+
+# <h3> **7. Mean Centers by Grouping Attribubtes** </h3>
+```{r}
+type <- schools_sf$type
+newid <- unique(type)
+
+schools_lyr2 <- tm_shape(schools_sf) + 
+                tm_dots(col="type", palette=c(Cluster='red', Isolation='orange'), size= 0.3) +
+                tm_layout(frame = F)
+
+schools_lyr2
+
+
+xx<-vector(); yy<-vector(); ctype<-vector()
+
+for (i in 1:2){
+  index<-(type == newid[i])
+  newschool<-schools_sf[index,]
+  xcoor<-newschool$X_coor
+  ycoor<-newschool$Y_coor
+  newschool.mc <- calc_mnc(id=1, points=cbind(xcoor, ycoor))
+  
+  xx[i]<-newschool.mc$LOCATIONS[2]
+  yy[i]<-newschool.mc$LOCATIONS[3]
+  ctype[i]<-newid[i]
+}
+
+newcenterxy <- data.frame(xx,yy, ctype)
+New_sf <- st_as_sf(newcenterxy , coords=c("xx","yy"))
+st_crs(New_sf) <-  st_crs(schools_sf)
+
+New_lyr <- tm_shape(New_sf) + 
+           tm_dots(col="ctype", palette=c(Cluster='blue', Isolation='cyan'), size= 0.5) +
+           tm_layout(frame = F) 
+
+
+schools_lyr2 + New_lyr 
+```
+
