@@ -245,11 +245,7 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
     ]
     selected_style = random.choice(styles)
     
-    # ============ 🔥 重點修改區域 ============
-    # 根據題型動態調整 Prompt，確保簡答題不會用到檔案
-    
     if qtype == "實作題":
-        # 實作題：必須提供檔案
         real_files = get_unit_files(unit_id) if unit_id else []
         file_names_str = ", ".join([f['name'] for f in real_files]) if real_files else "無 (請自行假設虛擬資料)"
         
@@ -260,24 +256,25 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
         target_file_instruction = "AI選擇的檔案名稱(必須完全符合列表)"
     
     else:
-        # 簡答題：強制不使用檔案
         system_instruction = """
         這是一道「觀念簡答題」。
         ❌ 請勿要求學生操作任何特定檔案。
         ❌ 請勿提及特定的檔名 (如 .shp)。
         ✅ 請專注於測試學生對該單元空間分析概念的理解。
         """
-        target_file_instruction = "None" # 強制回傳 None
+        target_file_instruction = "None"
 
+    # [UPDATED] 修改 System Prompt，加入 "hint" 欄位
     system_prompt = f"""
     你是頂尖的空間分析助教。請使用 GPT-4o 的強大邏輯來出題。
     目前的題型任務是：【{qtype}】。難度：{level}。
     
     {system_instruction}
     
-    請以 JSON 格式回傳：
+    請以 JSON 格式回傳，務必包含 hint (提示) 欄位：
     {{
-        "question_content": "題目內容(Markdown)...",
+        "question_content": "題目內容(Markdown)，請勿在題目中直接寫出提示或答案...",
+        "hint": "給學生的引導提示(Markdown)，例如『考慮使用 st_buffer 函數...』，但不要直接給答案。",
         "target_filename": "{target_file_instruction}",
         "style_used": "{selected_style}"
     }}
@@ -297,7 +294,7 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
         )
         return json.loads(response.choices[0].message.content)
     except Exception as e:
-        return {"question_content": f"出題錯誤: {e}", "target_filename": None, "style_used": "Error"}
+        return {"question_content": f"出題錯誤: {e}", "target_filename": None, "style_used": "Error", "hint": ""}
 
 
 def grade_submission(question_text: str, student_answer: str, unit_id: int | None) -> dict:
@@ -473,12 +470,18 @@ with tabs[0]:
     if "pq_data" in st.session_state:
         q_data = st.session_state["pq_data"]
         q_content = q_data.get("question_content", "")
+        q_hint = q_data.get("hint", "") # 抓取 hint
         target_file = q_data.get("target_filename")
         style = q_data.get("style_used", "")
 
         st.markdown(f"### 📌 題目 [{st.session_state['pq_meta']}]")
         st.caption(f"風格：{style}")
         st.info(q_content)
+
+        # [UPDATED] 提示區塊 - 預設摺疊
+        if q_hint:
+            with st.expander("💡 需要一點提示嗎？ (Click for Hint)"):
+                st.markdown(q_hint)
 
         if target_file and target_file != "None" and target_file is not None:
             files = get_unit_files(unit_val) if unit_val else []
