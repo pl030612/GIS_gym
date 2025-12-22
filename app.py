@@ -255,13 +255,43 @@ def _retrieve_context(query: str, unit_id: int | None, k: int = 8) -> str:
 
 
 # =====================================================
-# 7) AI 功能：GPT-4o
+# 7) AI 功能：GPT-4o (含單元技能對照表)
 # =====================================================
 def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | None) -> dict:
     q_str = f"Unit {unit_id}" if unit_id else ""
     seed = f"{q_str} 空間分析 {qtype} {level}"
     context = _retrieve_context(seed, unit_id=unit_id)
     
+    # 🔥 [關鍵修改] 單元技能對照表 (Unit Skill Map)
+    # 根據單元進度，限制 AI 只能考這些範圍，增加題目多元性
+    UNIT_SKILLS = {
+        # 基礎階段
+        1: ["資料讀取與檢視 (st_read, glimpse)", "基礎繪圖 (plot, tmap)", "屬性篩選 (filter, select)"],
+        2: ["座標系統轉換 (st_transform)", "CRS 定義與檢查 (st_crs)", "屬性資料處理 (mutate, group_by)"],
+        3: ["幾何計算 (st_area, st_length)", "空間資料輸出 (st_write)", "向量資料裁切 (st_crop)"],
+        
+        # 中階操作
+        4: ["緩衝區分析 (st_buffer)", "幾何中心點 (st_centroid)", "邊界方框 (st_bbox)"],
+        5: ["疊圖分析/交集 (st_intersection)", "聯集與差異 (st_union, st_difference)", "空間篩選 (st_filter)"],
+        6: ["空間連結 (st_join)", "屬性合併 (left_join)", "點位計數 (Point in Polygon)"],
+        
+        # 進階分析
+        7: ["距離矩陣計算 (st_distance)", "最近鄰分析 (Nearest Neighbor)", "環域分析"],
+        8: ["密度分析 (Kernel Density)", "熱區圖繪製", "網格分析 (Grid Analysis)"],
+        9: ["空間自相關 (Moran's I)", "熱點分析 (Hot Spot Analysis)", "空間權重矩陣"],
+        10: ["進階地圖視覺化 (Interactive Maps)", "三維空間分析", "綜合應用"]
+    }
+
+    # [邏輯] 決定本次考點
+    if unit_id and unit_id in UNIT_SKILLS:
+        # 如果選了特定單元，從該單元的技能中隨機選一個
+        current_skills = UNIT_SKILLS[unit_id]
+        selected_method = random.choice(current_skills)
+    else:
+        # 如果選「全部」或找不到單元，就從所有技能中隨機選
+        all_skills = [item for sublist in UNIT_SKILLS.values() for item in sublist]
+        selected_method = random.choice(all_skills)
+
     styles = [
         "**角色扮演**：設定學生為資料分析師，解決特定業主問題。",
         "**除錯挑戰**：描述一個分析流程，請學生用資料實作並驗證。",
@@ -300,6 +330,9 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
     你是頂尖的空間分析助教。請使用 GPT-4o 的強大邏輯來出題。
     目前的題型任務是：【{qtype}】。難度：{level}。
     
+    🔥 **本次題目核心考點：{selected_method}**
+    (請務必圍繞上述核心考點來設計題目，不要偏題)
+
     {system_instruction}
     
     請以 JSON 格式回傳，務必包含 hint (提示) 欄位：
