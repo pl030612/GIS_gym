@@ -18,15 +18,24 @@ from langchain_community.vectorstores import FAISS
 
 
 # =====================================================
-# 0) Streamlit 基本設定
+# 0) 參數設定 (在此修改截止日期)
 # =====================================================
-st.set_page_config(page_title="GIS Gym - 空間分析 AI 助教", page_icon="🧪", layout="wide")
+# 您可以在這裡統一設定所有作業的預設截止日期
+DEFAULT_DEADLINE = "2025-06-30"  
+# 或者若要維持自動往後推 14 天，可保留下方邏輯，但建議用固定日期較好管理
+
+
+# =====================================================
+# 1) Streamlit 基本設定
+# =====================================================
+st.set_page_config(page_title="GIS Gym", page_icon="🧪", layout="wide")
 st.title("🧪 GIS Gym｜空間分析 AI 助教平台")
-st.caption("自主練習 (Real Data) ⮕ 單元作業 (Assignments) ⮕ 助教分析 (AI Consultant)")
+# 簡化副標題，移除箭頭圖示
+st.caption("自主練習 (Real Data) | 單元作業 (Assignments) | 助教分析 (AI Consultant)")
 
 
 # =====================================================
-# 1) OpenAI API Key & Client
+# 2) OpenAI API Key & Client
 # =====================================================
 def get_openai_key():
     if "OPENAI_API_KEY" in st.secrets:
@@ -42,7 +51,7 @@ client = OpenAI(api_key=OPENAI_API_KEY)
 
 
 # =====================================================
-# 2) 路徑設定
+# 3) 路徑設定
 # =====================================================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 LECTURES_DIR = os.path.join(BASE_DIR, "lectures")
@@ -51,7 +60,7 @@ DB_PATH = os.path.join(BASE_DIR, "learning_history.sqlite")
 
 
 # =====================================================
-# 3) SQLite 初始化
+# 4) SQLite 初始化
 # =====================================================
 def init_db():
     conn = sqlite3.connect(DB_PATH)
@@ -105,7 +114,7 @@ init_db()
 
 
 # =====================================================
-# 4) 資料載入：Metadata、真實檔案、Word作業
+# 5) 資料載入：Metadata、真實檔案、Word作業
 # =====================================================
 @st.cache_data(show_spinner=False)
 def load_all_metadata():
@@ -186,9 +195,9 @@ def scan_assignments_from_files():
                 content = docx2txt.process(target_file)
                 assignments_db[unit_id] = {
                     "id": 1000 + unit_id,
-                    "title": f"Unit {unit_id} 作業：{os.path.basename(target_file)}",
+                    "title": f"Unit {unit_id} 作業", # 簡化標題，不顯示檔名
                     "description": content if content.strip() else "（檔案內容為空）",
-                    "deadline": (datetime.now() + timedelta(days=14)).strftime("%Y-%m-%d")
+                    "deadline": DEFAULT_DEADLINE # 使用全域設定的截止日期
                 }
             except Exception as e:
                 print(f"Error reading docx {target_file}: {e}")
@@ -199,7 +208,7 @@ ASSIGNMENTS_DB = scan_assignments_from_files()
 
 
 # =====================================================
-# 5) FAISS 與 RAG 核心
+# 6) FAISS 與 RAG 核心
 # =====================================================
 def ensure_vectorstore_loaded():
     if "vectorstore" in st.session_state and st.session_state["vectorstore"] is not None:
@@ -229,7 +238,7 @@ def _retrieve_context(query: str, unit_id: int | None, k: int = 8) -> str:
 
 
 # =====================================================
-# 6) AI 功能：GPT-4o (修正版 Prompt)
+# 7) AI 功能：GPT-4o (修正版 Prompt)
 # =====================================================
 def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | None) -> dict:
     q_str = f"Unit {unit_id}" if unit_id else ""
@@ -243,7 +252,6 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
     ]
     selected_style = random.choice(styles)
     
-    # 核心修改：R 語言限制 Prompt
     r_constraint = """
     ⚠️ 嚴格限制：
     1. 實作內容必須限定使用 **R 語言** (例如使用 sf, terra, tmap, tidyverse 等套件)。
@@ -364,7 +372,7 @@ def generate_weakness_report(unit_id: int):
 
 
 # =====================================================
-# 7) DB Log Functions & Readers
+# 8) DB Log Functions & Readers
 # =====================================================
 def log_practice(sid, uid, q, fb):
     conn = sqlite3.connect(DB_PATH)
@@ -410,7 +418,6 @@ def read_history_join_bonus() -> pd.DataFrame:
     return df
 
 def read_submissions_all() -> pd.DataFrame:
-    """助教後台：讀取所有作業繳交紀錄"""
     conn = sqlite3.connect(DB_PATH)
     df = pd.read_sql("SELECT * FROM submissions ORDER BY id DESC", conn)
     conn.close()
@@ -431,7 +438,7 @@ def upsert_bonus(history_id, bonus, note):
 
 
 # =====================================================
-# 8) 助教權限與 UI
+# 9) 助教權限與 UI
 # =====================================================
 with st.sidebar:
     st.header("👤 使用者設定")
@@ -457,7 +464,7 @@ with st.sidebar:
             st.session_state["is_ta"] = False
             st.rerun()
 
-# Tabs
+# Tabs: 僅保留導航用的圖示，其他地方簡化
 tabs_list = ["🏋️ 自主練習區", "📝 單元作業區"]
 if st.session_state["is_ta"]: tabs_list.append("📊 助教後台")
 tabs = st.tabs(tabs_list)
@@ -466,7 +473,7 @@ tabs = st.tabs(tabs_list)
 # Tab 1: 自主練習
 # -----------------------------------------------------
 with tabs[0]:
-    st.subheader("🏋️ 空間分析自主練習")
+    st.subheader("空間分析自主練習 (含實體資料)") # 移除 emoji
     with st.container(border=True):
         c1, c2, c3, c4 = st.columns([1.5, 1, 1, 1])
         unit_str = c1.selectbox("選擇單元", ["全部"] + unit_options, key="p_unit")
@@ -474,7 +481,7 @@ with tabs[0]:
         lvl = c2.selectbox("難度", ["入門", "進階"], key="p_lvl")
         qty = c3.selectbox("題型", ["簡答題", "實作題"], key="p_qty")
         
-        if c4.button("產生題目", type="primary", use_container_width=True):
+        if c4.button("GPT-4o 出題", type="primary", use_container_width=True): # 簡化按鈕文字
             with st.spinner("AI 正在出題..."):
                 q_data = generate_practice_question_real_data(lvl, qty, unit_val)
                 st.session_state["pq_data"] = q_data
@@ -487,12 +494,12 @@ with tabs[0]:
         target_file = q_data.get("target_filename")
         style = q_data.get("style_used", "")
 
-        st.markdown(f"### 📌 題目 [{st.session_state['pq_meta']}]")
+        st.markdown(f"### 題目 [{st.session_state['pq_meta']}]") # 移除 📌
         st.caption(f"風格：{style}")
         st.info(q_content)
 
         if q_hint:
-            with st.expander("需要一點提示嗎？"):
+            with st.expander("💡 提示 (Hint)"):
                 st.markdown(q_hint)
 
         if target_file and target_file != "None" and target_file is not None:
@@ -515,10 +522,10 @@ with tabs[0]:
                 with st.expander("查看完整評語", expanded=True): st.json(fb)
 
 # -----------------------------------------------------
-# Tab 2: 單元作業 (含圖資下載)
+# Tab 2: 單元作業
 # -----------------------------------------------------
 with tabs[1]:
-    st.subheader("📝 單元作業繳交")
+    st.subheader("單元作業繳交") # 移除 emoji
     
     if not ASSIGNMENTS_DB:
         st.info("📂 目前沒有掃描到任何作業檔案 (homework/assignment*.docx)。")
@@ -527,12 +534,13 @@ with tabs[1]:
         assignment = ASSIGNMENTS_DB.get(target_unit)
         
         if assignment:
-            st.markdown(f"### {assignment['title']}")
-            st.caption(f" 截止期限: {assignment['deadline']}")
-            with st.expander(" 作業說明 ", expanded=True):
-                st.write(assignment['description'])
+            # 這裡不顯示標題，直接顯示說明
+            st.markdown("### 作業說明") 
+            st.caption(f"📅 截止期限: {assignment['deadline']}")
             
-            # [NEW] 相關圖資下載區
+            # 直接顯示內容，不再摺疊
+            st.markdown(assignment['description'])
+            
             st.markdown("#### 📂 相關圖資下載")
             real_files = get_unit_files(target_unit)
             if real_files:
@@ -566,15 +574,15 @@ with tabs[1]:
                         st.rerun()
 
 # -----------------------------------------------------
-# Tab 3: 助教後台 (新增作業檢視與CSV下載)
+# Tab 3: 助教後台
 # -----------------------------------------------------
 if st.session_state["is_ta"] and len(tabs) > 2:
     with tabs[2]:
-        st.subheader("1. 助教管理後台")
+        st.subheader("助教管理後台") # 移除 emoji
         
         # 1. AI 報告
         with st.container(border=True):
-            st.markdown("### 🤖 AI 教學顧問報告")
+            st.markdown("### AI 教學顧問報告") # 移除 emoji
             ana_unit = st.selectbox("分析單元", unit_options, key="ana_unit")
             if st.button("生成分析報告"):
                 if ana_unit:
@@ -584,10 +592,9 @@ if st.session_state["is_ta"] and len(tabs) > 2:
         st.markdown("---")
         
         # 2. 練習紀錄 (Practice)
-        st.markdown("### 2. 自主練習紀錄 (Practice History)")
+        st.markdown("### 自主練習紀錄 (Practice)") # 移除 emoji
         df = read_history_join_bonus()
         if not df.empty:
-            # CSV Download Button
             csv = df.to_csv(index=False).encode('utf-8-sig')
             st.download_button("📥 下載練習紀錄 (.csv)", csv, "practice_history.csv", "text/csv")
             
@@ -611,11 +618,10 @@ if st.session_state["is_ta"] and len(tabs) > 2:
 
         st.markdown("---")
 
-        # 3. [NEW] 作業繳交紀錄 (Assignment Submissions)
-        st.markdown("### 3. 作業繳交檢視 (Assignment Submissions)")
+        # 3. 作業繳交紀錄 (Assignment Submissions)
+        st.markdown("### 作業繳交檢視 (Submissions)") # 移除 emoji
         df_sub = read_submissions_all()
         if not df_sub.empty:
-            # CSV Download Button
             csv_sub = df_sub.to_csv(index=False).encode('utf-8-sig')
             st.download_button("📥 下載作業紀錄 (.csv)", csv_sub, "assignment_submissions.csv", "text/csv")
 
