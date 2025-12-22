@@ -20,8 +20,6 @@ from langchain_community.vectorstores import FAISS
 # =====================================================
 # 0) 參數設定 (在此設定各單元截止日期)
 # =====================================================
-# 您可以在這裡 "個別" 設定每個單元的截止日期
-# 格式： { 單元號碼: "YYYY-MM-DD" }
 UNIT_DEADLINES = {
     1: "2025-09-30",
     2: "2025-10-07",
@@ -35,7 +33,6 @@ UNIT_DEADLINES = {
     10: "2025-12-02"
 }
 
-# 若上述字典沒設定到的單元，則使用此預設日期
 DEFAULT_DEADLINE = "2025-12-31"
 
 
@@ -482,7 +479,7 @@ with st.sidebar:
             st.rerun()
 
 # Tabs
-tabs_list = ["自主練習", "單元作業"] # 簡化 Tab 名稱
+tabs_list = ["自主練習", "單元作業"]
 if st.session_state["is_ta"]: tabs_list.append("助教後台")
 tabs = st.tabs(tabs_list)
 
@@ -490,9 +487,7 @@ tabs = st.tabs(tabs_list)
 # Tab 1: 自主練習
 # -----------------------------------------------------
 with tabs[0]:
-    # 移除上方大標題
     with st.container(border=True):
-        # [UPDATED] 加上 vertical_alignment="bottom" 讓按鈕對齊底部
         c1, c2, c3, c4 = st.columns([1.5, 1, 1, 1], vertical_alignment="bottom")
         unit_str = c1.selectbox("選擇單元", ["全部"] + unit_options, key="p_unit")
         unit_val = int(unit_str) if unit_str != "全部" else None
@@ -504,20 +499,23 @@ with tabs[0]:
                 q_data = generate_practice_question_real_data(lvl, qty, unit_val)
                 st.session_state["pq_data"] = q_data
                 st.session_state["pq_meta"] = f"{unit_str} | {lvl} | {qty}"
+                st.session_state["p_ans"] = "" 
+                st.session_state["q_counter"] = st.session_state.get("q_counter", 0) + 1
     
     if "pq_data" in st.session_state:
         q_data = st.session_state["pq_data"]
         q_content = q_data.get("question_content", "")
         q_hint = q_data.get("hint", "")
         target_file = q_data.get("target_filename")
-        style = q_data.get("style_used", "")
+        # style = q_data.get("style_used", "") # [Deleted] 移除風格變數
 
         st.markdown(f"### 題目 [{st.session_state['pq_meta']}]") 
-        st.caption(f"風格：{style}")
+        # st.caption(f"風格：{style}") # [Deleted] 移除風格顯示
         st.info(q_content)
 
         if q_hint:
-            with st.expander("💡 提示 (Hint)"):
+            suffix = "\u200b" * st.session_state.get("q_counter", 0)
+            with st.expander(f"💡 提示 (Hint){suffix}", expanded=False):
                 st.markdown(q_hint)
 
         if target_file and target_file != "None" and target_file is not None:
@@ -543,8 +541,6 @@ with tabs[0]:
 # Tab 2: 單元作業
 # -----------------------------------------------------
 with tabs[1]:
-    # 移除上方大標題
-    
     if not ASSIGNMENTS_DB:
         st.info("📂 目前沒有掃描到任何作業檔案 (homework/assignment*.docx)。")
     else:
@@ -594,8 +590,6 @@ with tabs[1]:
 # -----------------------------------------------------
 if st.session_state["is_ta"] and len(tabs) > 2:
     with tabs[2]:
-        # 移除上方大標題
-        
         # 1. AI 報告
         with st.container(border=True):
             st.markdown("### AI 教學顧問報告") 
