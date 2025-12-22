@@ -18,11 +18,25 @@ from langchain_community.vectorstores import FAISS
 
 
 # =====================================================
-# 0) 參數設定 (在此修改截止日期)
+# 0) 參數設定 (在此設定各單元截止日期)
 # =====================================================
-# 您可以在這裡統一設定所有作業的預設截止日期
-DEFAULT_DEADLINE = "2025-06-30"  
-# 或者若要維持自動往後推 14 天，可保留下方邏輯，但建議用固定日期較好管理
+# 您可以在這裡 "個別" 設定每個單元的截止日期
+# 格式： { 單元號碼: "YYYY-MM-DD" }
+UNIT_DEADLINES = {
+    1: "2025-09-30",
+    2: "2025-10-07",
+    3: "2025-10-14",
+    4: "2025-10-21",
+    5: "2025-10-28",
+    6: "2025-11-04",
+    7: "2025-11-11",
+    8: "2025-11-18",
+    9: "2025-11-25",
+    10: "2025-12-02"
+}
+
+# 若上述字典沒設定到的單元，則使用此預設日期
+DEFAULT_DEADLINE = "2025-12-31"
 
 
 # =====================================================
@@ -30,7 +44,6 @@ DEFAULT_DEADLINE = "2025-06-30"
 # =====================================================
 st.set_page_config(page_title="GIS Gym", page_icon="🧪", layout="wide")
 st.title("🧪 GIS Gym｜空間分析 AI 助教平台")
-# 簡化副標題，移除箭頭圖示
 st.caption("自主練習 (Real Data) | 單元作業 (Assignments) | 助教分析 (AI Consultant)")
 
 
@@ -193,11 +206,15 @@ def scan_assignments_from_files():
         if target_file:
             try:
                 content = docx2txt.process(target_file)
+                
+                # 取得該單元的截止日期，若無則用預設值
+                deadline = UNIT_DEADLINES.get(unit_id, DEFAULT_DEADLINE)
+                
                 assignments_db[unit_id] = {
                     "id": 1000 + unit_id,
-                    "title": f"Unit {unit_id} 作業", # 簡化標題，不顯示檔名
+                    "title": f"Unit {unit_id} 作業", 
                     "description": content if content.strip() else "（檔案內容為空）",
-                    "deadline": DEFAULT_DEADLINE # 使用全域設定的截止日期
+                    "deadline": deadline 
                 }
             except Exception as e:
                 print(f"Error reading docx {target_file}: {e}")
@@ -238,7 +255,7 @@ def _retrieve_context(query: str, unit_id: int | None, k: int = 8) -> str:
 
 
 # =====================================================
-# 7) AI 功能：GPT-4o (修正版 Prompt)
+# 7) AI 功能：GPT-4o
 # =====================================================
 def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | None) -> dict:
     q_str = f"Unit {unit_id}" if unit_id else ""
@@ -464,7 +481,7 @@ with st.sidebar:
             st.session_state["is_ta"] = False
             st.rerun()
 
-# Tabs: 僅保留導航用的圖示，其他地方簡化
+# Tabs
 tabs_list = ["🏋️ 自主練習區", "📝 單元作業區"]
 if st.session_state["is_ta"]: tabs_list.append("📊 助教後台")
 tabs = st.tabs(tabs_list)
@@ -473,7 +490,7 @@ tabs = st.tabs(tabs_list)
 # Tab 1: 自主練習
 # -----------------------------------------------------
 with tabs[0]:
-    st.subheader("空間分析自主練習 (含實體資料)") # 移除 emoji
+    # 移除上方大標題
     with st.container(border=True):
         c1, c2, c3, c4 = st.columns([1.5, 1, 1, 1])
         unit_str = c1.selectbox("選擇單元", ["全部"] + unit_options, key="p_unit")
@@ -481,7 +498,8 @@ with tabs[0]:
         lvl = c2.selectbox("難度", ["入門", "進階"], key="p_lvl")
         qty = c3.selectbox("題型", ["簡答題", "實作題"], key="p_qty")
         
-        if c4.button("GPT-4o 出題", type="primary", use_container_width=True): # 簡化按鈕文字
+        # [Modified] 按鈕文字修改
+        if c4.button("產生題目", type="primary", use_container_width=True): 
             with st.spinner("AI 正在出題..."):
                 q_data = generate_practice_question_real_data(lvl, qty, unit_val)
                 st.session_state["pq_data"] = q_data
@@ -494,7 +512,7 @@ with tabs[0]:
         target_file = q_data.get("target_filename")
         style = q_data.get("style_used", "")
 
-        st.markdown(f"### 題目 [{st.session_state['pq_meta']}]") # 移除 📌
+        st.markdown(f"### 題目 [{st.session_state['pq_meta']}]") 
         st.caption(f"風格：{style}")
         st.info(q_content)
 
@@ -519,13 +537,13 @@ with tabs[0]:
                 fb = grade_submission(q_content, ans, unit_val)
                 log_practice(sid, unit_val, q_content, fb)
                 st.success(f"分數: {fb.get('score')}")
-                with st.expander("查看完整評語", expanded=True): st.json(fb)
+                with st.expander("批改結果", expanded=True): st.json(fb) 
 
 # -----------------------------------------------------
 # Tab 2: 單元作業
 # -----------------------------------------------------
 with tabs[1]:
-    st.subheader("單元作業繳交") # 移除 emoji
+    # 移除上方大標題
     
     if not ASSIGNMENTS_DB:
         st.info("📂 目前沒有掃描到任何作業檔案 (homework/assignment*.docx)。")
@@ -534,11 +552,9 @@ with tabs[1]:
         assignment = ASSIGNMENTS_DB.get(target_unit)
         
         if assignment:
-            # 這裡不顯示標題，直接顯示說明
             st.markdown("### 作業說明") 
             st.caption(f"📅 截止期限: {assignment['deadline']}")
             
-            # 直接顯示內容，不再摺疊
             st.markdown(assignment['description'])
             
             st.markdown("#### 📂 相關圖資下載")
@@ -561,7 +577,7 @@ with tabs[1]:
                 prev = get_student_submission(sid, assignment['id'])
                 if prev:
                     st.success(f"✅ 已繳交。分數：{prev[0]}")
-                    with st.expander("查看上次批改"): st.json(json.loads(prev[1]))
+                    with st.expander("批改結果"): st.json(json.loads(prev[1])) 
                     st.write("---")
                 
                 assign_ans = st.text_area("作業作答區", height=250, key=f"assign_ans_{target_unit}")
@@ -578,11 +594,11 @@ with tabs[1]:
 # -----------------------------------------------------
 if st.session_state["is_ta"] and len(tabs) > 2:
     with tabs[2]:
-        st.subheader("助教管理後台") # 移除 emoji
+        # 移除上方大標題
         
         # 1. AI 報告
         with st.container(border=True):
-            st.markdown("### AI 教學顧問報告") # 移除 emoji
+            st.markdown("### AI 教學顧問報告") 
             ana_unit = st.selectbox("分析單元", unit_options, key="ana_unit")
             if st.button("生成分析報告"):
                 if ana_unit:
@@ -592,7 +608,7 @@ if st.session_state["is_ta"] and len(tabs) > 2:
         st.markdown("---")
         
         # 2. 練習紀錄 (Practice)
-        st.markdown("### 自主練習紀錄 (Practice)") # 移除 emoji
+        st.markdown("### 自主練習紀錄 (Practice)") 
         df = read_history_join_bonus()
         if not df.empty:
             csv = df.to_csv(index=False).encode('utf-8-sig')
@@ -619,7 +635,7 @@ if st.session_state["is_ta"] and len(tabs) > 2:
         st.markdown("---")
 
         # 3. 作業繳交紀錄 (Assignment Submissions)
-        st.markdown("### 作業繳交檢視 (Submissions)") # 移除 emoji
+        st.markdown("### 作業繳交檢視 (Submissions)") 
         df_sub = read_submissions_all()
         if not df_sub.empty:
             csv_sub = df_sub.to_csv(index=False).encode('utf-8-sig')
