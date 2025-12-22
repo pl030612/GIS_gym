@@ -482,8 +482,8 @@ with st.sidebar:
             st.rerun()
 
 # Tabs
-tabs_list = ["🏋️ 自主練習區", "📝 單元作業區"]
-if st.session_state["is_ta"]: tabs_list.append("📊 助教後台")
+tabs_list = ["自主練習", "單元作業"] # 簡化 Tab 名稱
+if st.session_state["is_ta"]: tabs_list.append("助教後台")
 tabs = st.tabs(tabs_list)
 
 # -----------------------------------------------------
@@ -492,13 +492,13 @@ tabs = st.tabs(tabs_list)
 with tabs[0]:
     # 移除上方大標題
     with st.container(border=True):
-        c1, c2, c3, c4 = st.columns([1.5, 1, 1, 1])
+        # [UPDATED] 加上 vertical_alignment="bottom" 讓按鈕對齊底部
+        c1, c2, c3, c4 = st.columns([1.5, 1, 1, 1], vertical_alignment="bottom")
         unit_str = c1.selectbox("選擇單元", ["全部"] + unit_options, key="p_unit")
         unit_val = int(unit_str) if unit_str != "全部" else None
         lvl = c2.selectbox("難度", ["入門", "進階"], key="p_lvl")
         qty = c3.selectbox("題型", ["簡答題", "實作題"], key="p_qty")
         
-        # [Modified] 按鈕文字修改
         if c4.button("產生題目", type="primary", use_container_width=True): 
             with st.spinner("AI 正在出題..."):
                 q_data = generate_practice_question_real_data(lvl, qty, unit_val)
