@@ -51,7 +51,7 @@ DB_PATH = os.path.join(BASE_DIR, "learning_history.sqlite")
 
 
 # =====================================================
-# 3) SQLite 初始化 (Unit ID 架構)
+# 3) SQLite 初始化
 # =====================================================
 def init_db():
     conn = sqlite3.connect(DB_PATH)
@@ -105,7 +105,7 @@ init_db()
 
 
 # =====================================================
-# 4) 資料載入：Metadata、真實檔案、Word作業(含快取)
+# 4) 資料載入：Metadata、真實檔案、Word作業
 # =====================================================
 @st.cache_data(show_spinner=False)
 def load_all_metadata():
@@ -117,7 +117,6 @@ def load_all_metadata():
         try:
             with open(f, "r", encoding="utf-8") as fh:
                 data = json.load(fh)
-                # 相容性處理
                 if "week" in data and "unit_id" not in data:
                     data["unit_id"] = data["week"]
                 out.append(data)
@@ -153,7 +152,6 @@ def get_unit_files(unit_id: int):
                 })
     return files_list
 
-# 🔥 效能關鍵：ttl=900 (15分鐘快取)
 @st.cache_data(ttl=900, show_spinner="正在掃描作業檔案...")
 def scan_assignments_from_files():
     """動態掃描 Word 作業檔"""
@@ -231,7 +229,7 @@ def _retrieve_context(query: str, unit_id: int | None, k: int = 8) -> str:
 
 
 # =====================================================
-# 6) AI 功能：GPT-4o (出題/批改/分析)
+# 6) AI 功能：GPT-4o (修正版 Prompt)
 # =====================================================
 def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | None) -> dict:
     q_str = f"Unit {unit_id}" if unit_id else ""
@@ -245,6 +243,14 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
     ]
     selected_style = random.choice(styles)
     
+    # 核心修改：R 語言限制 Prompt
+    r_constraint = """
+    ⚠️ 嚴格限制：
+    1. 實作內容必須限定使用 **R 語言** (例如使用 sf, terra, tmap, tidyverse 等套件)。
+    2. 🚫 禁止提及 "ArcGIS", "QGIS" 或通用的 "GIS 軟體" 字眼。
+    3. 題目應引導學生寫出 R 程式碼來解決問題。
+    """
+    
     if qtype == "實作題":
         real_files = get_unit_files(unit_id) if unit_id else []
         file_names_str = ", ".join([f['name'] for f in real_files]) if real_files else "無 (請自行假設虛擬資料)"
@@ -252,11 +258,12 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
         system_instruction = f"""
         你必須從提供的「真實檔案列表」中選擇一個檔案來設計操作任務。
         真實檔案列表: [{file_names_str}]
+        {r_constraint}
         """
         target_file_instruction = "AI選擇的檔案名稱(必須完全符合列表)"
     
     else:
-        system_instruction = """
+        system_instruction = f"""
         這是一道「觀念簡答題」。
         ❌ 請勿要求學生操作任何特定檔案。
         ❌ 請勿提及特定的檔名 (如 .shp)。
@@ -264,7 +271,6 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
         """
         target_file_instruction = "None"
 
-    # [UPDATED] 修改 System Prompt，加入 "hint" 欄位
     system_prompt = f"""
     你是頂尖的空間分析助教。請使用 GPT-4o 的強大邏輯來出題。
     目前的題型任務是：【{qtype}】。難度：{level}。
@@ -273,8 +279,8 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
     
     請以 JSON 格式回傳，務必包含 hint (提示) 欄位：
     {{
-        "question_content": "題目內容(Markdown)，請勿在題目中直接寫出提示或答案...",
-        "hint": "給學生的引導提示(Markdown)，例如『考慮使用 st_buffer 函數...』，但不要直接給答案。",
+        "question_content": "題目內容(Markdown)...",
+        "hint": "給學生的引導提示(Markdown)，例如『考慮使用 st_buffer 函數...』",
         "target_filename": "{target_file_instruction}",
         "style_used": "{selected_style}"
     }}
@@ -300,7 +306,7 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
 def grade_submission(question_text: str, student_answer: str, unit_id: int | None) -> dict:
     context = _retrieve_context(question_text, unit_id=unit_id, k=10)
     prompt = f"""
-    [角色] 嚴格的空間分析助教。
+    [角色] 嚴格的空間分析助教 (R 語言專家)。
     [題目] {question_text}
     [學生回答] {student_answer}
     [講義依據] {context}
@@ -311,7 +317,7 @@ def grade_submission(question_text: str, student_answer: str, unit_id: int | Non
       "level": "Excellent/Good/Fair/Poor",
       "strengths": ["優點..."],
       "weaknesses": ["缺點..."],
-      "suggestions": ["建議..."]
+      "suggestions": ["建議 (請專注於 R 語法與空間邏輯)..."]
     }}
     """
     try:
@@ -344,13 +350,13 @@ def generate_weakness_report(unit_id: int):
 
     weakness_text = "\n".join(all_weaknesses[:60])
     prompt = f"""
-    你是教學顧問。以下是 Unit {unit_id} 學生常犯錯誤列表：
+    你是教學顧問。以下是 Unit {unit_id} 學生常犯錯誤列表 (R 語言環境)：
     {weakness_text}
     
     請使用 GPT-4o 製作 Markdown 報告：
     1. **🚨 Top 3 核心弱點**
     2. **👨‍🏫 教學加強建議**
-    3. **📝 推薦考題 (2題)**
+    3. **📝 推薦考題 (2題，R語言實作)**
     """
     with st.spinner("🤖 AI 正在撰寫分析報告..."):
         r = client.chat.completions.create(model="gpt-4o", messages=[{"role": "user", "content": prompt}])
@@ -358,7 +364,7 @@ def generate_weakness_report(unit_id: int):
 
 
 # =====================================================
-# 7) DB Log Functions
+# 7) DB Log Functions & Readers
 # =====================================================
 def log_practice(sid, uid, q, fb):
     conn = sqlite3.connect(DB_PATH)
@@ -400,6 +406,13 @@ def read_history_join_bonus() -> pd.DataFrame:
     ORDER BY lh.id DESC
     """
     df = pd.read_sql(q, conn)
+    conn.close()
+    return df
+
+def read_submissions_all() -> pd.DataFrame:
+    """助教後台：讀取所有作業繳交紀錄"""
+    conn = sqlite3.connect(DB_PATH)
+    df = pd.read_sql("SELECT * FROM submissions ORDER BY id DESC", conn)
     conn.close()
     return df
 
@@ -446,14 +459,14 @@ with st.sidebar:
 
 # Tabs
 tabs_list = ["🏋️ 自主練習區", "📝 單元作業區"]
-if st.session_state["is_ta"]: tabs_list.append("📊 助教後台 (分析)")
+if st.session_state["is_ta"]: tabs_list.append("📊 助教後台")
 tabs = st.tabs(tabs_list)
 
 # -----------------------------------------------------
 # Tab 1: 自主練習
 # -----------------------------------------------------
 with tabs[0]:
-    st.subheader("🏋️ 空間分析自主練習 (含實體資料)")
+    st.subheader("🏋️ 空間分析自主練習")
     with st.container(border=True):
         c1, c2, c3, c4 = st.columns([1.5, 1, 1, 1])
         unit_str = c1.selectbox("選擇單元", ["全部"] + unit_options, key="p_unit")
@@ -461,7 +474,7 @@ with tabs[0]:
         lvl = c2.selectbox("難度", ["入門", "進階"], key="p_lvl")
         qty = c3.selectbox("題型", ["簡答題", "實作題"], key="p_qty")
         
-        if c4.button("🎲 GPT-4o 出題", type="primary", use_container_width=True):
+        if c4.button("🎲 出題", type="primary", use_container_width=True):
             with st.spinner("AI 正在出題..."):
                 q_data = generate_practice_question_real_data(lvl, qty, unit_val)
                 st.session_state["pq_data"] = q_data
@@ -470,7 +483,7 @@ with tabs[0]:
     if "pq_data" in st.session_state:
         q_data = st.session_state["pq_data"]
         q_content = q_data.get("question_content", "")
-        q_hint = q_data.get("hint", "") # 抓取 hint
+        q_hint = q_data.get("hint", "")
         target_file = q_data.get("target_filename")
         style = q_data.get("style_used", "")
 
@@ -478,9 +491,8 @@ with tabs[0]:
         st.caption(f"風格：{style}")
         st.info(q_content)
 
-        # [UPDATED] 提示區塊 - 預設摺疊
         if q_hint:
-            with st.expander("💡 需要一點提示嗎？ (Click for Hint)"):
+            with st.expander("💡 需要一點提示嗎？"):
                 st.markdown(q_hint)
 
         if target_file and target_file != "None" and target_file is not None:
@@ -503,7 +515,7 @@ with tabs[0]:
                 with st.expander("查看完整評語", expanded=True): st.json(fb)
 
 # -----------------------------------------------------
-# Tab 2: 單元作業 (自動掃描 Word)
+# Tab 2: 單元作業 (含圖資下載)
 # -----------------------------------------------------
 with tabs[1]:
     st.subheader("📝 單元作業繳交")
@@ -520,6 +532,20 @@ with tabs[1]:
             with st.expander("📄 作業說明 (從 Word 讀取)", expanded=True):
                 st.write(assignment['description'])
             
+            # [NEW] 相關圖資下載區
+            st.markdown("#### 📂 相關圖資下載")
+            real_files = get_unit_files(target_unit)
+            if real_files:
+                cols = st.columns(len(real_files)) if len(real_files) < 4 else st.columns(4)
+                for i, f in enumerate(real_files):
+                    with cols[i % 4]:
+                        with open(f['path'], "rb") as fp:
+                            st.download_button(f"📥 {f['name']}", fp, f['name'])
+            else:
+                st.caption("（此單元無實體檔案可供下載）")
+            
+            st.divider()
+
             sid = st.session_state["student_id"]
             if not sid:
                 st.warning("請先在側邊欄輸入學號。")
@@ -540,12 +566,13 @@ with tabs[1]:
                         st.rerun()
 
 # -----------------------------------------------------
-# Tab 3: 助教後台
+# Tab 3: 助教後台 (新增作業檢視與CSV下載)
 # -----------------------------------------------------
 if st.session_state["is_ta"] and len(tabs) > 2:
     with tabs[2]:
         st.subheader("📊 助教管理後台")
         
+        # 1. AI 報告
         with st.container(border=True):
             st.markdown("### 🤖 AI 教學顧問報告")
             ana_unit = st.selectbox("分析單元", unit_options, key="ana_unit")
@@ -555,10 +582,16 @@ if st.session_state["is_ta"] and len(tabs) > 2:
                     st.markdown(report)
         
         st.markdown("---")
-        st.markdown("### 📝 作答紀錄與加分")
+        
+        # 2. 練習紀錄 (Practice)
+        st.markdown("### 📝 自主練習紀錄 (Practice History)")
         df = read_history_join_bonus()
         if not df.empty:
-            f_unit = st.multiselect("篩選單元", sorted(df['unit_id'].dropna().unique()))
+            # CSV Download Button
+            csv = df.to_csv(index=False).encode('utf-8-sig')
+            st.download_button("📥 下載練習紀錄 (.csv)", csv, "practice_history.csv", "text/csv")
+            
+            f_unit = st.multiselect("篩選單元 (練習)", sorted(df['unit_id'].dropna().unique()), key="f_unit_prac")
             if f_unit: df = df[df['unit_id'].isin(f_unit)]
             
             event = st.dataframe(df, use_container_width=True, hide_index=True, selection_mode="single-row", on_select="rerun", height=300)
@@ -574,4 +607,21 @@ if st.session_state["is_ta"] and len(tabs) > 2:
                         upsert_bonus(int(row['id']), nb, nn)
                         st.rerun()
         else:
-            st.info("無資料")
+            st.info("無練習資料")
+
+        st.markdown("---")
+
+        # 3. [NEW] 作業繳交紀錄 (Assignment Submissions)
+        st.markdown("### 📄 作業繳交檢視 (Assignment Submissions)")
+        df_sub = read_submissions_all()
+        if not df_sub.empty:
+            # CSV Download Button
+            csv_sub = df_sub.to_csv(index=False).encode('utf-8-sig')
+            st.download_button("📥 下載作業紀錄 (.csv)", csv_sub, "assignment_submissions.csv", "text/csv")
+
+            f_unit_sub = st.multiselect("篩選單元 (作業)", sorted(df_sub['unit_id'].dropna().unique()), key="f_unit_sub")
+            if f_unit_sub: df_sub = df_sub[df_sub['unit_id'].isin(f_unit_sub)]
+
+            st.dataframe(df_sub, use_container_width=True, hide_index=True, height=300)
+        else:
+            st.info("目前尚無作業繳交紀錄。")
