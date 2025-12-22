@@ -474,7 +474,7 @@ with tabs[0]:
         lvl = c2.selectbox("難度", ["入門", "進階"], key="p_lvl")
         qty = c3.selectbox("題型", ["簡答題", "實作題"], key="p_qty")
         
-        if c4.button("🎲 出題", type="primary", use_container_width=True):
+        if c4.button("產生題目", type="primary", use_container_width=True):
             with st.spinner("AI 正在出題..."):
                 q_data = generate_practice_question_real_data(lvl, qty, unit_val)
                 st.session_state["pq_data"] = q_data
@@ -492,7 +492,7 @@ with tabs[0]:
         st.info(q_content)
 
         if q_hint:
-            with st.expander("💡 需要一點提示嗎？"):
+            with st.expander("需要一點提示嗎？"):
                 st.markdown(q_hint)
 
         if target_file and target_file != "None" and target_file is not None:
@@ -528,8 +528,8 @@ with tabs[1]:
         
         if assignment:
             st.markdown(f"### {assignment['title']}")
-            st.caption(f"📅 截止期限: {assignment['deadline']}")
-            with st.expander("📄 作業說明 (從 Word 讀取)", expanded=True):
+            st.caption(f" 截止期限: {assignment['deadline']}")
+            with st.expander(" 作業說明 ", expanded=True):
                 st.write(assignment['description'])
             
             # [NEW] 相關圖資下載區
@@ -570,7 +570,7 @@ with tabs[1]:
 # -----------------------------------------------------
 if st.session_state["is_ta"] and len(tabs) > 2:
     with tabs[2]:
-        st.subheader("📊 助教管理後台")
+        st.subheader("1. 助教管理後台")
         
         # 1. AI 報告
         with st.container(border=True):
@@ -584,7 +584,7 @@ if st.session_state["is_ta"] and len(tabs) > 2:
         st.markdown("---")
         
         # 2. 練習紀錄 (Practice)
-        st.markdown("### 📝 自主練習紀錄 (Practice History)")
+        st.markdown("### 2. 自主練習紀錄 (Practice History)")
         df = read_history_join_bonus()
         if not df.empty:
             # CSV Download Button
@@ -612,7 +612,7 @@ if st.session_state["is_ta"] and len(tabs) > 2:
         st.markdown("---")
 
         # 3. [NEW] 作業繳交紀錄 (Assignment Submissions)
-        st.markdown("### 📄 作業繳交檢視 (Assignment Submissions)")
+        st.markdown("### 3. 作業繳交檢視 (Assignment Submissions)")
         df_sub = read_submissions_all()
         if not df_sub.empty:
             # CSV Download Button
