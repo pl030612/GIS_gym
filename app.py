@@ -21,7 +21,7 @@ from langchain_community.vectorstores import FAISS
 # 0) 參數設定 & 語言包 (Settings & i18n)
 # =====================================================
 
-# 各單元截止日期
+# 各單元截止日期 (可視需求調整)
 UNIT_DEADLINES = {
     1: "2025-09-30",
     2: "2025-10-07",
@@ -36,7 +36,7 @@ UNIT_DEADLINES = {
 }
 DEFAULT_DEADLINE = "2025-12-31"
 
-# 介面翻譯字典
+# 介面翻譯字典 (UI Translations)
 TRANSLATIONS = {
     "zh": {
         "page_title": "GIS Gym｜空間分析 AI 助教平台",
@@ -409,6 +409,7 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
     seed = f"{q_str} spatial analysis {qtype} {level}"
     context = _retrieve_context(seed, unit_id=unit_id)
     
+    # [Logic] 決定考點 (Topic)
     unit_skills_map = SKILLS_DB.get(lang, SKILLS_DB["zh"])
     selected_method = "Random Spatial Analysis"
 
@@ -421,6 +422,12 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
         all_skills = [item for sublist in unit_skills_map.values() for item in sublist]
         selected_method = random.choice(all_skills)
 
+    # 取得檔案列表
+    real_files = get_unit_files(unit_id) if unit_id else []
+    file_names_str = ", ".join([f['name'] for f in real_files]) if real_files else "None"
+
+    # [Logic] 雙語 Prompt 區分
+    # 修正重點：將所有指令 (System Instruction) 與 User Prompt 都納入語言判斷
     if lang == "en":
         sys_role = "You are an expert GIS Teaching Assistant. Use GPT-4o logic to create questions."
         core_point = f"🔥 **Core Concept: {selected_method}**"
@@ -431,11 +438,32 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
         3. Guide students to write R code.
         """
         task_instruction = f"Task Type: {qtype}. Difficulty: {level}."
+        
+        # 英文版 - 題型指令
+        if qtype in ["實作題", "Practical (R Code)"]:
+            system_instruction = f"""
+            You must choose a file from the list to design a task: [{file_names_str}]
+            {r_rules}
+            """
+            target_file_instruction = "AI selected filename (must be from list)"
+        else:
+            system_instruction = f"""
+            Conceptual Short Answer Question.
+            ❌ Do not ask for file operations.
+            ✅ Focus on spatial analysis concepts.
+            """
+            target_file_instruction = "None"
+            
+        json_req = "Please respond in JSON format:"
+        user_prompt_text = f"Design a question based on the context. [Context] {context}"
+
+        # JSON Keys (output matches these)
         hint_label = "hint"
         q_content_label = "question_content"
         target_file_label = "target_filename"
-        json_req = "Please respond in JSON format:"
+
     else:
+        # 中文版
         sys_role = "你是頂尖的空間分析助教。請使用 GPT-4o 的強大邏輯來出題。"
         core_point = f"🔥 **本次題目核心考點：{selected_method}**"
         r_rules = """
@@ -445,28 +473,33 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
         3. 題目應引導學生寫出 R 程式碼來解決問題。
         """
         task_instruction = f"目前的題型任務是：【{qtype}】。難度：{level}。"
+        
+        # 中文版 - 題型指令
+        if qtype in ["實作題", "Practical (R Code)"]:
+            system_instruction = f"""
+            你必須從提供的「真實檔案列表」中選擇一個檔案來設計操作任務。
+            真實檔案列表: [{file_names_str}]
+            {r_rules}
+            """
+            target_file_instruction = "AI選擇的檔案名稱(必須完全符合列表)"
+        else:
+            system_instruction = f"""
+            這是一道「觀念簡答題」。
+            ❌ 請勿要求學生操作任何特定檔案。
+            ❌ 請勿提及特定的檔名 (如 .shp)。
+            ✅ 請專注於測試學生對該單元空間分析概念的理解。
+            """
+            target_file_instruction = "None"
+
+        json_req = "請以 JSON 格式回傳："
+        user_prompt_text = f"請根據考點與講義設計題目。[參考講義] {context}"
+
+        # JSON Keys
         hint_label = "hint"
         q_content_label = "question_content"
         target_file_label = "target_filename"
-        json_req = "請以 JSON 格式回傳："
 
-    real_files = get_unit_files(unit_id) if unit_id else []
-    file_names_str = ", ".join([f['name'] for f in real_files]) if real_files else "None"
-
-    if qtype in ["實作題", "Practical (R Code)"]:
-        system_instruction = f"""
-        You must choose a file from the list to design a task: [{file_names_str}]
-        {r_rules}
-        """
-        target_file_instruction = "AI selected filename (must be from list)"
-    else:
-        system_instruction = f"""
-        Conceptual Short Answer Question.
-        ❌ Do not ask for file operations.
-        ✅ Focus on spatial analysis concepts.
-        """
-        target_file_instruction = "None"
-
+    # 組裝 System Prompt
     system_prompt = f"""
     {sys_role}
     {task_instruction}
@@ -483,14 +516,12 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
     }}
     """
     
-    user_prompt = f"Design a question. [Context] {context}"
-
     try:
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=[
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt}
+                {"role": "user", "content": user_prompt_text}
             ],
             response_format={"type": "json_object"},
             temperature=0.7
@@ -503,7 +534,6 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
 def grade_submission(question_text: str, student_answer: str, unit_id: int | None, lang: str) -> dict:
     context = _retrieve_context(question_text, unit_id=unit_id, k=10)
     
-    # [UPDATED] 嚴格規則化評分 Prompt
     if lang == "en":
         prompt = f"""
         You are a TA for a 'Spatial Analysis' course in Geography. You grade solely based on the question requirements, student answer, and lecture context.
