@@ -1,17 +1,470 @@
 {
-  "unit_id": 2,
-  "topic": "空間數據",
-  "description": "在這個單元中，學生將深入了解空間數據的基本概念與應用。透過實作作業和實驗，學生將學習如何使用各類檔案格式進行空間數據的分析與視覺化，並掌握使用 R 語言進行數據處理的技巧。此外，課程將涵蓋環保署資料庫及台灣地區的各種地理資訊，幫助學生建立對空間數據的全面理解。",
-  "tags": [
-    "空間數據",
-    "GIS",
-    "地理資訊",
-    "R 語言",
-    "數據分析",
-    "環保署",
-    "台灣地理",
-    "資料視覺化"
-  ],
-  "source_folder": "02_spatial_data",
-  "file_count": 48
+    "unit_id": 2,
+    "week": 2,
+    "topic": "spatial data",
+    "module_title": "spatial data Module",
+    "learning_goals": [
+        "Understand the core concepts of spatial data.",
+        "Practice R coding implementation."
+    ],
+    "tags": [
+        "spatial data",
+        "GIS",
+        "Spatial Analysis"
+    ],
+    "files": [
+        {
+            "type": "document",
+            "filename": "homework_02.docx",
+            "path": "assignments/homework_02.docx",
+            "description": "Auto-generated entry for homework_02.docx",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "homework_02_en.docx",
+            "path": "assignments/homework_02_en.docx",
+            "description": "Auto-generated entry for homework_02_en.docx",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "code",
+            "filename": "lab_code.Rmd",
+            "path": "code/lab_code.Rmd",
+            "description": "Auto-generated entry for lab_code.Rmd",
+            "tags": [
+                "spatial data"
+            ],
+            "language": "R",
+            "usage": "lab_implementation",
+            "data_dependencies": [],
+            "main_functions": []
+        },
+        {
+            "type": "code",
+            "filename": "practice_solution.R",
+            "path": "code/practice_solution.R",
+            "description": "Auto-generated entry for practice_solution.R",
+            "tags": [
+                "spatial data"
+            ],
+            "language": "R",
+            "usage": "lab_implementation",
+            "data_dependencies": [],
+            "main_functions": []
+        },
+        {
+            "type": "code",
+            "filename": "textbook_demo.R",
+            "path": "code/textbook_demo.R",
+            "description": "Auto-generated entry for textbook_demo.R",
+            "tags": [
+                "spatial data"
+            ],
+            "language": "R",
+            "usage": "lab_implementation",
+            "data_dependencies": [],
+            "main_functions": []
+        },
+        {
+            "type": "data",
+            "filename": "EPA_STN1.dbf",
+            "path": "data/EPA_STN1.dbf",
+            "description": "Auto-generated entry for EPA_STN1.dbf",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "EPA_STN1.prj",
+            "path": "data/EPA_STN1.prj",
+            "description": "Auto-generated entry for EPA_STN1.prj",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "EPA_STN1.qpj",
+            "path": "data/EPA_STN1.qpj",
+            "description": "Auto-generated entry for EPA_STN1.qpj",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "EPA_STN1.shp",
+            "path": "data/EPA_STN1.shp",
+            "description": "Auto-generated entry for EPA_STN1.shp",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "EPA_STN1.shx",
+            "path": "data/EPA_STN1.shx",
+            "description": "Auto-generated entry for EPA_STN1.shx",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Popn_TWN2.dbf",
+            "path": "data/Popn_TWN2.dbf",
+            "description": "Auto-generated entry for Popn_TWN2.dbf",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Popn_TWN2.prj",
+            "path": "data/Popn_TWN2.prj",
+            "description": "Auto-generated entry for Popn_TWN2.prj",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Popn_TWN2.qpj",
+            "path": "data/Popn_TWN2.qpj",
+            "description": "Auto-generated entry for Popn_TWN2.qpj",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Popn_TWN2.shp",
+            "path": "data/Popn_TWN2.shp",
+            "description": "Auto-generated entry for Popn_TWN2.shp",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Popn_TWN2.shx",
+            "path": "data/Popn_TWN2.shx",
+            "description": "Auto-generated entry for Popn_TWN2.shx",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Sample.RData",
+            "path": "data/Sample.RData",
+            "description": "Auto-generated entry for Sample.RData",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "TaiwanCounty.cpg",
+            "path": "data/TaiwanCounty.cpg",
+            "description": "Auto-generated entry for TaiwanCounty.cpg",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "TaiwanCounty.dbf",
+            "path": "data/TaiwanCounty.dbf",
+            "description": "Auto-generated entry for TaiwanCounty.dbf",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "TaiwanCounty.prj",
+            "path": "data/TaiwanCounty.prj",
+            "description": "Auto-generated entry for TaiwanCounty.prj",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "TaiwanCounty.qpj",
+            "path": "data/TaiwanCounty.qpj",
+            "description": "Auto-generated entry for TaiwanCounty.qpj",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "TaiwanCounty.shp",
+            "path": "data/TaiwanCounty.shp",
+            "description": "Auto-generated entry for TaiwanCounty.shp",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "TaiwanCounty.shx",
+            "path": "data/TaiwanCounty.shx",
+            "description": "Auto-generated entry for TaiwanCounty.shx",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Taiwan_county.cpg",
+            "path": "data/Taiwan_county.cpg",
+            "description": "Auto-generated entry for Taiwan_county.cpg",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taiwan_county.dbf",
+            "path": "data/Taiwan_county.dbf",
+            "description": "Auto-generated entry for Taiwan_county.dbf",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taiwan_county.prj",
+            "path": "data/Taiwan_county.prj",
+            "description": "Auto-generated entry for Taiwan_county.prj",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Taiwan_county.sbn",
+            "path": "data/Taiwan_county.sbn",
+            "description": "Auto-generated entry for Taiwan_county.sbn",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Taiwan_county.sbx",
+            "path": "data/Taiwan_county.sbx",
+            "description": "Auto-generated entry for Taiwan_county.sbx",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taiwan_county.shp",
+            "path": "data/Taiwan_county.shp",
+            "description": "Auto-generated entry for Taiwan_county.shp",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Taiwan_county.shp.xml",
+            "path": "data/Taiwan_county.shp.xml",
+            "description": "Auto-generated entry for Taiwan_county.shp.xml",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taiwan_county.shx",
+            "path": "data/Taiwan_county.shx",
+            "description": "Auto-generated entry for Taiwan_county.shx",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Taiwan_temple.cpg",
+            "path": "data/Taiwan_temple.cpg",
+            "description": "Auto-generated entry for Taiwan_temple.cpg",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taiwan_temple.dbf",
+            "path": "data/Taiwan_temple.dbf",
+            "description": "Auto-generated entry for Taiwan_temple.dbf",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taiwan_temple.prj",
+            "path": "data/Taiwan_temple.prj",
+            "description": "Auto-generated entry for Taiwan_temple.prj",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Taiwan_temple.sbn",
+            "path": "data/Taiwan_temple.sbn",
+            "description": "Auto-generated entry for Taiwan_temple.sbn",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Taiwan_temple.sbx",
+            "path": "data/Taiwan_temple.sbx",
+            "description": "Auto-generated entry for Taiwan_temple.sbx",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taiwan_temple.shp",
+            "path": "data/Taiwan_temple.shp",
+            "description": "Auto-generated entry for Taiwan_temple.shp",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Taiwan_temple.shp.xml",
+            "path": "data/Taiwan_temple.shp.xml",
+            "description": "Auto-generated entry for Taiwan_temple.shp.xml",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taiwan_temple.shx",
+            "path": "data/Taiwan_temple.shx",
+            "description": "Auto-generated entry for Taiwan_temple.shx",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Taiwan_town.cpg",
+            "path": "data/Taiwan_town.cpg",
+            "description": "Auto-generated entry for Taiwan_town.cpg",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taiwan_town.dbf",
+            "path": "data/Taiwan_town.dbf",
+            "description": "Auto-generated entry for Taiwan_town.dbf",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taiwan_town.prj",
+            "path": "data/Taiwan_town.prj",
+            "description": "Auto-generated entry for Taiwan_town.prj",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Taiwan_town.sbn",
+            "path": "data/Taiwan_town.sbn",
+            "description": "Auto-generated entry for Taiwan_town.sbn",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Taiwan_town.sbx",
+            "path": "data/Taiwan_town.sbx",
+            "description": "Auto-generated entry for Taiwan_town.sbx",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taiwan_town.shp",
+            "path": "data/Taiwan_town.shp",
+            "description": "Auto-generated entry for Taiwan_town.shp",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Taiwan_town.shp.xml",
+            "path": "data/Taiwan_town.shp.xml",
+            "description": "Auto-generated entry for Taiwan_town.shp.xml",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taiwan_town.shx",
+            "path": "data/Taiwan_town.shx",
+            "description": "Auto-generated entry for Taiwan_town.shx",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "slides_02.pdf",
+            "path": "materials/slides_02.pdf",
+            "description": "Auto-generated entry for slides_02.pdf",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "textbook_02.pdf",
+            "path": "materials/textbook_02.pdf",
+            "description": "Auto-generated entry for textbook_02.pdf",
+            "tags": [
+                "spatial data"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "textbook_practice_02.pdf",
+            "path": "materials/textbook_practice_02.pdf",
+            "description": "Auto-generated entry for textbook_practice_02.pdf",
+            "tags": [
+                "spatial data"
+            ]
+        }
+    ]
 }

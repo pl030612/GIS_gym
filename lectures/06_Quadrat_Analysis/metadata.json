@@ -1,17 +1,542 @@
 {
-  "unit_id": 6,
-  "topic": "區劃分析",
-  "description": "在本單元中，學生將深入了解區劃分析的基本原理與應用，透過分析空間資料來評估地理分佈的特徵。課程將涵蓋相關的理論知識，並透過提供的範例與作業，幫助學生掌握如何使用 R 語言進行實際的數據分析，並運用 GIS 軟體進行空間資料的視覺化展示。",
-  "tags": [
-    "區劃分析",
-    "Quadrat Analysis",
-    "空間統計",
-    "Spatial Statistics",
-    "地理資訊系統",
-    "Geographic Information System",
-    "數據分析",
-    "Data Analysis"
-  ],
-  "source_folder": "06_Quadrat_Analysis",
-  "file_count": 56
+    "unit_id": 6,
+    "week": 6,
+    "topic": "Quadrat Analysis",
+    "module_title": "Quadrat Analysis Module",
+    "learning_goals": [
+        "Understand the core concepts of Quadrat Analysis.",
+        "Practice R coding implementation."
+    ],
+    "tags": [
+        "Quadrat Analysis",
+        "GIS",
+        "Spatial Analysis"
+    ],
+    "files": [
+        {
+            "type": "document",
+            "filename": "textbook第五章切到VMR;範例切到5-1.txt",
+            "path": "textbook第五章切到VMR;範例切到5-1.txt",
+            "description": "Auto-generated entry for textbook第五章切到VMR;範例切到5-1.txt",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "homework_06.docx",
+            "path": "assignments/homework_06.docx",
+            "description": "Auto-generated entry for homework_06.docx",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "homework_06_en.docx",
+            "path": "assignments/homework_06_en.docx",
+            "description": "Auto-generated entry for homework_06_en.docx",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "code",
+            "filename": "lab_code.Rmd",
+            "path": "code/lab_code.Rmd",
+            "description": "Auto-generated entry for lab_code.Rmd",
+            "tags": [
+                "Quadrat Analysis"
+            ],
+            "language": "R",
+            "usage": "lab_implementation",
+            "data_dependencies": [],
+            "main_functions": []
+        },
+        {
+            "type": "code",
+            "filename": "practice_solution.R",
+            "path": "code/practice_solution.R",
+            "description": "Auto-generated entry for practice_solution.R",
+            "tags": [
+                "Quadrat Analysis"
+            ],
+            "language": "R",
+            "usage": "lab_implementation",
+            "data_dependencies": [],
+            "main_functions": []
+        },
+        {
+            "type": "code",
+            "filename": "textbook_demo.R",
+            "path": "code/textbook_demo.R",
+            "description": "Auto-generated entry for textbook_demo.R",
+            "tags": [
+                "Quadrat Analysis"
+            ],
+            "language": "R",
+            "usage": "lab_implementation",
+            "data_dependencies": [],
+            "main_functions": []
+        },
+        {
+            "type": "data",
+            "filename": "grid5X5.dbf",
+            "path": "data/grid5X5.dbf",
+            "description": "Auto-generated entry for grid5X5.dbf",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "grid5X5.prj",
+            "path": "data/grid5X5.prj",
+            "description": "Auto-generated entry for grid5X5.prj",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "grid5X5.sbn",
+            "path": "data/grid5X5.sbn",
+            "description": "Auto-generated entry for grid5X5.sbn",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "grid5X5.sbx",
+            "path": "data/grid5X5.sbx",
+            "description": "Auto-generated entry for grid5X5.sbx",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "grid5X5.shp",
+            "path": "data/grid5X5.shp",
+            "description": "Auto-generated entry for grid5X5.shp",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "grid5X5.shp.xml",
+            "path": "data/grid5X5.shp.xml",
+            "description": "Auto-generated entry for grid5X5.shp.xml",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "grid5X5.shx",
+            "path": "data/grid5X5.shx",
+            "description": "Auto-generated entry for grid5X5.shx",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Schools.cpg",
+            "path": "data/Schools.cpg",
+            "description": "Auto-generated entry for Schools.cpg",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Schools.dbf",
+            "path": "data/Schools.dbf",
+            "description": "Auto-generated entry for Schools.dbf",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Schools.prj",
+            "path": "data/Schools.prj",
+            "description": "Auto-generated entry for Schools.prj",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Schools.shp",
+            "path": "data/Schools.shp",
+            "description": "Auto-generated entry for Schools.shp",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Schools.shx",
+            "path": "data/Schools.shx",
+            "description": "Auto-generated entry for Schools.shx",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "TainanCounty.dbf",
+            "path": "data/TainanCounty.dbf",
+            "description": "Auto-generated entry for TainanCounty.dbf",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "TainanCounty.prj",
+            "path": "data/TainanCounty.prj",
+            "description": "Auto-generated entry for TainanCounty.prj",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "TainanCounty.shp",
+            "path": "data/TainanCounty.shp",
+            "description": "Auto-generated entry for TainanCounty.shp",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "TainanCounty.shx",
+            "path": "data/TainanCounty.shx",
+            "description": "Auto-generated entry for TainanCounty.shx",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tainan_county.dbf",
+            "path": "data/Tainan_county.dbf",
+            "description": "Auto-generated entry for Tainan_county.dbf",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tainan_county.prj",
+            "path": "data/Tainan_county.prj",
+            "description": "Auto-generated entry for Tainan_county.prj",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Tainan_county.sbn",
+            "path": "data/Tainan_county.sbn",
+            "description": "Auto-generated entry for Tainan_county.sbn",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Tainan_county.sbx",
+            "path": "data/Tainan_county.sbx",
+            "description": "Auto-generated entry for Tainan_county.sbx",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tainan_county.shp",
+            "path": "data/Tainan_county.shp",
+            "description": "Auto-generated entry for Tainan_county.shp",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Tainan_county.shp.xml",
+            "path": "data/Tainan_county.shp.xml",
+            "description": "Auto-generated entry for Tainan_county.shp.xml",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tainan_county.shx",
+            "path": "data/Tainan_county.shx",
+            "description": "Auto-generated entry for Tainan_county.shx",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tainan_schools.dbf",
+            "path": "data/Tainan_schools.dbf",
+            "description": "Auto-generated entry for Tainan_schools.dbf",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tainan_schools.prj",
+            "path": "data/Tainan_schools.prj",
+            "description": "Auto-generated entry for Tainan_schools.prj",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Tainan_schools.sbn",
+            "path": "data/Tainan_schools.sbn",
+            "description": "Auto-generated entry for Tainan_schools.sbn",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Tainan_schools.sbx",
+            "path": "data/Tainan_schools.sbx",
+            "description": "Auto-generated entry for Tainan_schools.sbx",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tainan_schools.shp",
+            "path": "data/Tainan_schools.shp",
+            "description": "Auto-generated entry for Tainan_schools.shp",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Tainan_schools.shp.xml",
+            "path": "data/Tainan_schools.shp.xml",
+            "description": "Auto-generated entry for Tainan_schools.shp.xml",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tainan_schools.shx",
+            "path": "data/Tainan_schools.shx",
+            "description": "Auto-generated entry for Tainan_schools.shx",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Tainan_temple_mazhou.cpg",
+            "path": "data/Tainan_temple_mazhou.cpg",
+            "description": "Auto-generated entry for Tainan_temple_mazhou.cpg",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tainan_temple_mazhou.dbf",
+            "path": "data/Tainan_temple_mazhou.dbf",
+            "description": "Auto-generated entry for Tainan_temple_mazhou.dbf",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tainan_temple_mazhou.prj",
+            "path": "data/Tainan_temple_mazhou.prj",
+            "description": "Auto-generated entry for Tainan_temple_mazhou.prj",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Tainan_temple_mazhou.sbn",
+            "path": "data/Tainan_temple_mazhou.sbn",
+            "description": "Auto-generated entry for Tainan_temple_mazhou.sbn",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Tainan_temple_mazhou.sbx",
+            "path": "data/Tainan_temple_mazhou.sbx",
+            "description": "Auto-generated entry for Tainan_temple_mazhou.sbx",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tainan_temple_mazhou.shp",
+            "path": "data/Tainan_temple_mazhou.shp",
+            "description": "Auto-generated entry for Tainan_temple_mazhou.shp",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Tainan_temple_mazhou.shp.xml",
+            "path": "data/Tainan_temple_mazhou.shp.xml",
+            "description": "Auto-generated entry for Tainan_temple_mazhou.shp.xml",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Taiwan_temple_mazhou.cpg",
+            "path": "data/Taiwan_temple_mazhou.cpg",
+            "description": "Auto-generated entry for Taiwan_temple_mazhou.cpg",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taiwan_temple_mazhou.dbf",
+            "path": "data/Taiwan_temple_mazhou.dbf",
+            "description": "Auto-generated entry for Taiwan_temple_mazhou.dbf",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taiwan_temple_mazhou.prj",
+            "path": "data/Taiwan_temple_mazhou.prj",
+            "description": "Auto-generated entry for Taiwan_temple_mazhou.prj",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Taiwan_temple_mazhou.sbn",
+            "path": "data/Taiwan_temple_mazhou.sbn",
+            "description": "Auto-generated entry for Taiwan_temple_mazhou.sbn",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Taiwan_temple_mazhou.sbx",
+            "path": "data/Taiwan_temple_mazhou.sbx",
+            "description": "Auto-generated entry for Taiwan_temple_mazhou.sbx",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taiwan_temple_mazhou.shp",
+            "path": "data/Taiwan_temple_mazhou.shp",
+            "description": "Auto-generated entry for Taiwan_temple_mazhou.shp",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taiwan_temple_mazhou.shx",
+            "path": "data/Taiwan_temple_mazhou.shx",
+            "description": "Auto-generated entry for Taiwan_temple_mazhou.shx",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Taiwan_town.cpg",
+            "path": "data/Taiwan_town.cpg",
+            "description": "Auto-generated entry for Taiwan_town.cpg",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taiwan_town.dbf",
+            "path": "data/Taiwan_town.dbf",
+            "description": "Auto-generated entry for Taiwan_town.dbf",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taiwan_town.prj",
+            "path": "data/Taiwan_town.prj",
+            "description": "Auto-generated entry for Taiwan_town.prj",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Taiwan_town.sbn",
+            "path": "data/Taiwan_town.sbn",
+            "description": "Auto-generated entry for Taiwan_town.sbn",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "slides_06.pdf",
+            "path": "materials/slides_06.pdf",
+            "description": "Auto-generated entry for slides_06.pdf",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "textbook_05_01.pdf",
+            "path": "materials/textbook_05_01.pdf",
+            "description": "Auto-generated entry for textbook_05_01.pdf",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "textbook_practice_05_01.pdf",
+            "path": "materials/textbook_practice_05_01.pdf",
+            "description": "Auto-generated entry for textbook_practice_05_01.pdf",
+            "tags": [
+                "Quadrat Analysis"
+            ]
+        }
+    ]
 }

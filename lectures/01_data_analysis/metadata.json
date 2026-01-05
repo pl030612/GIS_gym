@@ -1,17 +1,151 @@
 {
-  "unit_id": 1,
-  "topic": "數據分析",
-  "description": "在這個單元中，學生將學習如何使用各種 GIS 工具和技術進行數據分析。透過實作作業和實驗，學生將熟悉如何處理和分析空間數據，並運用提供的數據集進行實際的案例研究。此外，學生將學會使用 R 語言進行數據處理與視覺化，以增進其分析能力。",
-  "tags": [
-    "數據分析",
-    "GIS",
-    "空間數據",
-    "R 語言",
-    "實作作業",
-    "案例研究",
-    "數據處理",
-    "視覺化"
-  ],
-  "source_folder": "01_data_analysis",
-  "file_count": 13
+    "unit_id": 1,
+    "week": 1,
+    "topic": "data analysis",
+    "module_title": "data analysis Module",
+    "learning_goals": [
+        "Understand the core concepts of data analysis.",
+        "Practice R coding implementation."
+    ],
+    "tags": [
+        "data analysis",
+        "GIS",
+        "Spatial Analysis"
+    ],
+    "files": [
+        {
+            "type": "document",
+            "filename": "homework_01.docx",
+            "path": "assignments/homework_01.docx",
+            "description": "Auto-generated entry for homework_01.docx",
+            "tags": [
+                "data analysis"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "homework_01_en.docx",
+            "path": "assignments/homework_01_en.docx",
+            "description": "Auto-generated entry for homework_01_en.docx",
+            "tags": [
+                "data analysis"
+            ]
+        },
+        {
+            "type": "code",
+            "filename": "lab_code.Rmd",
+            "path": "code/lab_code.Rmd",
+            "description": "Auto-generated entry for lab_code.Rmd",
+            "tags": [
+                "data analysis"
+            ],
+            "language": "R",
+            "usage": "lab_implementation",
+            "data_dependencies": [],
+            "main_functions": []
+        },
+        {
+            "type": "code",
+            "filename": "textbook_demo.R.R",
+            "path": "code/textbook_demo.R.R",
+            "description": "Auto-generated entry for textbook_demo.R.R",
+            "tags": [
+                "data analysis"
+            ],
+            "language": "R",
+            "usage": "lab_implementation",
+            "data_dependencies": [],
+            "main_functions": []
+        },
+        {
+            "type": "data",
+            "filename": "landdata.csv",
+            "path": "data/landdata.csv",
+            "description": "Auto-generated entry for landdata.csv",
+            "tags": [
+                "data analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Student.csv",
+            "path": "data/Student.csv",
+            "description": "Auto-generated entry for Student.csv",
+            "tags": [
+                "data analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taiwan_town.dbf",
+            "path": "data/Taiwan_town.dbf",
+            "description": "Auto-generated entry for Taiwan_town.dbf",
+            "tags": [
+                "data analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taiwan_town.prj",
+            "path": "data/Taiwan_town.prj",
+            "description": "Auto-generated entry for Taiwan_town.prj",
+            "tags": [
+                "data analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Taiwan_town.qpj",
+            "path": "data/Taiwan_town.qpj",
+            "description": "Auto-generated entry for Taiwan_town.qpj",
+            "tags": [
+                "data analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taiwan_town.shp",
+            "path": "data/Taiwan_town.shp",
+            "description": "Auto-generated entry for Taiwan_town.shp",
+            "tags": [
+                "data analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taiwan_town.shx",
+            "path": "data/Taiwan_town.shx",
+            "description": "Auto-generated entry for Taiwan_town.shx",
+            "tags": [
+                "data analysis"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "slides_01.pdf",
+            "path": "materials/slides_01.pdf",
+            "description": "Auto-generated entry for slides_01.pdf",
+            "tags": [
+                "data analysis"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "textbook_01.pdf",
+            "path": "materials/textbook_01.pdf",
+            "description": "Auto-generated entry for textbook_01.pdf",
+            "tags": [
+                "data analysis"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "textbook_practice_01.pdf",
+            "path": "materials/textbook_practice_01.pdf",
+            "description": "Auto-generated entry for textbook_practice_01.pdf",
+            "tags": [
+                "data analysis"
+            ]
+        }
+    ]
 }

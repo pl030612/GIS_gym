@@ -1,17 +1,551 @@
 {
-  "unit_id": 8,
-  "topic": "距離基礎方法",
-  "description": "在本單元中，學生將學習距離基礎的方法，包括如何計算空間資料之間的距離以及如何利用這些距離進行分析。透過提供的作業、實驗程式碼及教材，學生將能掌握相關的 GIS 技術，並應用於實際案例，如學校與其他地理特徵的距離分析。",
-  "tags": [
-    "距離分析",
-    "Distance Analysis",
-    "空間資料",
-    "Spatial Data",
-    "GIS技術",
-    "GIS Techniques",
-    "地理資訊系統",
-    "Geographic Information System"
-  ],
-  "source_folder": "08_Distance-based_Methods",
-  "file_count": 57
+    "unit_id": 8,
+    "week": 8,
+    "topic": "Distance-based Methods",
+    "module_title": "Distance-based Methods Module",
+    "learning_goals": [
+        "Understand the core concepts of Distance-based Methods.",
+        "Practice R coding implementation."
+    ],
+    "tags": [
+        "Distance-based Methods",
+        "GIS",
+        "Spatial Analysis"
+    ],
+    "files": [
+        {
+            "type": "document",
+            "filename": "homework_08.docx",
+            "path": "assignments/homework_08.docx",
+            "description": "Auto-generated entry for homework_08.docx",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "homework_08_en.docx",
+            "path": "assignments/homework_08_en.docx",
+            "description": "Auto-generated entry for homework_08_en.docx",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "code",
+            "filename": "lab_code.Rmd",
+            "path": "code/lab_code.Rmd",
+            "description": "Auto-generated entry for lab_code.Rmd",
+            "tags": [
+                "Distance-based Methods"
+            ],
+            "language": "R",
+            "usage": "lab_implementation",
+            "data_dependencies": [],
+            "main_functions": []
+        },
+        {
+            "type": "code",
+            "filename": "practice_solution.R",
+            "path": "code/practice_solution.R",
+            "description": "Auto-generated entry for practice_solution.R",
+            "tags": [
+                "Distance-based Methods"
+            ],
+            "language": "R",
+            "usage": "lab_implementation",
+            "data_dependencies": [],
+            "main_functions": []
+        },
+        {
+            "type": "code",
+            "filename": "textbook_demo.R",
+            "path": "code/textbook_demo.R",
+            "description": "Auto-generated entry for textbook_demo.R",
+            "tags": [
+                "Distance-based Methods"
+            ],
+            "language": "R",
+            "usage": "lab_implementation",
+            "data_dependencies": [],
+            "main_functions": []
+        },
+        {
+            "type": "data",
+            "filename": "grid5X5.dbf",
+            "path": "data/grid5X5.dbf",
+            "description": "Auto-generated entry for grid5X5.dbf",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "grid5X5.prj",
+            "path": "data/grid5X5.prj",
+            "description": "Auto-generated entry for grid5X5.prj",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "grid5X5.sbn",
+            "path": "data/grid5X5.sbn",
+            "description": "Auto-generated entry for grid5X5.sbn",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "grid5X5.sbx",
+            "path": "data/grid5X5.sbx",
+            "description": "Auto-generated entry for grid5X5.sbx",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "grid5X5.shp",
+            "path": "data/grid5X5.shp",
+            "description": "Auto-generated entry for grid5X5.shp",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "grid5X5.shp.xml",
+            "path": "data/grid5X5.shp.xml",
+            "description": "Auto-generated entry for grid5X5.shp.xml",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "grid5X5.shx",
+            "path": "data/grid5X5.shx",
+            "description": "Auto-generated entry for grid5X5.shx",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "SCHOOL.cpg",
+            "path": "data/SCHOOL.cpg",
+            "description": "Auto-generated entry for SCHOOL.cpg",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "SCHOOL.dbf",
+            "path": "data/SCHOOL.dbf",
+            "description": "Auto-generated entry for SCHOOL.dbf",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "SCHOOL.prj",
+            "path": "data/SCHOOL.prj",
+            "description": "Auto-generated entry for SCHOOL.prj",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "SCHOOL.qpj",
+            "path": "data/SCHOOL.qpj",
+            "description": "Auto-generated entry for SCHOOL.qpj",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "SCHOOL.shp",
+            "path": "data/SCHOOL.shp",
+            "description": "Auto-generated entry for SCHOOL.shp",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "SCHOOL.shx",
+            "path": "data/SCHOOL.shx",
+            "description": "Auto-generated entry for SCHOOL.shx",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Schools.cpg",
+            "path": "data/Schools.cpg",
+            "description": "Auto-generated entry for Schools.cpg",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Schools.dbf",
+            "path": "data/Schools.dbf",
+            "description": "Auto-generated entry for Schools.dbf",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Schools.prj",
+            "path": "data/Schools.prj",
+            "description": "Auto-generated entry for Schools.prj",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Schools.shp",
+            "path": "data/Schools.shp",
+            "description": "Auto-generated entry for Schools.shp",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Schools.shx",
+            "path": "data/Schools.shx",
+            "description": "Auto-generated entry for Schools.shx",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "TainanCounty.dbf",
+            "path": "data/TainanCounty.dbf",
+            "description": "Auto-generated entry for TainanCounty.dbf",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "TainanCounty.prj",
+            "path": "data/TainanCounty.prj",
+            "description": "Auto-generated entry for TainanCounty.prj",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "TainanCounty.shp",
+            "path": "data/TainanCounty.shp",
+            "description": "Auto-generated entry for TainanCounty.shp",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "TainanCounty.shx",
+            "path": "data/TainanCounty.shx",
+            "description": "Auto-generated entry for TainanCounty.shx",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tainan_county.dbf",
+            "path": "data/Tainan_county.dbf",
+            "description": "Auto-generated entry for Tainan_county.dbf",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tainan_county.prj",
+            "path": "data/Tainan_county.prj",
+            "description": "Auto-generated entry for Tainan_county.prj",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Tainan_county.sbn",
+            "path": "data/Tainan_county.sbn",
+            "description": "Auto-generated entry for Tainan_county.sbn",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Tainan_county.sbx",
+            "path": "data/Tainan_county.sbx",
+            "description": "Auto-generated entry for Tainan_county.sbx",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tainan_county.shp",
+            "path": "data/Tainan_county.shp",
+            "description": "Auto-generated entry for Tainan_county.shp",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Tainan_county.shp.xml",
+            "path": "data/Tainan_county.shp.xml",
+            "description": "Auto-generated entry for Tainan_county.shp.xml",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tainan_county.shx",
+            "path": "data/Tainan_county.shx",
+            "description": "Auto-generated entry for Tainan_county.shx",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tainan_schools.dbf",
+            "path": "data/Tainan_schools.dbf",
+            "description": "Auto-generated entry for Tainan_schools.dbf",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tainan_schools.prj",
+            "path": "data/Tainan_schools.prj",
+            "description": "Auto-generated entry for Tainan_schools.prj",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Tainan_schools.sbn",
+            "path": "data/Tainan_schools.sbn",
+            "description": "Auto-generated entry for Tainan_schools.sbn",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Tainan_schools.sbx",
+            "path": "data/Tainan_schools.sbx",
+            "description": "Auto-generated entry for Tainan_schools.sbx",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tainan_schools.shp",
+            "path": "data/Tainan_schools.shp",
+            "description": "Auto-generated entry for Tainan_schools.shp",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Tainan_schools.shp.xml",
+            "path": "data/Tainan_schools.shp.xml",
+            "description": "Auto-generated entry for Tainan_schools.shp.xml",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tainan_schools.shx",
+            "path": "data/Tainan_schools.shx",
+            "description": "Auto-generated entry for Tainan_schools.shx",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Tainan_temple_mazhou.cpg",
+            "path": "data/Tainan_temple_mazhou.cpg",
+            "description": "Auto-generated entry for Tainan_temple_mazhou.cpg",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tainan_temple_mazhou.dbf",
+            "path": "data/Tainan_temple_mazhou.dbf",
+            "description": "Auto-generated entry for Tainan_temple_mazhou.dbf",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tainan_temple_mazhou.prj",
+            "path": "data/Tainan_temple_mazhou.prj",
+            "description": "Auto-generated entry for Tainan_temple_mazhou.prj",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Tainan_temple_mazhou.sbn",
+            "path": "data/Tainan_temple_mazhou.sbn",
+            "description": "Auto-generated entry for Tainan_temple_mazhou.sbn",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Tainan_temple_mazhou.sbx",
+            "path": "data/Tainan_temple_mazhou.sbx",
+            "description": "Auto-generated entry for Tainan_temple_mazhou.sbx",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tainan_temple_mazhou.shp",
+            "path": "data/Tainan_temple_mazhou.shp",
+            "description": "Auto-generated entry for Tainan_temple_mazhou.shp",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Tainan_temple_mazhou.shp.xml",
+            "path": "data/Tainan_temple_mazhou.shp.xml",
+            "description": "Auto-generated entry for Tainan_temple_mazhou.shp.xml",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tpe_Fastfood.dbf",
+            "path": "data/Tpe_Fastfood.dbf",
+            "description": "Auto-generated entry for Tpe_Fastfood.dbf",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tpe_Fastfood.prj",
+            "path": "data/Tpe_Fastfood.prj",
+            "description": "Auto-generated entry for Tpe_Fastfood.prj",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Tpe_Fastfood.sbn",
+            "path": "data/Tpe_Fastfood.sbn",
+            "description": "Auto-generated entry for Tpe_Fastfood.sbn",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Tpe_Fastfood.sbx",
+            "path": "data/Tpe_Fastfood.sbx",
+            "description": "Auto-generated entry for Tpe_Fastfood.sbx",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tpe_Fastfood.shp",
+            "path": "data/Tpe_Fastfood.shp",
+            "description": "Auto-generated entry for Tpe_Fastfood.shp",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tpe_Fastfood.shx",
+            "path": "data/Tpe_Fastfood.shx",
+            "description": "Auto-generated entry for Tpe_Fastfood.shx",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "reading_material.pdf",
+            "path": "materials/reading_material.pdf",
+            "description": "Auto-generated entry for reading_material.pdf",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "slides_08.pdf",
+            "path": "materials/slides_08.pdf",
+            "description": "Auto-generated entry for slides_08.pdf",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "textbook_05_03.pdf",
+            "path": "materials/textbook_05_03.pdf",
+            "description": "Auto-generated entry for textbook_05_03.pdf",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "textbook_practice_05_03.pdf",
+            "path": "materials/textbook_practice_05_03.pdf",
+            "description": "Auto-generated entry for textbook_practice_05_03.pdf",
+            "tags": [
+                "Distance-based Methods"
+            ]
+        }
+    ]
 }

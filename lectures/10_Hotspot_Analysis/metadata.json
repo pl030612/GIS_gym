@@ -1,17 +1,344 @@
 {
-  "unit_id": 10,
-  "topic": "熱點分析",
-  "description": "在本單元中，學生將學習熱點分析的基本概念與方法，這是一種用於識別空間數據中高密度或高發生率區域的技術。透過實作與實驗，學生將運用 R 語言進行數據分析，並利用提供的數據集進行實際案例分析，進一步理解如何在 GIS 中應用熱點分析技術。",
-  "tags": [
-    "熱點分析",
-    "Hotspot Analysis",
-    "空間數據",
-    "Spatial Data",
-    "GIS",
-    "R 語言",
-    "數據分析",
-    "Data Analysis"
-  ],
-  "source_folder": "10_Hotspot_Analysis",
-  "file_count": 36
+    "unit_id": 10,
+    "week": 10,
+    "topic": "Hotspot Analysis",
+    "module_title": "Hotspot Analysis Module",
+    "learning_goals": [
+        "Understand the core concepts of Hotspot Analysis.",
+        "Practice R coding implementation."
+    ],
+    "tags": [
+        "Hotspot Analysis",
+        "GIS",
+        "Spatial Analysis"
+    ],
+    "files": [
+        {
+            "type": "code",
+            "filename": "lab_code_1.Rmd",
+            "path": "code/lab_code_1.Rmd",
+            "description": "Auto-generated entry for lab_code_1.Rmd",
+            "tags": [
+                "Hotspot Analysis"
+            ],
+            "language": "R",
+            "usage": "lab_implementation",
+            "data_dependencies": [],
+            "main_functions": []
+        },
+        {
+            "type": "code",
+            "filename": "lab_code_2.Rmd",
+            "path": "code/lab_code_2.Rmd",
+            "description": "Auto-generated entry for lab_code_2.Rmd",
+            "tags": [
+                "Hotspot Analysis"
+            ],
+            "language": "R",
+            "usage": "lab_implementation",
+            "data_dependencies": [],
+            "main_functions": []
+        },
+        {
+            "type": "document",
+            "filename": "practice_solution.html",
+            "path": "code/practice_solution.html",
+            "description": "Auto-generated entry for practice_solution.html",
+            "tags": [
+                "Hotspot Analysis"
+            ]
+        },
+        {
+            "type": "code",
+            "filename": "textbook_demo.R",
+            "path": "code/textbook_demo.R",
+            "description": "Auto-generated entry for textbook_demo.R",
+            "tags": [
+                "Hotspot Analysis"
+            ],
+            "language": "R",
+            "usage": "lab_implementation",
+            "data_dependencies": [],
+            "main_functions": []
+        },
+        {
+            "type": "other",
+            "filename": "Dengue_Case.cpg",
+            "path": "data/Dengue_Case.cpg",
+            "description": "Auto-generated entry for Dengue_Case.cpg",
+            "tags": [
+                "Hotspot Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Dengue_Case.dbf",
+            "path": "data/Dengue_Case.dbf",
+            "description": "Auto-generated entry for Dengue_Case.dbf",
+            "tags": [
+                "Hotspot Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Dengue_Case.prj",
+            "path": "data/Dengue_Case.prj",
+            "description": "Auto-generated entry for Dengue_Case.prj",
+            "tags": [
+                "Hotspot Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Dengue_Case.sbn",
+            "path": "data/Dengue_Case.sbn",
+            "description": "Auto-generated entry for Dengue_Case.sbn",
+            "tags": [
+                "Hotspot Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Dengue_Case.sbx",
+            "path": "data/Dengue_Case.sbx",
+            "description": "Auto-generated entry for Dengue_Case.sbx",
+            "tags": [
+                "Hotspot Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Dengue_Case.shp",
+            "path": "data/Dengue_Case.shp",
+            "description": "Auto-generated entry for Dengue_Case.shp",
+            "tags": [
+                "Hotspot Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Dengue_Case.shp.xml",
+            "path": "data/Dengue_Case.shp.xml",
+            "description": "Auto-generated entry for Dengue_Case.shp.xml",
+            "tags": [
+                "Hotspot Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Dengue_Case.shx",
+            "path": "data/Dengue_Case.shx",
+            "description": "Auto-generated entry for Dengue_Case.shx",
+            "tags": [
+                "Hotspot Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "KAOH_town.cpg",
+            "path": "data/KAOH_town.cpg",
+            "description": "Auto-generated entry for KAOH_town.cpg",
+            "tags": [
+                "Hotspot Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "KAOH_town.dbf",
+            "path": "data/KAOH_town.dbf",
+            "description": "Auto-generated entry for KAOH_town.dbf",
+            "tags": [
+                "Hotspot Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "KAOH_town.prj",
+            "path": "data/KAOH_town.prj",
+            "description": "Auto-generated entry for KAOH_town.prj",
+            "tags": [
+                "Hotspot Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "KAOH_town.sbn",
+            "path": "data/KAOH_town.sbn",
+            "description": "Auto-generated entry for KAOH_town.sbn",
+            "tags": [
+                "Hotspot Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "KAOH_town.sbx",
+            "path": "data/KAOH_town.sbx",
+            "description": "Auto-generated entry for KAOH_town.sbx",
+            "tags": [
+                "Hotspot Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "KAOH_town.shp",
+            "path": "data/KAOH_town.shp",
+            "description": "Auto-generated entry for KAOH_town.shp",
+            "tags": [
+                "Hotspot Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "KAOH_town.shp.xml",
+            "path": "data/KAOH_town.shp.xml",
+            "description": "Auto-generated entry for KAOH_town.shp.xml",
+            "tags": [
+                "Hotspot Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "KAOH_town.shx",
+            "path": "data/KAOH_town.shx",
+            "description": "Auto-generated entry for KAOH_town.shx",
+            "tags": [
+                "Hotspot Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "NorthTW.dbf",
+            "path": "data/NorthTW.dbf",
+            "description": "Auto-generated entry for NorthTW.dbf",
+            "tags": [
+                "Hotspot Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "NorthTW.prj",
+            "path": "data/NorthTW.prj",
+            "description": "Auto-generated entry for NorthTW.prj",
+            "tags": [
+                "Hotspot Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "NorthTW.Rdata",
+            "path": "data/NorthTW.Rdata",
+            "description": "Auto-generated entry for NorthTW.Rdata",
+            "tags": [
+                "Hotspot Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "NorthTW.shp",
+            "path": "data/NorthTW.shp",
+            "description": "Auto-generated entry for NorthTW.shp",
+            "tags": [
+                "Hotspot Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "NorthTW.shx",
+            "path": "data/NorthTW.shx",
+            "description": "Auto-generated entry for NorthTW.shx",
+            "tags": [
+                "Hotspot Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Popn_TWN2.dbf",
+            "path": "data/Popn_TWN2.dbf",
+            "description": "Auto-generated entry for Popn_TWN2.dbf",
+            "tags": [
+                "Hotspot Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Popn_TWN2.prj",
+            "path": "data/Popn_TWN2.prj",
+            "description": "Auto-generated entry for Popn_TWN2.prj",
+            "tags": [
+                "Hotspot Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Popn_TWN2.qpj",
+            "path": "data/Popn_TWN2.qpj",
+            "description": "Auto-generated entry for Popn_TWN2.qpj",
+            "tags": [
+                "Hotspot Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Popn_TWN2.shp",
+            "path": "data/Popn_TWN2.shp",
+            "description": "Auto-generated entry for Popn_TWN2.shp",
+            "tags": [
+                "Hotspot Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Popn_TWN2.shx",
+            "path": "data/Popn_TWN2.shx",
+            "description": "Auto-generated entry for Popn_TWN2.shx",
+            "tags": [
+                "Hotspot Analysis"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "reading_material.pdf",
+            "path": "materials/reading_material.pdf",
+            "description": "Auto-generated entry for reading_material.pdf",
+            "tags": [
+                "Hotspot Analysis"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "slides_10.pdf",
+            "path": "materials/slides_10.pdf",
+            "description": "Auto-generated entry for slides_10.pdf",
+            "tags": [
+                "Hotspot Analysis"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "textbook_06_01.pdf",
+            "path": "materials/textbook_06_01.pdf",
+            "description": "Auto-generated entry for textbook_06_01.pdf",
+            "tags": [
+                "Hotspot Analysis"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "textbook_08.pdf",
+            "path": "materials/textbook_08.pdf",
+            "description": "Auto-generated entry for textbook_08.pdf",
+            "tags": [
+                "Hotspot Analysis"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "textbook_practice_08.pdf",
+            "path": "materials/textbook_practice_08.pdf",
+            "description": "Auto-generated entry for textbook_practice_08.pdf",
+            "tags": [
+                "Hotspot Analysis"
+            ]
+        }
+    ]
 }

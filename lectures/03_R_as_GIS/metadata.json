@@ -1,17 +1,187 @@
 {
-  "unit_id": 3,
-  "topic": "R 作為地理資訊系統",
-  "description": "在這個單元中，學生將學習如何使用 R 語言進行地理空間分析。透過各種實作練習與範例檔案，學生將掌握 R 中用於處理和分析地理資料的工具，並能夠將其應用於實際的 GIS 問題，例如城市規劃和數據視覺化。此單元的內容包括作業、實驗室代碼及相關的地理數據檔案，幫助學生建立堅實的基礎。",
-  "tags": [
-    "R語言",
-    "地理資訊系統",
-    "空間分析",
-    "數據視覺化",
-    "城市規劃",
-    "GIS",
-    "地理數據",
-    "統計分析"
-  ],
-  "source_folder": "03_R_as_GIS",
-  "file_count": 17
+    "unit_id": 3,
+    "week": 3,
+    "topic": "R as GIS",
+    "module_title": "R as GIS Module",
+    "learning_goals": [
+        "Understand the core concepts of R as GIS.",
+        "Practice R coding implementation."
+    ],
+    "tags": [
+        "R as GIS",
+        "GIS",
+        "Spatial Analysis"
+    ],
+    "files": [
+        {
+            "type": "document",
+            "filename": "homework_03.docx",
+            "path": "assignments/homework_03.docx",
+            "description": "Auto-generated entry for homework_03.docx",
+            "tags": [
+                "R as GIS"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "homework_03_en.docx",
+            "path": "assignments/homework_03_en.docx",
+            "description": "Auto-generated entry for homework_03_en.docx",
+            "tags": [
+                "R as GIS"
+            ]
+        },
+        {
+            "type": "code",
+            "filename": "lab_code.Rmd",
+            "path": "code/lab_code.Rmd",
+            "description": "Auto-generated entry for lab_code.Rmd",
+            "tags": [
+                "R as GIS"
+            ],
+            "language": "R",
+            "usage": "lab_implementation",
+            "data_dependencies": [],
+            "main_functions": []
+        },
+        {
+            "type": "code",
+            "filename": "practice_solution.R",
+            "path": "code/practice_solution.R",
+            "description": "Auto-generated entry for practice_solution.R",
+            "tags": [
+                "R as GIS"
+            ],
+            "language": "R",
+            "usage": "lab_implementation",
+            "data_dependencies": [],
+            "main_functions": []
+        },
+        {
+            "type": "other",
+            "filename": "Sample2.Rdata",
+            "path": "data/Sample2.Rdata",
+            "description": "Auto-generated entry for Sample2.Rdata",
+            "tags": [
+                "R as GIS"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Sample3.Rdata",
+            "path": "data/Sample3.Rdata",
+            "description": "Auto-generated entry for Sample3.Rdata",
+            "tags": [
+                "R as GIS"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taipei_Vill.dbf",
+            "path": "data/Taipei_Vill.dbf",
+            "description": "Auto-generated entry for Taipei_Vill.dbf",
+            "tags": [
+                "R as GIS"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taipei_Vill.prj",
+            "path": "data/Taipei_Vill.prj",
+            "description": "Auto-generated entry for Taipei_Vill.prj",
+            "tags": [
+                "R as GIS"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Taipei_Vill.qpj",
+            "path": "data/Taipei_Vill.qpj",
+            "description": "Auto-generated entry for Taipei_Vill.qpj",
+            "tags": [
+                "R as GIS"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taipei_Vill.shp",
+            "path": "data/Taipei_Vill.shp",
+            "description": "Auto-generated entry for Taipei_Vill.shp",
+            "tags": [
+                "R as GIS"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taipei_Vill.shx",
+            "path": "data/Taipei_Vill.shx",
+            "description": "Auto-generated entry for Taipei_Vill.shx",
+            "tags": [
+                "R as GIS"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tpe_Fastfood.dbf",
+            "path": "data/Tpe_Fastfood.dbf",
+            "description": "Auto-generated entry for Tpe_Fastfood.dbf",
+            "tags": [
+                "R as GIS"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tpe_Fastfood.prj",
+            "path": "data/Tpe_Fastfood.prj",
+            "description": "Auto-generated entry for Tpe_Fastfood.prj",
+            "tags": [
+                "R as GIS"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Tpe_Fastfood.sbn",
+            "path": "data/Tpe_Fastfood.sbn",
+            "description": "Auto-generated entry for Tpe_Fastfood.sbn",
+            "tags": [
+                "R as GIS"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Tpe_Fastfood.sbx",
+            "path": "data/Tpe_Fastfood.sbx",
+            "description": "Auto-generated entry for Tpe_Fastfood.sbx",
+            "tags": [
+                "R as GIS"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tpe_Fastfood.shp",
+            "path": "data/Tpe_Fastfood.shp",
+            "description": "Auto-generated entry for Tpe_Fastfood.shp",
+            "tags": [
+                "R as GIS"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tpe_Fastfood.shx",
+            "path": "data/Tpe_Fastfood.shx",
+            "description": "Auto-generated entry for Tpe_Fastfood.shx",
+            "tags": [
+                "R as GIS"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "slides_03.pdf",
+            "path": "materials/slides_03.pdf",
+            "description": "Auto-generated entry for slides_03.pdf",
+            "tags": [
+                "R as GIS"
+            ]
+        }
+    ]
 }

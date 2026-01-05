@@ -1,17 +1,659 @@
 {
-  "unit_id": 4,
-  "topic": "R 作為 GIS2",
-  "description": "在本單元中，學生將學習如何使用 R 語言進行地理資訊系統（GIS）的分析與應用。透過實作作業、測驗及實驗代碼，學生將掌握 R 語言的 GIS 套件及其在空間數據處理中的應用，包括如何操作和分析各種地理空間數據格式，並學會使用 R 進行資料視覺化與報告生成。",
-  "tags": [
-    "GIS",
-    "R 語言",
-    "空間分析",
-    "地理數據",
-    "地圖視覺化",
-    "資料處理",
-    "實作作業",
-    "測驗"
-  ],
-  "source_folder": "04_R_as_GIS2",
-  "file_count": 68
+    "unit_id": 4,
+    "week": 4,
+    "topic": "R as GIS2",
+    "module_title": "R as GIS2 Module",
+    "learning_goals": [
+        "Understand the core concepts of R as GIS2.",
+        "Practice R coding implementation."
+    ],
+    "tags": [
+        "R as GIS2",
+        "GIS",
+        "Spatial Analysis"
+    ],
+    "files": [
+        {
+            "type": "document",
+            "filename": "homework_04.docx",
+            "path": "assignments/homework_04.docx",
+            "description": "Auto-generated entry for homework_04.docx",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "homework_04_en.docx",
+            "path": "assignments/homework_04_en.docx",
+            "description": "Auto-generated entry for homework_04_en.docx",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "quiz.docx",
+            "path": "assignments/quiz.docx",
+            "description": "Auto-generated entry for quiz.docx",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "quiz_en.docx",
+            "path": "assignments/quiz_en.docx",
+            "description": "Auto-generated entry for quiz_en.docx",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "code",
+            "filename": "lab_code.Rmd",
+            "path": "code/lab_code.Rmd",
+            "description": "Auto-generated entry for lab_code.Rmd",
+            "tags": [
+                "R as GIS2"
+            ],
+            "language": "R",
+            "usage": "lab_implementation",
+            "data_dependencies": [],
+            "main_functions": []
+        },
+        {
+            "type": "code",
+            "filename": "practice_soultion.R",
+            "path": "code/practice_soultion.R",
+            "description": "Auto-generated entry for practice_soultion.R",
+            "tags": [
+                "R as GIS2"
+            ],
+            "language": "R",
+            "usage": "lab_implementation",
+            "data_dependencies": [],
+            "main_functions": []
+        },
+        {
+            "type": "code",
+            "filename": "textbook_demo.R",
+            "path": "code/textbook_demo.R",
+            "description": "Auto-generated entry for textbook_demo.R",
+            "tags": [
+                "R as GIS2"
+            ],
+            "language": "R",
+            "usage": "lab_implementation",
+            "data_dependencies": [],
+            "main_functions": []
+        },
+        {
+            "type": "data",
+            "filename": "flood.dbf",
+            "path": "data/flood.dbf",
+            "description": "Auto-generated entry for flood.dbf",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "flood.prj",
+            "path": "data/flood.prj",
+            "description": "Auto-generated entry for flood.prj",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "flood.shp",
+            "path": "data/flood.shp",
+            "description": "Auto-generated entry for flood.shp",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "flood.shx",
+            "path": "data/flood.shx",
+            "description": "Auto-generated entry for flood.shx",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "MRT.dbf",
+            "path": "data/MRT.dbf",
+            "description": "Auto-generated entry for MRT.dbf",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "MRT.prj",
+            "path": "data/MRT.prj",
+            "description": "Auto-generated entry for MRT.prj",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "MRT.qpj",
+            "path": "data/MRT.qpj",
+            "description": "Auto-generated entry for MRT.qpj",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "MRT.shp",
+            "path": "data/MRT.shp",
+            "description": "Auto-generated entry for MRT.shp",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "MRT.shx",
+            "path": "data/MRT.shx",
+            "description": "Auto-generated entry for MRT.shx",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Popn_TWN2.dbf",
+            "path": "data/Popn_TWN2.dbf",
+            "description": "Auto-generated entry for Popn_TWN2.dbf",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Popn_TWN2.prj",
+            "path": "data/Popn_TWN2.prj",
+            "description": "Auto-generated entry for Popn_TWN2.prj",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Popn_TWN2.qpj",
+            "path": "data/Popn_TWN2.qpj",
+            "description": "Auto-generated entry for Popn_TWN2.qpj",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Popn_TWN2.shp",
+            "path": "data/Popn_TWN2.shp",
+            "description": "Auto-generated entry for Popn_TWN2.shp",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Popn_TWN2.shx",
+            "path": "data/Popn_TWN2.shx",
+            "description": "Auto-generated entry for Popn_TWN2.shx",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Sample3.Rdata",
+            "path": "data/Sample3.Rdata",
+            "description": "Auto-generated entry for Sample3.Rdata",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taipei_flood200.tif",
+            "path": "data/Taipei_flood200.tif",
+            "description": "Auto-generated entry for Taipei_flood200.tif",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Taipei_hospital.cpg",
+            "path": "data/Taipei_hospital.cpg",
+            "description": "Auto-generated entry for Taipei_hospital.cpg",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taipei_hospital.dbf",
+            "path": "data/Taipei_hospital.dbf",
+            "description": "Auto-generated entry for Taipei_hospital.dbf",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taipei_hospital.prj",
+            "path": "data/Taipei_hospital.prj",
+            "description": "Auto-generated entry for Taipei_hospital.prj",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Taipei_hospital.sbn",
+            "path": "data/Taipei_hospital.sbn",
+            "description": "Auto-generated entry for Taipei_hospital.sbn",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Taipei_hospital.sbx",
+            "path": "data/Taipei_hospital.sbx",
+            "description": "Auto-generated entry for Taipei_hospital.sbx",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taipei_hospital.shp",
+            "path": "data/Taipei_hospital.shp",
+            "description": "Auto-generated entry for Taipei_hospital.shp",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taipei_hospital.shx",
+            "path": "data/Taipei_hospital.shx",
+            "description": "Auto-generated entry for Taipei_hospital.shx",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Taipei_hospital.xml",
+            "path": "data/Taipei_hospital.xml",
+            "description": "Auto-generated entry for Taipei_hospital.xml",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taipei_Vill.dbf",
+            "path": "data/Taipei_Vill.dbf",
+            "description": "Auto-generated entry for Taipei_Vill.dbf",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taipei_Vill.prj",
+            "path": "data/Taipei_Vill.prj",
+            "description": "Auto-generated entry for Taipei_Vill.prj",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Taipei_Vill.qpj",
+            "path": "data/Taipei_Vill.qpj",
+            "description": "Auto-generated entry for Taipei_Vill.qpj",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taipei_Vill.shp",
+            "path": "data/Taipei_Vill.shp",
+            "description": "Auto-generated entry for Taipei_Vill.shp",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taipei_Vill.shx",
+            "path": "data/Taipei_Vill.shx",
+            "description": "Auto-generated entry for Taipei_Vill.shx",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Taipei_village.cpg",
+            "path": "data/Taipei_village.cpg",
+            "description": "Auto-generated entry for Taipei_village.cpg",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taipei_village.dbf",
+            "path": "data/Taipei_village.dbf",
+            "description": "Auto-generated entry for Taipei_village.dbf",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taipei_village.prj",
+            "path": "data/Taipei_village.prj",
+            "description": "Auto-generated entry for Taipei_village.prj",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taipei_village.shp",
+            "path": "data/Taipei_village.shp",
+            "description": "Auto-generated entry for Taipei_village.shp",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taipei_village.shx",
+            "path": "data/Taipei_village.shx",
+            "description": "Auto-generated entry for Taipei_village.shx",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taiwan_town.dbf",
+            "path": "data/Taiwan_town.dbf",
+            "description": "Auto-generated entry for Taiwan_town.dbf",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taiwan_town.prj",
+            "path": "data/Taiwan_town.prj",
+            "description": "Auto-generated entry for Taiwan_town.prj",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Taiwan_town.sbn",
+            "path": "data/Taiwan_town.sbn",
+            "description": "Auto-generated entry for Taiwan_town.sbn",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Taiwan_town.sbx",
+            "path": "data/Taiwan_town.sbx",
+            "description": "Auto-generated entry for Taiwan_town.sbx",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taiwan_town.shp",
+            "path": "data/Taiwan_town.shp",
+            "description": "Auto-generated entry for Taiwan_town.shp",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taiwan_town.shx",
+            "path": "data/Taiwan_town.shx",
+            "description": "Auto-generated entry for Taiwan_town.shx",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "TPE_LI.dbf",
+            "path": "data/TPE_LI.dbf",
+            "description": "Auto-generated entry for TPE_LI.dbf",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "TPE_LI.prj",
+            "path": "data/TPE_LI.prj",
+            "description": "Auto-generated entry for TPE_LI.prj",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "TPE_LI.qpj",
+            "path": "data/TPE_LI.qpj",
+            "description": "Auto-generated entry for TPE_LI.qpj",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "TPE_LI.shp",
+            "path": "data/TPE_LI.shp",
+            "description": "Auto-generated entry for TPE_LI.shp",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "TPE_LI.shx",
+            "path": "data/TPE_LI.shx",
+            "description": "Auto-generated entry for TPE_LI.shx",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "trainstation.dbf",
+            "path": "data/trainstation.dbf",
+            "description": "Auto-generated entry for trainstation.dbf",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "trainstation.sbn",
+            "path": "data/trainstation.sbn",
+            "description": "Auto-generated entry for trainstation.sbn",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "trainstation.sbx",
+            "path": "data/trainstation.sbx",
+            "description": "Auto-generated entry for trainstation.sbx",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "trainstation.shp",
+            "path": "data/trainstation.shp",
+            "description": "Auto-generated entry for trainstation.shp",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "trainstation.shx",
+            "path": "data/trainstation.shx",
+            "description": "Auto-generated entry for trainstation.shx",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "TWN10_D.DBF",
+            "path": "data/TWN10_D.DBF",
+            "description": "Auto-generated entry for TWN10_D.DBF",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "TWN10_D.SHP",
+            "path": "data/TWN10_D.SHP",
+            "description": "Auto-generated entry for TWN10_D.SHP",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "TWN10_D.SHX",
+            "path": "data/TWN10_D.SHX",
+            "description": "Auto-generated entry for TWN10_D.SHX",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "watershed.cpg",
+            "path": "data/watershed.cpg",
+            "description": "Auto-generated entry for watershed.cpg",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "watershed.dbf",
+            "path": "data/watershed.dbf",
+            "description": "Auto-generated entry for watershed.dbf",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "watershed.qmd",
+            "path": "data/watershed.qmd",
+            "description": "Auto-generated entry for watershed.qmd",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "watershed.sbn",
+            "path": "data/watershed.sbn",
+            "description": "Auto-generated entry for watershed.sbn",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "watershed.sbx",
+            "path": "data/watershed.sbx",
+            "description": "Auto-generated entry for watershed.sbx",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "watershed.shp",
+            "path": "data/watershed.shp",
+            "description": "Auto-generated entry for watershed.shp",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "watershed.shx",
+            "path": "data/watershed.shx",
+            "description": "Auto-generated entry for watershed.shx",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "slides_04.pdf",
+            "path": "materials/slides_04.pdf",
+            "description": "Auto-generated entry for slides_04.pdf",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "textbook_03.pdf",
+            "path": "materials/textbook_03.pdf",
+            "description": "Auto-generated entry for textbook_03.pdf",
+            "tags": [
+                "R as GIS2"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "textbook_practice_03.pdf",
+            "path": "materials/textbook_practice_03.pdf",
+            "description": "Auto-generated entry for textbook_practice_03.pdf",
+            "tags": [
+                "R as GIS2"
+            ]
+        }
+    ]
 }

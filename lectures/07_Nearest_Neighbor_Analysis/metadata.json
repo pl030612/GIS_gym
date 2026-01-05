@@ -1,17 +1,443 @@
 {
-  "unit_id": 7,
-  "topic": "最近鄰分析",
-  "description": "在這個單元中，學生將學習最近鄰分析的基本概念和技術，並了解如何應用這些技術來解決實際的空間問題。透過使用提供的資料集和範例，學生將能夠進行空間數據的分析，並運用 R 語言進行實作，最終掌握如何評估地理現象之間的距離關係。",
-  "tags": [
-    "GIS",
-    "空間分析",
-    "最近鄰",
-    "R 語言",
-    "數據分析",
-    "地理資訊",
-    "空間數據",
-    "學校分佈"
-  ],
-  "source_folder": "07_Nearest_Neighbor_Analysis",
-  "file_count": 45
+    "unit_id": 7,
+    "week": 7,
+    "topic": "Nearest Neighbor Analysis",
+    "module_title": "Nearest Neighbor Analysis Module",
+    "learning_goals": [
+        "Understand the core concepts of Nearest Neighbor Analysis.",
+        "Practice R coding implementation."
+    ],
+    "tags": [
+        "Nearest Neighbor Analysis",
+        "GIS",
+        "Spatial Analysis"
+    ],
+    "files": [
+        {
+            "type": "document",
+            "filename": "textbook第五章切到G;範例切到5-3-1.txt",
+            "path": "textbook第五章切到G;範例切到5-3-1.txt",
+            "description": "Auto-generated entry for textbook第五章切到G;範例切到5-3-1.txt",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "homework_07.docx",
+            "path": "assignments/homework_07.docx",
+            "description": "Auto-generated entry for homework_07.docx",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "homework_07_en.docx",
+            "path": "assignments/homework_07_en.docx",
+            "description": "Auto-generated entry for homework_07_en.docx",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "code",
+            "filename": "lab_code.Rmd",
+            "path": "code/lab_code.Rmd",
+            "description": "Auto-generated entry for lab_code.Rmd",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ],
+            "language": "R",
+            "usage": "lab_implementation",
+            "data_dependencies": [],
+            "main_functions": []
+        },
+        {
+            "type": "code",
+            "filename": "practice_solution.R",
+            "path": "code/practice_solution.R",
+            "description": "Auto-generated entry for practice_solution.R",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ],
+            "language": "R",
+            "usage": "lab_implementation",
+            "data_dependencies": [],
+            "main_functions": []
+        },
+        {
+            "type": "code",
+            "filename": "textbook_demo.R",
+            "path": "code/textbook_demo.R",
+            "description": "Auto-generated entry for textbook_demo.R",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ],
+            "language": "R",
+            "usage": "lab_implementation",
+            "data_dependencies": [],
+            "main_functions": []
+        },
+        {
+            "type": "data",
+            "filename": "grid5X5.dbf",
+            "path": "data/grid5X5.dbf",
+            "description": "Auto-generated entry for grid5X5.dbf",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "grid5X5.prj",
+            "path": "data/grid5X5.prj",
+            "description": "Auto-generated entry for grid5X5.prj",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "grid5X5.sbn",
+            "path": "data/grid5X5.sbn",
+            "description": "Auto-generated entry for grid5X5.sbn",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "grid5X5.sbx",
+            "path": "data/grid5X5.sbx",
+            "description": "Auto-generated entry for grid5X5.sbx",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "grid5X5.shp",
+            "path": "data/grid5X5.shp",
+            "description": "Auto-generated entry for grid5X5.shp",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "grid5X5.shp.xml",
+            "path": "data/grid5X5.shp.xml",
+            "description": "Auto-generated entry for grid5X5.shp.xml",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "grid5X5.shx",
+            "path": "data/grid5X5.shx",
+            "description": "Auto-generated entry for grid5X5.shx",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Schools.cpg",
+            "path": "data/Schools.cpg",
+            "description": "Auto-generated entry for Schools.cpg",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Schools.dbf",
+            "path": "data/Schools.dbf",
+            "description": "Auto-generated entry for Schools.dbf",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Schools.prj",
+            "path": "data/Schools.prj",
+            "description": "Auto-generated entry for Schools.prj",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Schools.shp",
+            "path": "data/Schools.shp",
+            "description": "Auto-generated entry for Schools.shp",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Schools.shx",
+            "path": "data/Schools.shx",
+            "description": "Auto-generated entry for Schools.shx",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "TainanCounty.dbf",
+            "path": "data/TainanCounty.dbf",
+            "description": "Auto-generated entry for TainanCounty.dbf",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "TainanCounty.prj",
+            "path": "data/TainanCounty.prj",
+            "description": "Auto-generated entry for TainanCounty.prj",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "TainanCounty.shp",
+            "path": "data/TainanCounty.shp",
+            "description": "Auto-generated entry for TainanCounty.shp",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "TainanCounty.shx",
+            "path": "data/TainanCounty.shx",
+            "description": "Auto-generated entry for TainanCounty.shx",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tainan_county.dbf",
+            "path": "data/Tainan_county.dbf",
+            "description": "Auto-generated entry for Tainan_county.dbf",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tainan_county.prj",
+            "path": "data/Tainan_county.prj",
+            "description": "Auto-generated entry for Tainan_county.prj",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Tainan_county.sbn",
+            "path": "data/Tainan_county.sbn",
+            "description": "Auto-generated entry for Tainan_county.sbn",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Tainan_county.sbx",
+            "path": "data/Tainan_county.sbx",
+            "description": "Auto-generated entry for Tainan_county.sbx",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tainan_county.shp",
+            "path": "data/Tainan_county.shp",
+            "description": "Auto-generated entry for Tainan_county.shp",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Tainan_county.shp.xml",
+            "path": "data/Tainan_county.shp.xml",
+            "description": "Auto-generated entry for Tainan_county.shp.xml",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tainan_county.shx",
+            "path": "data/Tainan_county.shx",
+            "description": "Auto-generated entry for Tainan_county.shx",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tainan_schools.dbf",
+            "path": "data/Tainan_schools.dbf",
+            "description": "Auto-generated entry for Tainan_schools.dbf",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tainan_schools.prj",
+            "path": "data/Tainan_schools.prj",
+            "description": "Auto-generated entry for Tainan_schools.prj",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Tainan_schools.sbn",
+            "path": "data/Tainan_schools.sbn",
+            "description": "Auto-generated entry for Tainan_schools.sbn",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Tainan_schools.sbx",
+            "path": "data/Tainan_schools.sbx",
+            "description": "Auto-generated entry for Tainan_schools.sbx",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tainan_schools.shp",
+            "path": "data/Tainan_schools.shp",
+            "description": "Auto-generated entry for Tainan_schools.shp",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Tainan_schools.shp.xml",
+            "path": "data/Tainan_schools.shp.xml",
+            "description": "Auto-generated entry for Tainan_schools.shp.xml",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tainan_schools.shx",
+            "path": "data/Tainan_schools.shx",
+            "description": "Auto-generated entry for Tainan_schools.shx",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Tainan_temple_mazhou.cpg",
+            "path": "data/Tainan_temple_mazhou.cpg",
+            "description": "Auto-generated entry for Tainan_temple_mazhou.cpg",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tainan_temple_mazhou.dbf",
+            "path": "data/Tainan_temple_mazhou.dbf",
+            "description": "Auto-generated entry for Tainan_temple_mazhou.dbf",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tainan_temple_mazhou.prj",
+            "path": "data/Tainan_temple_mazhou.prj",
+            "description": "Auto-generated entry for Tainan_temple_mazhou.prj",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Tainan_temple_mazhou.sbn",
+            "path": "data/Tainan_temple_mazhou.sbn",
+            "description": "Auto-generated entry for Tainan_temple_mazhou.sbn",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Tainan_temple_mazhou.sbx",
+            "path": "data/Tainan_temple_mazhou.sbx",
+            "description": "Auto-generated entry for Tainan_temple_mazhou.sbx",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Tainan_temple_mazhou.shp",
+            "path": "data/Tainan_temple_mazhou.shp",
+            "description": "Auto-generated entry for Tainan_temple_mazhou.shp",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Tainan_temple_mazhou.shp.xml",
+            "path": "data/Tainan_temple_mazhou.shp.xml",
+            "description": "Auto-generated entry for Tainan_temple_mazhou.shp.xml",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "slides_07.pdf",
+            "path": "materials/slides_07.pdf",
+            "description": "Auto-generated entry for slides_07.pdf",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "textboook_05_02.pdf",
+            "path": "materials/textboook_05_02.pdf",
+            "description": "Auto-generated entry for textboook_05_02.pdf",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "textboook_practice_05_02.pdf",
+            "path": "materials/textboook_practice_05_02.pdf",
+            "description": "Auto-generated entry for textboook_practice_05_02.pdf",
+            "tags": [
+                "Nearest Neighbor Analysis"
+            ]
+        }
+    ]
 }

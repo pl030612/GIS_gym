@@ -1,17 +1,313 @@
 {
-  "unit_id": 9,
-  "topic": "空間自相關",
-  "description": "在這個單元中，我們將深入探討空間自相關的概念及其在地理資訊系統中的應用。學習如何分析地理數據的空間分佈特徵，以及如何使用相關的統計方法來檢視不同地理單位之間的關聯性。透過提供的實作練習及案例資料，學生將能夠實際運用 R 語言進行空間分析，並理解其背後的理論基礎。",
-  "tags": [
-    "空間自相關",
-    "Spatial Autocorrelation",
-    "地理資訊系統",
-    "GIS",
-    "空間分析",
-    "統計方法",
-    "R 語言",
-    "地理數據"
-  ],
-  "source_folder": "09_Spatial_Autocorrelation",
-  "file_count": 31
+    "unit_id": 9,
+    "week": 9,
+    "topic": "Spatial Autocorrelation",
+    "module_title": "Spatial Autocorrelation Module",
+    "learning_goals": [
+        "Understand the core concepts of Spatial Autocorrelation.",
+        "Practice R coding implementation."
+    ],
+    "tags": [
+        "Spatial Autocorrelation",
+        "GIS",
+        "Spatial Analysis"
+    ],
+    "files": [
+        {
+            "type": "document",
+            "filename": "homework_09.docx",
+            "path": "assignments/homework_09.docx",
+            "description": "Auto-generated entry for homework_09.docx",
+            "tags": [
+                "Spatial Autocorrelation"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "homework_09_en.docx",
+            "path": "assignments/homework_09_en.docx",
+            "description": "Auto-generated entry for homework_09_en.docx",
+            "tags": [
+                "Spatial Autocorrelation"
+            ]
+        },
+        {
+            "type": "code",
+            "filename": "lab_code.Rmd",
+            "path": "code/lab_code.Rmd",
+            "description": "Auto-generated entry for lab_code.Rmd",
+            "tags": [
+                "Spatial Autocorrelation"
+            ],
+            "language": "R",
+            "usage": "lab_implementation",
+            "data_dependencies": [],
+            "main_functions": []
+        },
+        {
+            "type": "document",
+            "filename": "practice_solution.html",
+            "path": "code/practice_solution.html",
+            "description": "Auto-generated entry for practice_solution.html",
+            "tags": [
+                "Spatial Autocorrelation"
+            ]
+        },
+        {
+            "type": "code",
+            "filename": "textbook_demo.R",
+            "path": "code/textbook_demo.R",
+            "description": "Auto-generated entry for textbook_demo.R",
+            "tags": [
+                "Spatial Autocorrelation"
+            ],
+            "language": "R",
+            "usage": "lab_implementation",
+            "data_dependencies": [],
+            "main_functions": []
+        },
+        {
+            "type": "other",
+            "filename": "Dengue_Case.cpg",
+            "path": "data/Dengue_Case.cpg",
+            "description": "Auto-generated entry for Dengue_Case.cpg",
+            "tags": [
+                "Spatial Autocorrelation"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Dengue_Case.dbf",
+            "path": "data/Dengue_Case.dbf",
+            "description": "Auto-generated entry for Dengue_Case.dbf",
+            "tags": [
+                "Spatial Autocorrelation"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Dengue_Case.prj",
+            "path": "data/Dengue_Case.prj",
+            "description": "Auto-generated entry for Dengue_Case.prj",
+            "tags": [
+                "Spatial Autocorrelation"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Dengue_Case.sbn",
+            "path": "data/Dengue_Case.sbn",
+            "description": "Auto-generated entry for Dengue_Case.sbn",
+            "tags": [
+                "Spatial Autocorrelation"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Dengue_Case.sbx",
+            "path": "data/Dengue_Case.sbx",
+            "description": "Auto-generated entry for Dengue_Case.sbx",
+            "tags": [
+                "Spatial Autocorrelation"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Dengue_Case.shp",
+            "path": "data/Dengue_Case.shp",
+            "description": "Auto-generated entry for Dengue_Case.shp",
+            "tags": [
+                "Spatial Autocorrelation"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Dengue_Case.shp.xml",
+            "path": "data/Dengue_Case.shp.xml",
+            "description": "Auto-generated entry for Dengue_Case.shp.xml",
+            "tags": [
+                "Spatial Autocorrelation"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Dengue_Case.shx",
+            "path": "data/Dengue_Case.shx",
+            "description": "Auto-generated entry for Dengue_Case.shx",
+            "tags": [
+                "Spatial Autocorrelation"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "KAOH_town.cpg",
+            "path": "data/KAOH_town.cpg",
+            "description": "Auto-generated entry for KAOH_town.cpg",
+            "tags": [
+                "Spatial Autocorrelation"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "KAOH_town.dbf",
+            "path": "data/KAOH_town.dbf",
+            "description": "Auto-generated entry for KAOH_town.dbf",
+            "tags": [
+                "Spatial Autocorrelation"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "KAOH_town.prj",
+            "path": "data/KAOH_town.prj",
+            "description": "Auto-generated entry for KAOH_town.prj",
+            "tags": [
+                "Spatial Autocorrelation"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "KAOH_town.sbn",
+            "path": "data/KAOH_town.sbn",
+            "description": "Auto-generated entry for KAOH_town.sbn",
+            "tags": [
+                "Spatial Autocorrelation"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "KAOH_town.sbx",
+            "path": "data/KAOH_town.sbx",
+            "description": "Auto-generated entry for KAOH_town.sbx",
+            "tags": [
+                "Spatial Autocorrelation"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "KAOH_town.shp",
+            "path": "data/KAOH_town.shp",
+            "description": "Auto-generated entry for KAOH_town.shp",
+            "tags": [
+                "Spatial Autocorrelation"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "KAOH_town.shp.xml",
+            "path": "data/KAOH_town.shp.xml",
+            "description": "Auto-generated entry for KAOH_town.shp.xml",
+            "tags": [
+                "Spatial Autocorrelation"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "KAOH_town.shx",
+            "path": "data/KAOH_town.shx",
+            "description": "Auto-generated entry for KAOH_town.shx",
+            "tags": [
+                "Spatial Autocorrelation"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Popn_TWN2.dbf",
+            "path": "data/Popn_TWN2.dbf",
+            "description": "Auto-generated entry for Popn_TWN2.dbf",
+            "tags": [
+                "Spatial Autocorrelation"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Popn_TWN2.prj",
+            "path": "data/Popn_TWN2.prj",
+            "description": "Auto-generated entry for Popn_TWN2.prj",
+            "tags": [
+                "Spatial Autocorrelation"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Popn_TWN2.qpj",
+            "path": "data/Popn_TWN2.qpj",
+            "description": "Auto-generated entry for Popn_TWN2.qpj",
+            "tags": [
+                "Spatial Autocorrelation"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Popn_TWN2.shp",
+            "path": "data/Popn_TWN2.shp",
+            "description": "Auto-generated entry for Popn_TWN2.shp",
+            "tags": [
+                "Spatial Autocorrelation"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Popn_TWN2.shx",
+            "path": "data/Popn_TWN2.shx",
+            "description": "Auto-generated entry for Popn_TWN2.shx",
+            "tags": [
+                "Spatial Autocorrelation"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "reading_material_1.pdf",
+            "path": "materials/reading_material_1.pdf",
+            "description": "Auto-generated entry for reading_material_1.pdf",
+            "tags": [
+                "Spatial Autocorrelation"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "reading_material_2.pdf",
+            "path": "materials/reading_material_2.pdf",
+            "description": "Auto-generated entry for reading_material_2.pdf",
+            "tags": [
+                "Spatial Autocorrelation"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "reading_material_3.pdf",
+            "path": "materials/reading_material_3.pdf",
+            "description": "Auto-generated entry for reading_material_3.pdf",
+            "tags": [
+                "Spatial Autocorrelation"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "slides_09.pdf",
+            "path": "materials/slides_09.pdf",
+            "description": "Auto-generated entry for slides_09.pdf",
+            "tags": [
+                "Spatial Autocorrelation"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "textbook_07.pdf",
+            "path": "materials/textbook_07.pdf",
+            "description": "Auto-generated entry for textbook_07.pdf",
+            "tags": [
+                "Spatial Autocorrelation"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "textbook_practice_07.pdf",
+            "path": "materials/textbook_practice_07.pdf",
+            "description": "Auto-generated entry for textbook_practice_07.pdf",
+            "tags": [
+                "Spatial Autocorrelation"
+            ]
+        }
+    ]
 }

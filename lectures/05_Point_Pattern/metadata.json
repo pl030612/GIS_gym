@@ -1,17 +1,174 @@
 {
-  "unit_id": 5,
-  "topic": "點模式",
-  "description": "在這個單元中，學生將學習如何分析和理解點模式的分佈。透過實作作業和實驗，學生將探索不同地理點的空間分佈特徵，並使用相應的工具進行數據分析。單元中的資料檔案包含學校資料與台灣行政區資料，將幫助學生更好地掌握點模式的應用及其在 GIS 中的重要性。",
-  "tags": [
-    "點模式",
-    "空間分析",
-    "GIS",
-    "地理資訊",
-    "資料視覺化",
-    "空間資料",
-    "分析方法",
-    "Statistics"
-  ],
-  "source_folder": "05_Point_Pattern",
-  "file_count": 16
+    "unit_id": 5,
+    "week": 5,
+    "topic": "Point Pattern",
+    "module_title": "Point Pattern Module",
+    "learning_goals": [
+        "Understand the core concepts of Point Pattern.",
+        "Practice R coding implementation."
+    ],
+    "tags": [
+        "Point Pattern",
+        "GIS",
+        "Spatial Analysis"
+    ],
+    "files": [
+        {
+            "type": "document",
+            "filename": "homework_05.docx",
+            "path": "assignments/homework_05.docx",
+            "description": "Auto-generated entry for homework_05.docx",
+            "tags": [
+                "Point Pattern"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "homework_05_en.docx",
+            "path": "assignments/homework_05_en.docx",
+            "description": "Auto-generated entry for homework_05_en.docx",
+            "tags": [
+                "Point Pattern"
+            ]
+        },
+        {
+            "type": "code",
+            "filename": "lab_code.Rmd",
+            "path": "code/lab_code.Rmd",
+            "description": "Auto-generated entry for lab_code.Rmd",
+            "tags": [
+                "Point Pattern"
+            ],
+            "language": "R",
+            "usage": "lab_implementation",
+            "data_dependencies": [],
+            "main_functions": []
+        },
+        {
+            "type": "document",
+            "filename": "practice_solution.html",
+            "path": "code/practice_solution.html",
+            "description": "Auto-generated entry for practice_solution.html",
+            "tags": [
+                "Point Pattern"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Schools.dbf",
+            "path": "data/Schools.dbf",
+            "description": "Auto-generated entry for Schools.dbf",
+            "tags": [
+                "Point Pattern"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Schools.prj",
+            "path": "data/Schools.prj",
+            "description": "Auto-generated entry for Schools.prj",
+            "tags": [
+                "Point Pattern"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Schools.sbn",
+            "path": "data/Schools.sbn",
+            "description": "Auto-generated entry for Schools.sbn",
+            "tags": [
+                "Point Pattern"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Schools.sbx",
+            "path": "data/Schools.sbx",
+            "description": "Auto-generated entry for Schools.sbx",
+            "tags": [
+                "Point Pattern"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Schools.shp",
+            "path": "data/Schools.shp",
+            "description": "Auto-generated entry for Schools.shp",
+            "tags": [
+                "Point Pattern"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Schools.shx",
+            "path": "data/Schools.shx",
+            "description": "Auto-generated entry for Schools.shx",
+            "tags": [
+                "Point Pattern"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Taiwan_town.sbx",
+            "path": "data/Taiwan_town.sbx",
+            "description": "Auto-generated entry for Taiwan_town.sbx",
+            "tags": [
+                "Point Pattern"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taiwan_town.shp",
+            "path": "data/Taiwan_town.shp",
+            "description": "Auto-generated entry for Taiwan_town.shp",
+            "tags": [
+                "Point Pattern"
+            ]
+        },
+        {
+            "type": "data",
+            "filename": "Taiwan_town.shx",
+            "path": "data/Taiwan_town.shx",
+            "description": "Auto-generated entry for Taiwan_town.shx",
+            "tags": [
+                "Point Pattern"
+            ]
+        },
+        {
+            "type": "other",
+            "filename": "Taiwan_town.xml",
+            "path": "data/Taiwan_town.xml",
+            "description": "Auto-generated entry for Taiwan_town.xml",
+            "tags": [
+                "Point Pattern"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "slides_05.pdf",
+            "path": "materials/slides_05.pdf",
+            "description": "Auto-generated entry for slides_05.pdf",
+            "tags": [
+                "Point Pattern"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "textbook_04.pdf",
+            "path": "materials/textbook_04.pdf",
+            "description": "Auto-generated entry for textbook_04.pdf",
+            "tags": [
+                "Point Pattern"
+            ]
+        },
+        {
+            "type": "document",
+            "filename": "textbook_practice_04.pdf",
+            "path": "materials/textbook_practice_04.pdf",
+            "description": "Auto-generated entry for textbook_practice_04.pdf",
+            "tags": [
+                "Point Pattern"
+            ]
+        }
+    ]
 }
