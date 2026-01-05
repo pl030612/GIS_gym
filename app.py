@@ -21,7 +21,7 @@ from langchain_community.vectorstores import FAISS
 # 0) 參數設定 & 語言包 (Settings & i18n)
 # =====================================================
 
-# 各單元截止日期 (可視需求調整)
+# 各單元截止日期
 UNIT_DEADLINES = {
     1: "2025-09-30",
     2: "2025-10-07",
@@ -36,7 +36,7 @@ UNIT_DEADLINES = {
 }
 DEFAULT_DEADLINE = "2025-12-31"
 
-# 介面翻譯字典 (UI Translations)
+# 介面翻譯字典
 TRANSLATIONS = {
     "zh": {
         "page_title": "GIS Gym｜空間分析 AI 助教平台",
@@ -168,7 +168,7 @@ TRANSLATIONS = {
     }
 }
 
-# [CORE] 雙語技能對照表 (User-Defined)
+# [CORE] 雙語技能對照表
 SKILLS_DB = {
     "zh": {
         1: ["資料讀取與檢視 (st_read)", "基礎繪圖 (plot, tmap)", "屬性篩選 (filter, select)", "t檢定 (t.test)", "機率分布 (Probability Distribution, pbinom)"],
@@ -409,7 +409,6 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
     seed = f"{q_str} spatial analysis {qtype} {level}"
     context = _retrieve_context(seed, unit_id=unit_id)
     
-    # [Logic] 決定考點 (Topic)
     unit_skills_map = SKILLS_DB.get(lang, SKILLS_DB["zh"])
     selected_method = "Random Spatial Analysis"
 
@@ -422,12 +421,10 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
         all_skills = [item for sublist in unit_skills_map.values() for item in sublist]
         selected_method = random.choice(all_skills)
 
-    # 取得檔案列表
     real_files = get_unit_files(unit_id) if unit_id else []
     file_names_str = ", ".join([f['name'] for f in real_files]) if real_files else "None"
 
     # [Logic] 雙語 Prompt 區分
-    # 修正重點：將所有指令 (System Instruction) 與 User Prompt 都納入語言判斷
     if lang == "en":
         sys_role = "You are an expert GIS Teaching Assistant. Use GPT-4o logic to create questions."
         core_point = f"🔥 **Core Concept: {selected_method}**"
@@ -439,11 +436,15 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
         """
         task_instruction = f"Task Type: {qtype}. Difficulty: {level}."
         
-        # 英文版 - 題型指令
+        # 英文版 - 題型指令 (隱藏步驟)
         if qtype in ["實作題", "Practical (R Code)"]:
             system_instruction = f"""
             You must choose a file from the list to design a task: [{file_names_str}]
             {r_rules}
+            
+            [IMPORTANT STYLE GUIDE]
+            1. In 'question_content': clearly state the **Goal** and the **Data** to use. ❌ Do NOT reveal the step-by-step solution here. Let the student think.
+            2. In 'hint': Provide the detailed steps, key R functions to use, and logical flow.
             """
             target_file_instruction = "AI selected filename (must be from list)"
         else:
@@ -457,7 +458,6 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
         json_req = "Please respond in JSON format:"
         user_prompt_text = f"Design a question based on the context. [Context] {context}"
 
-        # JSON Keys (output matches these)
         hint_label = "hint"
         q_content_label = "question_content"
         target_file_label = "target_filename"
@@ -474,12 +474,16 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
         """
         task_instruction = f"目前的題型任務是：【{qtype}】。難度：{level}。"
         
-        # 中文版 - 題型指令
+        # 中文版 - 題型指令 (隱藏步驟)
         if qtype in ["實作題", "Practical (R Code)"]:
             system_instruction = f"""
             你必須從提供的「真實檔案列表」中選擇一個檔案來設計操作任務。
             真實檔案列表: [{file_names_str}]
             {r_rules}
+            
+            【出題重要規範】
+            1. 在 'question_content' (題目) 中：只說明**任務目標**與**使用資料**。❌ 嚴禁直接列出步驟 1, 2, 3。請保留思考空間給學生。
+            2. 在 'hint' (提示) 中：才列出詳細的解題步驟、建議使用的 R 套件與函數。
             """
             target_file_instruction = "AI選擇的檔案名稱(必須完全符合列表)"
         else:
@@ -494,12 +498,10 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
         json_req = "請以 JSON 格式回傳："
         user_prompt_text = f"請根據考點與講義設計題目。[參考講義] {context}"
 
-        # JSON Keys
         hint_label = "hint"
         q_content_label = "question_content"
         target_file_label = "target_filename"
 
-    # 組裝 System Prompt
     system_prompt = f"""
     {sys_role}
     {task_instruction}
