@@ -67,13 +67,12 @@ TRANSLATIONS = {
         "btn_submit": "送出批改",
         "expander_feedback": "批改結果",
         
-        # [Key Fixed] 統一使用 fb_score
         "fb_score": "🎯 得分：", 
-        "fb_rubric": "📝 評分細項 (Rubric)",
-        "fb_strengths": "✅ 優點 (Strengths)",
-        "fb_weaknesses": "⚠️ 弱點 (Weaknesses)",
-        "fb_missing": "❌ 缺失項目 (Missing Items)",
-        "fb_action": "🚀 行動建議 (Action Items)",
+        "fb_rubric": " 評分細項 ",
+        "fb_strengths": " 優點 ",
+        "fb_weaknesses": " 弱點 ",
+        "fb_missing": " 缺失項目 ",
+        "fb_action": "行動建議 ",
         "col_crit": "評分標準",
         "col_pts": "得分",
         "col_max": "配分",
@@ -82,7 +81,7 @@ TRANSLATIONS = {
         "no_assign_file": "📂 目前沒有掃描到任何作業檔案。",
         "sel_assign_unit": "選擇作業單元",
         "header_assign_desc": "作業說明",
-        "label_deadline": "📅 截止期限:",
+        "label_deadline": " 截止期限:",
         "header_assign_data": "📂 相關圖資下載",
         "no_data_file": "（此單元無實體檔案可供下載）",
         "msg_submitted": "✅ 已繳交。分數：",
@@ -128,7 +127,6 @@ TRANSLATIONS = {
         "btn_submit": "Submit for Grading",
         "expander_feedback": "Feedback Result",
         
-        # [Key Fixed]
         "fb_score": "🎯 Score:",
         "fb_rubric": "📝 Rubric",
         "fb_strengths": "✅ Strengths",
@@ -194,7 +192,7 @@ SKILLS_DB = {
 # =====================================================
 # 1) Streamlit 基本設定 & CSS 美化
 # =====================================================
-st.set_page_config(page_title="GIS Gym", page_icon="🔮", layout="wide")
+st.set_page_config(page_title="GIS Gym", page_icon="🧪", layout="wide")
 
 # CSS 注入
 st.markdown(
@@ -839,8 +837,6 @@ def display_feedback_ui(fb, t_dict):
     
     score = fb.get('score', 0)
     level = fb.get('level', 'N/A')
-    
-    # [Fixed] 修正 Key 為 fb_score
     st.markdown(f"### {t_dict['fb_score']} {score} / 10 ({level})")
     
     st.markdown(f"#### {t_dict['fb_rubric']}")
@@ -892,6 +888,7 @@ def display_feedback_ui(fb, t_dict):
 # 11) 助教權限與 Sidebar UI
 # =====================================================
 with st.sidebar:
+    st.header("🌐 Language")
     lang_choice = st.radio(
         "Select Language:",
         ("繁體中文", "English"),
@@ -971,8 +968,7 @@ with tabs[0]:
         q_data = st.session_state["pq_data"]
         q_content = q_data.get("question_content", "")
         q_hint = q_data.get("hint", "")
-        target_file = q_data.get("target_filename")
-
+        
         st.markdown(f"### {T['header_q']} [{st.session_state['pq_meta']}]") 
         st.info(q_content)
 
@@ -981,12 +977,25 @@ with tabs[0]:
             with st.expander(f"{T['expander_hint']}{suffix}", expanded=False):
                 st.markdown(q_hint)
 
-        if target_file and target_file != "None" and target_file is not None:
-            files = get_unit_files(unit_val) if unit_val else []
-            file_path = next((f['path'] for f in files if f['name'] == target_file), None)
-            if file_path and os.path.exists(file_path):
-                with open(file_path, "rb") as fp:
-                    st.download_button(f"{T['btn_download_data']} ({target_file})", fp, target_file)
+        # [Modified] Foldable menu for files, collapsed by default
+        if unit_val:
+            all_unit_files = get_unit_files(unit_val)
+            if all_unit_files:
+                with st.expander(f"📂 {T['btn_download_data']} (Unit {unit_val} Files)", expanded=False):
+                    cols = st.columns(3)
+                    for i, f in enumerate(all_unit_files):
+                        with cols[i % 3]:
+                            with open(f['path'], "rb") as fp:
+                                st.download_button(
+                                    label=f"📥 {f['name']}", 
+                                    data=fp, 
+                                    file_name=f['name'],
+                                    mime="application/octet-stream",
+                                    key=f"dl_prac_{f['name']}"
+                                )
+            else:
+                if type_display in ["實作題", "Practical (R Code)"]:
+                    st.warning(T['no_data_file'])
         
         sid = st.session_state["student_id"]
         ans = st.text_area("Answer", height=150, key="p_ans", disabled=not sid, placeholder=T['placeholder_ans'])
@@ -1006,7 +1015,8 @@ with tabs[1]:
     if not ASSIGNMENTS_DB:
         st.info(T['no_assign_file'])
     else:
-        target_unit = st.selectbox(T['sel_assign_unit'], options=sorted(ASSIGNMENTS_DB.keys()), format_func=lambda x: f"Unit {x}")
+        target_unit = st.selectbox(T['sel_assign_unit'], options=sorted(ASSIGNMENTS_DB.keys()))
+        
         assignment = ASSIGNMENTS_DB.get(target_unit)
         
         if assignment:
@@ -1069,11 +1079,9 @@ if st.session_state["is_ta"] and len(tabs) > 2:
         if not df.empty:
             c1, c2 = st.columns([1, 2])
             with c1:
-                # 原本的下載按鈕
                 csv = df.to_csv(index=False).encode('utf-8-sig')
                 st.download_button(T['btn_dl_csv'], csv, "practice_history.csv", "text/csv")
             with c2:
-                # [New] 手動備份按鈕 (Practice)
                 if st.button(T['btn_email_backup']):
                     success = send_backup_email(
                         "GIS Gym Practice History Backup", 
@@ -1114,11 +1122,9 @@ if st.session_state["is_ta"] and len(tabs) > 2:
         if not df_sub.empty:
             c1, c2 = st.columns([1, 2])
             with c1:
-                # 原本的下載按鈕
                 csv_sub = df_sub.to_csv(index=False).encode('utf-8-sig')
                 st.download_button(T['btn_dl_csv'], csv_sub, "assignment_submissions.csv", "text/csv")
             with c2:
-                # [New] 手動備份按鈕 (Assignment)
                 if st.button(T['btn_email_backup'], key="btn_email_assign"):
                     success = send_backup_email(
                         "GIS Gym Assignment Backup", 
