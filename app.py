@@ -955,32 +955,6 @@ tabs_list = [T['tab_practice'], T['tab_assignment']]
 if st.session_state["is_ta"]: tabs_list.append(T['tab_ta'])
 tabs = st.tabs(tabs_list)
 
-# === 將此段貼在 st.sidebar 的最後面 ===
-    st.divider()
-    st.markdown("### 🔧 測試區")
-    if st.button("測試寄信功能"):
-        # 測試看看 secrets 是否讀得到
-        if "email" not in st.secrets:
-            st.error("❌ 找不到 secrets 設定！請檢查 .streamlit/secrets.toml")
-        else:
-            try:
-                # 嘗試寄出一封簡單的信
-                email_config = st.secrets["email"]
-                server = smtplib.SMTP(email_config["smtp_server"], email_config["smtp_port"])
-                server.starttls()
-                server.login(email_config["sender_email"], email_config["sender_password"])
-                
-                msg = MIMEText("這是一封測試信，代表系統 Email 功能正常！")
-                msg['From'] = email_config["sender_email"]
-                msg['To'] = email_config["receiver_email"]
-                msg['Subject'] = "GIS Gym 系統測試信"
-                
-                server.send_message(msg)
-                server.quit()
-                st.success(f"✅ 測試信已寄出！請檢查 {email_config['receiver_email']}")
-            except Exception as e:
-                st.error(f"❌ 寄信失敗，錯誤原因：\n{e}")
-
 # -----------------------------------------------------
 # Tab 1: Practice (自主練習)
 # -----------------------------------------------------
@@ -1037,7 +1011,7 @@ with tabs[0]:
                         with cols[i % 3]:
                             with open(f['path'], "rb") as fp:
                                 st.download_button(
-                                    label=f"{f['name']}", 
+                                    label=f"📥 {f['name']}", 
                                     data=fp, 
                                     file_name=f['name'],
                                     mime="application/octet-stream",
