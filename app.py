@@ -1006,7 +1006,7 @@ with tabs[0]:
                         with cols[i % 3]:
                             with open(f['path'], "rb") as fp:
                                 st.download_button(
-                                    label=f"{f['name']}", 
+                                    label=f"📥 {f['name']}", 
                                     data=fp, 
                                     file_name=f['name'],
                                     mime="application/octet-stream",
