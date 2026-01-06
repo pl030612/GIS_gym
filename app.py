@@ -40,8 +40,8 @@ DEFAULT_DEADLINE = "2025-12-31"
 
 TRANSLATIONS = {
     "zh": {
-        "page_title": "🔮 GIS Gym",  # [Modified] 精簡標題
-        "caption": "空間分析 AI 助教平台 | 自主練習 (Real Data) | 單元作業 (Assignments)",
+        "page_title": "🔮 GIS Gym",
+        # "caption": "空間分析 AI 助教平台 | 自主練習 (Real Data) | 單元作業 (Assignments)",
         "sidebar_user": "使用者設定",
         "label_student_id": "輸入學號",
         "ta_login": "助教登入",
@@ -101,8 +101,8 @@ TRANSLATIONS = {
         "msg_email_fail": "寄信失敗: {}"
     },
     "en": {
-        "page_title": "🔮 GIS Gym", # [Modified] Simplified Title
-        "caption": "Spatial Analysis AI Tutor | Self-Practice | Assignments",
+        "page_title": "🔮 GIS Gym",
+        # "caption": "Spatial Analysis AI Tutor | Self-Practice | Assignments",
         "sidebar_user": "User Settings",
         "label_student_id": "Student ID",
         "ta_login": "TA Login",
@@ -999,7 +999,7 @@ with tabs[0]:
             with st.expander(f"{T['expander_hint']}{suffix}", expanded=False):
                 st.markdown(q_hint)
 
-        # [Modified] Only show files if NOT a short answer question
+        # [Logic Check] Only show files if NOT a short answer question
         is_short_answer = (type_display in [T['opt_short'], "簡答題", "Short Answer"])
         
         if unit_val and not is_short_answer:
@@ -1011,7 +1011,7 @@ with tabs[0]:
                         with cols[i % 3]:
                             with open(f['path'], "rb") as fp:
                                 st.download_button(
-                                    label=f"📥 {f['name']}", 
+                                    label=f"{f['name']}", 
                                     data=fp, 
                                     file_name=f['name'],
                                     mime="application/octet-stream",
@@ -1047,14 +1047,21 @@ with tabs[1]:
             st.caption(f"{T['label_deadline']} {assignment['deadline']}")
             st.markdown(assignment['description'])
             
-            st.markdown(f"#### {T['header_assign_data']}")
+            # [Modified] Foldable menu for assignment files
             real_files = get_unit_files(target_unit)
             if real_files:
-                cols = st.columns(len(real_files)) if len(real_files) < 4 else st.columns(4)
-                for i, f in enumerate(real_files):
-                    with cols[i % 4]:
-                        with open(f['path'], "rb") as fp:
-                            st.download_button(f"📥 {f['name']}", fp, f['name'])
+                with st.expander(f"📂 {T['header_assign_data']}", expanded=False):
+                    cols = st.columns(3)
+                    for i, f in enumerate(real_files):
+                        with cols[i % 3]:
+                            with open(f['path'], "rb") as fp:
+                                st.download_button(
+                                    label=f"{f['name']}", 
+                                    data=fp, 
+                                    file_name=f['name'],
+                                    mime="application/octet-stream",
+                                    key=f"dl_assign_{f['name']}"
+                                )
             else:
                 st.caption(T['no_data_file'])
             
@@ -1164,6 +1171,6 @@ if st.session_state["is_ta"] and len(tabs) > 2:
 
             target_order = ["timestamp", "student_id", "unit_id", "score", "weakness", "answer"]
             display_cols = [c for c in target_order if c in df_sub.columns]
-            st.dataframe(df_sub[display_cols], use_container_width=True, hide_index=True, height=300)
+            st.dataframe(df_sub[display_cols], uFse_container_width=True, hide_index=True, height=300)
         else:
             st.info(T['msg_no_data'])
