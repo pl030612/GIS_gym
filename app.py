@@ -885,7 +885,6 @@ def display_feedback_ui(fb, t_dict):
 # 11) 助教權限與 Sidebar UI
 # =====================================================
 with st.sidebar:
-    st.header("Language")
     lang_choice = st.radio(
         "Select Language:",
         ("繁體中文", "English"),
