@@ -4,7 +4,11 @@ import glob
 import sqlite3
 import random
 import re
-import docx2txt  # pip install docx2txt
+import docx2txt
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.application import MIMEApplication
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -18,10 +22,8 @@ from langchain_community.vectorstores import FAISS
 
 
 # =====================================================
-# 0) 參數設定 & 語言包 (Settings & i18n)
+# 0) 參數設定 & 語言包
 # =====================================================
-
-# 各單元截止日期
 UNIT_DEADLINES = {
     1: "2025-09-30",
     2: "2025-10-07",
@@ -36,7 +38,6 @@ UNIT_DEADLINES = {
 }
 DEFAULT_DEADLINE = "2025-12-31"
 
-# 介面翻譯字典
 TRANSLATIONS = {
     "zh": {
         "page_title": "GIS Gym｜空間分析 AI 助教平台",
@@ -50,8 +51,6 @@ TRANSLATIONS = {
         "tab_practice": "自主練習",
         "tab_assignment": "單元作業",
         "tab_ta": "助教後台",
-        
-        # Practice Tab
         "sel_unit": "選擇單元",
         "sel_topic": "主題",
         "sel_level": "難度",
@@ -68,8 +67,6 @@ TRANSLATIONS = {
         "placeholder_ans": "輸入答案...",
         "btn_submit": "送出批改",
         "expander_feedback": "批改結果",
-        
-        # Feedback UI
         "fb_score": "🎯 得分：",
         "fb_rubric": "📝 評分細項 (Rubric)",
         "fb_strengths": "✅ 優點 (Strengths)",
@@ -80,9 +77,7 @@ TRANSLATIONS = {
         "col_pts": "得分",
         "col_max": "配分",
         "col_evi": "證據/評語",
-        
-        # Assignment Tab
-        "no_assign_file": "📂 目前沒有掃描到任何作業檔案 (homework/assignment*.docx)。",
+        "no_assign_file": "📂 目前沒有掃描到任何作業檔案。",
         "sel_assign_unit": "選擇作業單元",
         "header_assign_desc": "作業說明",
         "label_deadline": "📅 截止期限:",
@@ -90,8 +85,6 @@ TRANSLATIONS = {
         "no_data_file": "（此單元無實體檔案可供下載）",
         "msg_submitted": "✅ 已繳交。分數：",
         "btn_submit_assign": "繳交 Unit {} 作業",
-        
-        # TA Tab
         "header_ta_report": "AI 教學顧問報告",
         "btn_gen_report": "生成分析報告",
         "header_prac_history": "自主練習紀錄 (Practice)",
@@ -100,7 +93,10 @@ TRANSLATIONS = {
         "col_weakness": "弱點摘要",
         "msg_no_data": "無資料",
         "msg_edit_bonus": "編輯加分: ID {} ({})",
-        "btn_update": "更新"
+        "btn_update": "更新",
+        "btn_email_backup": "📧 將完整 CSV 寄給助教",
+        "msg_email_sent": "✅ 備份信件已寄出！",
+        "msg_email_fail": "❌ 寄信失敗: {}"
     },
     "en": {
         "page_title": "GIS Gym | Spatial Analysis AI Tutor",
@@ -114,8 +110,6 @@ TRANSLATIONS = {
         "tab_practice": "Practice",
         "tab_assignment": "Assignments",
         "tab_ta": "TA Dashboard",
-        
-        # Practice Tab
         "sel_unit": "Unit",
         "sel_topic": "Topic",
         "sel_level": "Level",
@@ -132,8 +126,6 @@ TRANSLATIONS = {
         "placeholder_ans": "Your answer...",
         "btn_submit": "Submit for Grading",
         "expander_feedback": "Feedback Result",
-        
-        # Feedback UI
         "fb_score": "🎯 Score:",
         "fb_rubric": "📝 Rubric",
         "fb_strengths": "✅ Strengths",
@@ -144,18 +136,14 @@ TRANSLATIONS = {
         "col_pts": "Points",
         "col_max": "Max",
         "col_evi": "Evidence",
-        
-        # Assignment Tab
-        "no_assign_file": "📂 No assignment files found (homework/assignment*.docx).",
+        "no_assign_file": "📂 No assignment files found.",
         "sel_assign_unit": "Select Unit",
         "header_assign_desc": "Instructions",
         "label_deadline": "📅 Deadline:",
         "header_assign_data": "📂 Related Datasets",
-        "no_data_file": "(No files available for this unit)",
+        "no_data_file": "(No files available)",
         "msg_submitted": "✅ Submitted. Score:",
         "btn_submit_assign": "Submit Unit {} Assignment",
-        
-        # TA Tab
         "header_ta_report": "AI Consultant Report",
         "btn_gen_report": "Generate Report",
         "header_prac_history": "Practice History",
@@ -164,11 +152,13 @@ TRANSLATIONS = {
         "col_weakness": "Weaknesses Summary",
         "msg_no_data": "No Data",
         "msg_edit_bonus": "Edit Bonus: ID {} ({})",
-        "btn_update": "Update"
+        "btn_update": "Update",
+        "btn_email_backup": "📧 Email CSV Backup to TA",
+        "msg_email_sent": "✅ Backup email sent!",
+        "msg_email_fail": "❌ Email failed: {}"
     }
 }
 
-# [CORE] 雙語技能對照表
 SKILLS_DB = {
     "zh": {
         1: ["資料讀取與檢視 (st_read)", "基礎繪圖 (plot, tmap)", "屬性篩選 (filter, select)", "t檢定 (t.test)", "機率分布 (Probability Distribution, pbinom)"],
@@ -279,7 +269,7 @@ init_db()
 
 
 # =====================================================
-# 5) 資料載入：Metadata、真實檔案、Word作業
+# 5) 資料載入與讀取器
 # =====================================================
 @st.cache_data(show_spinner=False)
 def load_all_metadata():
@@ -402,7 +392,79 @@ def _retrieve_context(query: str, unit_id: int | None, k: int = 8) -> str:
 
 
 # =====================================================
-# 7) AI 功能：GPT-4o (雙語版 & 指定主題 & 嚴格評分)
+# 7) Helper Functions (Move Up)
+# =====================================================
+def extract_weaknesses(val):
+    try:
+        if not val: return ""
+        d = json.loads(val)
+        w = d.get("weaknesses", [])
+        if isinstance(w, list):
+            return "; ".join([f"{i+1}. {x}" for i, x in enumerate(w)])
+        return str(w)
+    except:
+        return ""
+
+def read_history_join_bonus() -> pd.DataFrame:
+    conn = sqlite3.connect(DB_PATH)
+    q = """
+    SELECT lh.id, lh.timestamp, lh.student_id, lh.unit_id, lh.score, lh.question, lh.feedback_json,
+           COALESCE(bp.bonus, 0) AS bonus,
+           (COALESCE(lh.score, 0) + COALESCE(bp.bonus, 0)) AS total_score,
+           bp.note AS bonus_note
+    FROM learning_history lh
+    LEFT JOIN bonus_points bp ON lh.id = bp.history_id
+    ORDER BY lh.id DESC
+    """
+    df = pd.read_sql(q, conn)
+    conn.close()
+    return df
+
+def read_submissions_all() -> pd.DataFrame:
+    conn = sqlite3.connect(DB_PATH)
+    df = pd.read_sql("SELECT * FROM submissions ORDER BY id DESC", conn)
+    conn.close()
+    return df
+
+# [New] Email Sending Function
+def send_backup_email(subject, body, csv_data=None, csv_filename="backup.csv"):
+    if "email" not in st.secrets:
+        # 如果沒設定 email secrets，就默默略過
+        return False
+
+    try:
+        email_config = st.secrets["email"]
+        sender = email_config["sender_email"]
+        password = email_config["sender_password"]
+        receiver = email_config["receiver_email"]
+        smtp_server = email_config["smtp_server"]
+        smtp_port = email_config["smtp_port"]
+
+        msg = MIMEMultipart()
+        msg['From'] = sender
+        msg['To'] = receiver
+        msg['Subject'] = subject
+        msg.attach(MIMEText(body, 'plain'))
+
+        # Attach CSV if provided
+        if csv_data:
+            part = MIMEApplication(csv_data, Name=csv_filename)
+            part['Content-Disposition'] = f'attachment; filename="{csv_filename}"'
+            msg.attach(part)
+
+        with smtplib.SMTP(smtp_server, smtp_port) as server:
+            server.starttls()
+            server.login(sender, password)
+            server.send_message(msg)
+        
+        return True
+    except Exception as e:
+        print(f"Email Error: {e}")
+        return False
+
+
+# =====================================================
+# 8) AI 功能：GPT-4o
 # =====================================================
 def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | None, specific_topic: str | None, lang: str) -> dict:
     q_str = f"Unit {unit_id}" if unit_id else ""
@@ -424,7 +486,6 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
     real_files = get_unit_files(unit_id) if unit_id else []
     file_names_str = ", ".join([f['name'] for f in real_files]) if real_files else "None"
 
-    # [Logic] 雙語 Prompt 區分
     if lang == "en":
         sys_role = "You are an expert GIS Teaching Assistant. Use GPT-4o logic to create questions."
         core_point = f"🔥 **Core Concept: {selected_method}**"
@@ -436,7 +497,6 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
         """
         task_instruction = f"Task Type: {qtype}. Difficulty: {level}."
         
-        # 英文版 - 題型指令 (隱藏步驟)
         if qtype in ["實作題", "Practical (R Code)"]:
             system_instruction = f"""
             You must choose a file from the list to design a task: [{file_names_str}]
@@ -457,13 +517,11 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
             
         json_req = "Please respond in JSON format:"
         user_prompt_text = f"Design a question based on the context. [Context] {context}"
-
         hint_label = "hint"
         q_content_label = "question_content"
         target_file_label = "target_filename"
 
     else:
-        # 中文版
         sys_role = "你是頂尖的空間分析助教。請使用 GPT-4o 的強大邏輯來出題。"
         core_point = f"🔥 **本次題目核心考點：{selected_method}**"
         r_rules = """
@@ -474,7 +532,6 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
         """
         task_instruction = f"目前的題型任務是：【{qtype}】。難度：{level}。"
         
-        # 中文版 - 題型指令 (隱藏步驟)
         if qtype in ["實作題", "Practical (R Code)"]:
             system_instruction = f"""
             你必須從提供的「真實檔案列表」中選擇一個檔案來設計操作任務。
@@ -497,7 +554,6 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
 
         json_req = "請以 JSON 格式回傳："
         user_prompt_text = f"請根據考點與講義設計題目。[參考講義] {context}"
-
         hint_label = "hint"
         q_content_label = "question_content"
         target_file_label = "target_filename"
@@ -669,7 +725,7 @@ def generate_weakness_report(unit_id: int):
 
 
 # =====================================================
-# 8) DB Log Functions
+# 9) DB Log Functions (整合 Email 自動備份)
 # =====================================================
 def log_practice(sid, uid, q, fb):
     conn = sqlite3.connect(DB_PATH)
@@ -680,6 +736,32 @@ def log_practice(sid, uid, q, fb):
     """, (datetime.now().isoformat(), sid, uid, q, fb.get('score'), fb.get('level'), json.dumps(fb, ensure_ascii=False)))
     conn.commit()
     conn.close()
+    
+    # [UPDATED] 立即讀取完整資料表並製作 CSV 寄出
+    try:
+        df = read_history_join_bonus()
+        # 解析 weakness 讓 CSV 好讀
+        df["weakness"] = df["feedback_json"].apply(extract_weaknesses)
+        csv_data = df.to_csv(index=False).encode('utf-8-sig')
+        
+        email_body = f"""
+        [GIS Gym Practice Auto-Backup]
+        Timestamp: {datetime.now()}
+        Student: {sid}
+        Unit: {uid}
+        Question: {q}
+        Score: {fb.get('score')}
+        """
+        # 檔名加上時間戳記
+        ts = datetime.now().strftime('%Y%m%d_%H%M')
+        send_backup_email(
+            f"GIS Gym Practice: {sid} (Latest CSV)", 
+            email_body, 
+            csv_data=csv_data, 
+            csv_filename=f"practice_history_{ts}.csv"
+        )
+    except Exception as e:
+        print(f"Auto-backup email failed: {e}")
 
 def log_assignment_submission(assign_id, sid, uid, ans, fb):
     conn = sqlite3.connect(DB_PATH)
@@ -691,6 +773,30 @@ def log_assignment_submission(assign_id, sid, uid, ans, fb):
     conn.commit()
     conn.close()
 
+    # [UPDATED] 立即讀取完整作業紀錄並製作 CSV 寄出
+    try:
+        df_sub = read_submissions_all()
+        # 解析 weakness
+        df_sub["weakness"] = df_sub["feedback_json"].apply(extract_weaknesses)
+        csv_sub = df_sub.to_csv(index=False).encode('utf-8-sig')
+        
+        email_body = f"""
+        [GIS Gym Assignment Auto-Backup]
+        Timestamp: {datetime.now()}
+        Student: {sid}
+        Unit: {uid}
+        Assignment ID: {assign_id}
+        """
+        ts = datetime.now().strftime('%Y%m%d_%H%M')
+        send_backup_email(
+            f"GIS Gym Assignment: {sid} (Latest CSV)", 
+            email_body, 
+            csv_data=csv_sub, 
+            csv_filename=f"assignment_submissions_{ts}.csv"
+        )
+    except Exception as e:
+        print(f"Auto-backup email failed: {e}")
+
 def get_student_submission(sid, assign_id):
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
@@ -698,27 +804,6 @@ def get_student_submission(sid, assign_id):
     row = cur.fetchone()
     conn.close()
     return row
-
-def read_history_join_bonus() -> pd.DataFrame:
-    conn = sqlite3.connect(DB_PATH)
-    q = """
-    SELECT lh.id, lh.timestamp, lh.student_id, lh.unit_id, lh.score, lh.question, lh.feedback_json,
-           COALESCE(bp.bonus, 0) AS bonus,
-           (COALESCE(lh.score, 0) + COALESCE(bp.bonus, 0)) AS total_score,
-           bp.note AS bonus_note
-    FROM learning_history lh
-    LEFT JOIN bonus_points bp ON lh.id = bp.history_id
-    ORDER BY lh.id DESC
-    """
-    df = pd.read_sql(q, conn)
-    conn.close()
-    return df
-
-def read_submissions_all() -> pd.DataFrame:
-    conn = sqlite3.connect(DB_PATH)
-    df = pd.read_sql("SELECT * FROM submissions ORDER BY id DESC", conn)
-    conn.close()
-    return df
 
 def upsert_bonus(history_id, bonus, note):
     conn = sqlite3.connect(DB_PATH)
@@ -735,30 +820,23 @@ def upsert_bonus(history_id, bonus, note):
 
 
 # =====================================================
-# 9) UI Helper Functions (Updated for New Schema)
+# 10) UI Helper Functions
 # =====================================================
 def display_feedback_ui(fb, t_dict):
-    """
-    自訂評分顯示 UI (支援新版 Rubric Schema)
-    """
     if not fb: return
     
-    # Score & Level
     score = fb.get('score', 0)
     level = fb.get('level', 'N/A')
     st.markdown(f"### {t_dict['fb_score']} {score} / 10 ({level})")
     
-    # 1. Rubric Table
     st.markdown(f"#### {t_dict['fb_rubric']}")
     if 'rubric' in fb and isinstance(fb['rubric'], list):
         rubric_df = pd.DataFrame(fb['rubric'])
-        # 重新命名欄位以符合語言設定
         rubric_df.columns = [t_dict['col_crit'], t_dict['col_pts'], t_dict['col_max'], t_dict['col_evi']]
         st.table(rubric_df)
     else:
         st.write("-")
 
-    # 2. Strengths & Weaknesses
     c1, c2 = st.columns(2)
     with c1:
         st.markdown(f"#### {t_dict['fb_strengths']}")
@@ -768,7 +846,6 @@ def display_feedback_ui(fb, t_dict):
                 st.markdown(f"- {s}")
         else:
             st.write("-")
-            
     with c2:
         st.markdown(f"#### {t_dict['fb_weaknesses']}")
         weaknesses = fb.get('weaknesses', [])
@@ -778,7 +855,6 @@ def display_feedback_ui(fb, t_dict):
         else:
             st.write("-")
     
-    # 3. Missing Items
     st.markdown(f"#### {t_dict['fb_missing']}")
     missing = fb.get('missing_items', [])
     if missing:
@@ -787,32 +863,19 @@ def display_feedback_ui(fb, t_dict):
     else:
         st.write("(None)")
 
-    # 4. Action Items
     st.markdown(f"#### {t_dict['fb_action']}")
     actions = fb.get('action_items', [])
     if actions:
         for a in actions:
-            # Handle action items structure (goal -> how)
             goal = a.get('goal', '')
             how = a.get('how', '')
             st.info(f"**Goal**: {goal}\n\n**How**: {how}")
     else:
         st.write("(None)")
 
-def extract_weaknesses(val):
-    try:
-        if not val: return ""
-        d = json.loads(val)
-        w = d.get("weaknesses", [])
-        if isinstance(w, list):
-            return "; ".join([f"{i+1}. {x}" for i, x in enumerate(w)])
-        return str(w)
-    except:
-        return ""
-
 
 # =====================================================
-# 10) 助教權限與 Sidebar UI
+# 11) 助教權限與 Sidebar UI
 # =====================================================
 with st.sidebar:
     st.markdown("### 🌐 Language")
@@ -984,13 +1047,29 @@ if st.session_state["is_ta"] and len(tabs) > 2:
         
         st.markdown("---")
         
+        # Practice History
         st.markdown(f"### {T['header_prac_history']}") 
         df = read_history_join_bonus()
+        
         if not df.empty:
+            c1, c2 = st.columns([1, 2])
+            with c1:
+                # 原本的下載按鈕
+                csv = df.to_csv(index=False).encode('utf-8-sig')
+                st.download_button(T['btn_dl_csv'], csv, "practice_history.csv", "text/csv")
+            with c2:
+                # [New] 手動備份按鈕 (Practice)
+                if st.button(T['btn_email_backup']):
+                    success = send_backup_email(
+                        "GIS Gym Practice History Backup", 
+                        "Attached is the full practice history CSV.",
+                        csv_data=csv,
+                        csv_filename="practice_history.csv"
+                    )
+                    if success: st.success(T['msg_email_sent'])
+                    else: st.error(T['msg_email_fail'].format("Check secrets"))
+
             df["weakness"] = df["feedback_json"].apply(extract_weaknesses)
-            csv = df.to_csv(index=False).encode('utf-8-sig')
-            st.download_button(T['btn_dl_csv'], csv, "practice_history.csv", "text/csv")
-            
             f_unit = st.multiselect("Filter Unit", sorted(df['unit_id'].dropna().unique()), key="f_unit_prac")
             if f_unit: df = df[df['unit_id'].isin(f_unit)]
             
@@ -1014,13 +1093,28 @@ if st.session_state["is_ta"] and len(tabs) > 2:
 
         st.markdown("---")
 
+        # Assignment Submissions
         st.markdown(f"### {T['header_assign_history']}") 
         df_sub = read_submissions_all()
         if not df_sub.empty:
-            df_sub["weakness"] = df_sub["feedback_json"].apply(extract_weaknesses)
-            csv_sub = df_sub.to_csv(index=False).encode('utf-8-sig')
-            st.download_button(T['btn_dl_csv'], csv_sub, "assignment_submissions.csv", "text/csv")
+            c1, c2 = st.columns([1, 2])
+            with c1:
+                # 原本的下載按鈕
+                csv_sub = df_sub.to_csv(index=False).encode('utf-8-sig')
+                st.download_button(T['btn_dl_csv'], csv_sub, "assignment_submissions.csv", "text/csv")
+            with c2:
+                # [New] 手動備份按鈕 (Assignment)
+                if st.button(T['btn_email_backup'], key="btn_email_assign"):
+                    success = send_backup_email(
+                        "GIS Gym Assignment Backup", 
+                        "Attached is the full assignment submissions CSV.",
+                        csv_data=csv_sub,
+                        csv_filename="assignment_submissions.csv"
+                    )
+                    if success: st.success(T['msg_email_sent'])
+                    else: st.error(T['msg_email_fail'].format("Check secrets"))
 
+            df_sub["weakness"] = df_sub["feedback_json"].apply(extract_weaknesses)
             f_unit_sub = st.multiselect("Filter Unit (Assign)", sorted(df_sub['unit_id'].dropna().unique()), key="f_unit_sub")
             if f_unit_sub: df_sub = df_sub[df_sub['unit_id'].isin(f_unit_sub)]
 
