@@ -66,7 +66,9 @@ TRANSLATIONS = {
         "placeholder_ans": "輸入答案...",
         "btn_submit": "送出批改",
         "expander_feedback": "批改結果",
-        "fb_score": "🎯 得分：",
+        
+        # [Key Fixed] 統一使用 fb_score
+        "fb_score": "🎯 得分：", 
         "fb_rubric": "📝 評分細項 (Rubric)",
         "fb_strengths": "✅ 優點 (Strengths)",
         "fb_weaknesses": "⚠️ 弱點 (Weaknesses)",
@@ -76,6 +78,7 @@ TRANSLATIONS = {
         "col_pts": "得分",
         "col_max": "配分",
         "col_evi": "證據/評語",
+        
         "no_assign_file": "📂 目前沒有掃描到任何作業檔案。",
         "sel_assign_unit": "選擇作業單元",
         "header_assign_desc": "作業說明",
@@ -124,6 +127,8 @@ TRANSLATIONS = {
         "placeholder_ans": "Your answer...",
         "btn_submit": "Submit for Grading",
         "expander_feedback": "Feedback Result",
+        
+        # [Key Fixed]
         "fb_score": "🎯 Score:",
         "fb_rubric": "📝 Rubric",
         "fb_strengths": "✅ Strengths",
@@ -134,6 +139,7 @@ TRANSLATIONS = {
         "col_pts": "Points",
         "col_max": "Max",
         "col_evi": "Evidence",
+        
         "no_assign_file": "📂 No assignment files found.",
         "sel_assign_unit": "Select Unit",
         "header_assign_desc": "Instructions",
@@ -190,11 +196,10 @@ SKILLS_DB = {
 # =====================================================
 st.set_page_config(page_title="GIS Gym", page_icon="🔮", layout="wide")
 
-# [NEW] CSS 注入：調整側邊欄留白與字體
+# CSS 注入
 st.markdown(
     """
     <style>
-    /* 縮減側邊欄頂部不必要的留白 */
     section[data-testid="stSidebar"] div.block-container {
         padding-top: 2rem;
     }
@@ -407,7 +412,7 @@ def _retrieve_context(query: str, unit_id: int | None, k: int = 8) -> str:
 
 
 # =====================================================
-# 7) Helper Functions (Move Up)
+# 7) Helper Functions
 # =====================================================
 def extract_weaknesses(val):
     try:
@@ -476,7 +481,7 @@ def send_backup_email(subject, body, csv_data=None, csv_filename="backup.csv"):
 
 
 # =====================================================
-# 8) AI 功能：GPT-4o
+# 8) AI 功能
 # =====================================================
 def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | None, specific_topic: str | None, lang: str) -> dict:
     q_str = f"Unit {unit_id}" if unit_id else ""
@@ -834,6 +839,8 @@ def display_feedback_ui(fb, t_dict):
     
     score = fb.get('score', 0)
     level = fb.get('level', 'N/A')
+    
+    # [Fixed] 修正 Key 為 fb_score
     st.markdown(f"### {t_dict['fb_score']} {score} / 10 ({level})")
     
     st.markdown(f"#### {t_dict['fb_rubric']}")
@@ -988,7 +995,7 @@ with tabs[0]:
             with st.spinner("Grading..."):
                 fb = grade_submission(q_content, ans, unit_val, st.session_state["language"])
                 log_practice(sid, unit_val, q_content, fb)
-                st.success(f"{T['feedback_score']} {fb.get('score')}")
+                st.success(f"{T['fb_score']} {fb.get('score')}")
                 with st.expander(T['expander_feedback'], expanded=True): 
                     display_feedback_ui(fb, T)
 
