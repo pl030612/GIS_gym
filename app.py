@@ -40,8 +40,7 @@ DEFAULT_DEADLINE = "2025-12-31"
 
 TRANSLATIONS = {
     "zh": {
-        "page_title": "GIS Gym｜空間分析 AI 助教平台",
-        "caption": "自主練習 (Real Data) | 單元作業 (Assignments) | 助教分析 (AI Consultant)",
+        "page_title": "GIS Gym",
         "sidebar_user": "👤 使用者設定",
         "label_student_id": "輸入學號",
         "ta_login": "🔒 助教登入",
@@ -99,8 +98,7 @@ TRANSLATIONS = {
         "msg_email_fail": "❌ 寄信失敗: {}"
     },
     "en": {
-        "page_title": "GIS Gym | Spatial Analysis AI Tutor",
-        "caption": "Self-Practice (Real Data) | Assignments | TA Analysis",
+        "page_title": "GIS Gym",
         "sidebar_user": "👤 User Settings",
         "label_student_id": "Student ID",
         "ta_login": "🔒 TA Login",
@@ -198,8 +196,7 @@ if "language" not in st.session_state:
 T = TRANSLATIONS[st.session_state["language"]]
 
 # [修正] 補回這兩行，標題才會出現！
-st.title(f"🧪 {T['page_title']}")
-st.caption(T['caption'])
+st.title(f"🔮 {T['page_title']}")
 
 
 # =====================================================
