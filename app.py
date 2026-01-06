@@ -190,10 +190,16 @@ SKILLS_DB = {
 # =====================================================
 # 1) Streamlit 基本設定
 # =====================================================
+st.set_page_config(page_title="GIS Gym", page_icon="🧪", layout="wide")
+
 if "language" not in st.session_state:
     st.session_state["language"] = "zh"
 
 T = TRANSLATIONS[st.session_state["language"]]
+
+# [修正] 補回這兩行，標題才會出現！
+st.title(f"🧪 {T['page_title']}")
+st.caption(T['caption'])
 
 
 # =====================================================
