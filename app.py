@@ -41,7 +41,6 @@ DEFAULT_DEADLINE = "2025-12-31"
 TRANSLATIONS = {
     "zh": {
         "page_title": "🔮 GIS Gym",
-        "caption": "空間分析 AI 助教平台 | 自主練習 (Real Data) | 單元作業 (Assignments)",
         "sidebar_user": "使用者設定",
         "label_student_id": "輸入學號",
         "ta_login": "助教登入",
@@ -86,7 +85,7 @@ TRANSLATIONS = {
         "header_assign_data": "相關圖資下載",
         "no_data_file": "（此單元無實體檔案可供下載）",
         "msg_submitted": "已繳交。分數：",
-        "btn_submit_assign": "繳交作業", # [Modified] 簡化文字
+        "btn_submit_assign": "繳交作業",
         "header_ta_report": "AI 教學顧問報告",
         "btn_gen_report": "生成分析報告",
         "header_prac_history": "自主練習紀錄",
@@ -96,13 +95,11 @@ TRANSLATIONS = {
         "msg_no_data": "無資料",
         "msg_edit_bonus": "編輯加分: ID {} ({})",
         "btn_update": "更新",
-        "btn_email_backup": "將完整 CSV 寄給助教",
         "msg_email_sent": "備份信件已寄出！",
         "msg_email_fail": "寄信失敗: {}"
     },
     "en": {
         "page_title": "🔮 GIS Gym",
-        "caption": "Spatial Analysis AI Tutor | Self-Practice | Assignments",
         "sidebar_user": "User Settings",
         "label_student_id": "Student ID",
         "ta_login": "TA Login",
@@ -147,7 +144,7 @@ TRANSLATIONS = {
         "header_assign_data": "Related Datasets",
         "no_data_file": "(No files available)",
         "msg_submitted": "Submitted. Score:",
-        "btn_submit_assign": "Submit Assignment", # [Modified] Simplified
+        "btn_submit_assign": "Submit Assignment",
         "header_ta_report": "AI Consultant Report",
         "btn_gen_report": "Generate Report",
         "header_prac_history": "Practice History",
@@ -157,7 +154,6 @@ TRANSLATIONS = {
         "msg_no_data": "No Data",
         "msg_edit_bonus": "Edit Bonus: ID {} ({})",
         "btn_update": "Update",
-        "btn_email_backup": "Email CSV Backup to TA",
         "msg_email_sent": "Backup email sent!",
         "msg_email_fail": "Email failed: {}"
     }
@@ -214,7 +210,7 @@ if "language" not in st.session_state:
 T = TRANSLATIONS[st.session_state["language"]]
 
 st.title(f"{T['page_title']}")
-st.caption(T['caption'])
+# st.caption(T['caption'])
 
 
 # =====================================================
@@ -910,7 +906,6 @@ def display_feedback_ui(fb, t_dict):
 # 11) 助教權限與 Sidebar UI
 # =====================================================
 with st.sidebar:
-    st.header("🌐 Language")
     lang_choice = st.radio(
         "Select Language:",
         ("繁體中文", "English"),
@@ -954,32 +949,6 @@ with st.sidebar:
 tabs_list = [T['tab_practice'], T['tab_assignment']]
 if st.session_state["is_ta"]: tabs_list.append(T['tab_ta'])
 tabs = st.tabs(tabs_list)
-
-# === 將此段貼在 st.sidebar 的最後面 ===
-    st.divider()
-    st.markdown("### 🔧 測試區")
-    if st.button("測試寄信功能"):
-        # 測試看看 secrets 是否讀得到
-        if "email" not in st.secrets:
-            st.error("❌ 找不到 secrets 設定！請檢查 .streamlit/secrets.toml")
-        else:
-            try:
-                # 嘗試寄出一封簡單的信
-                email_config = st.secrets["email"]
-                server = smtplib.SMTP(email_config["smtp_server"], email_config["smtp_port"])
-                server.starttls()
-                server.login(email_config["sender_email"], email_config["sender_password"])
-                
-                msg = MIMEText("這是一封測試信，代表系統 Email 功能正常！")
-                msg['From'] = email_config["sender_email"]
-                msg['To'] = email_config["receiver_email"]
-                msg['Subject'] = "GIS Gym 系統測試信"
-                
-                server.send_message(msg)
-                server.quit()
-                st.success(f"✅ 測試信已寄出！請檢查 {email_config['receiver_email']}")
-            except Exception as e:
-                st.error(f"❌ 寄信失敗，錯誤原因：\n{e}")
 
 # -----------------------------------------------------
 # Tab 1: Practice (自主練習)
@@ -1139,15 +1108,7 @@ if st.session_state["is_ta"] and len(tabs) > 2:
                 csv = df.to_csv(index=False).encode('utf-8-sig')
                 st.download_button(T['btn_dl_csv'], csv, "practice_history.csv", "text/csv")
             with c2:
-                if st.button(T['btn_email_backup']):
-                    success = send_backup_email(
-                        "GIS Gym Practice History Backup", 
-                        "Attached is the full practice history CSV.",
-                        csv_data=csv,
-                        csv_filename="practice_history.csv"
-                    )
-                    if success: st.success(T['msg_email_sent'])
-                    else: st.error(T['msg_email_fail'].format("Check secrets"))
+                pass # removed manual email button
 
             df["weakness"] = df["feedback_json"].apply(extract_weaknesses)
             f_unit = st.multiselect("Filter Unit", sorted(df['unit_id'].dropna().unique()), key="f_unit_prac")
@@ -1182,15 +1143,7 @@ if st.session_state["is_ta"] and len(tabs) > 2:
                 csv_sub = df_sub.to_csv(index=False).encode('utf-8-sig')
                 st.download_button(T['btn_dl_csv'], csv_sub, "assignment_submissions.csv", "text/csv")
             with c2:
-                if st.button(T['btn_email_backup'], key="btn_email_assign"):
-                    success = send_backup_email(
-                        "GIS Gym Assignment Backup", 
-                        "Attached is the full assignment submissions CSV.",
-                        csv_data=csv_sub,
-                        csv_filename="assignment_submissions.csv"
-                    )
-                    if success: st.success(T['msg_email_sent'])
-                    else: st.error(T['msg_email_fail'].format("Check secrets"))
+                pass # removed manual email button
 
             df_sub["weakness"] = df_sub["feedback_json"].apply(extract_weaknesses)
             f_unit_sub = st.multiselect("Filter Unit (Assign)", sorted(df_sub['unit_id'].dropna().unique()), key="f_unit_sub")
