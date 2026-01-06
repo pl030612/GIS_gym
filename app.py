@@ -41,7 +41,7 @@ DEFAULT_DEADLINE = "2025-12-31"
 TRANSLATIONS = {
     "zh": {
         "page_title": "🔮 GIS Gym",
-        # "caption": "空間分析 AI 助教平台 | 自主練習 (Real Data) | 單元作業 (Assignments)",
+        "caption": "空間分析 AI 助教平台 | 自主練習 (Real Data) | 單元作業 (Assignments)",
         "sidebar_user": "使用者設定",
         "label_student_id": "輸入學號",
         "ta_login": "助教登入",
@@ -86,7 +86,7 @@ TRANSLATIONS = {
         "header_assign_data": "相關圖資下載",
         "no_data_file": "（此單元無實體檔案可供下載）",
         "msg_submitted": "已繳交。分數：",
-        "btn_submit_assign": "繳交 Unit {} 作業",
+        "btn_submit_assign": "繳交作業", # [Modified] 簡化文字
         "header_ta_report": "AI 教學顧問報告",
         "btn_gen_report": "生成分析報告",
         "header_prac_history": "自主練習紀錄",
@@ -102,7 +102,7 @@ TRANSLATIONS = {
     },
     "en": {
         "page_title": "🔮 GIS Gym",
-        # "caption": "Spatial Analysis AI Tutor | Self-Practice | Assignments",
+        "caption": "Spatial Analysis AI Tutor | Self-Practice | Assignments",
         "sidebar_user": "User Settings",
         "label_student_id": "Student ID",
         "ta_login": "TA Login",
@@ -147,7 +147,7 @@ TRANSLATIONS = {
         "header_assign_data": "Related Datasets",
         "no_data_file": "(No files available)",
         "msg_submitted": "Submitted. Score:",
-        "btn_submit_assign": "Submit Unit {} Assignment",
+        "btn_submit_assign": "Submit Assignment", # [Modified] Simplified
         "header_ta_report": "AI Consultant Report",
         "btn_gen_report": "Generate Report",
         "header_prac_history": "Practice History",
@@ -214,7 +214,7 @@ if "language" not in st.session_state:
 T = TRANSLATIONS[st.session_state["language"]]
 
 st.title(f"{T['page_title']}")
-# st.caption(T['caption'])
+st.caption(T['caption'])
 
 
 # =====================================================
@@ -910,7 +910,7 @@ def display_feedback_ui(fb, t_dict):
 # 11) 助教權限與 Sidebar UI
 # =====================================================
 with st.sidebar:
-    # st.header("🌐 Language")
+    st.header("🌐 Language")
     lang_choice = st.radio(
         "Select Language:",
         ("繁體中文", "English"),
@@ -1079,7 +1079,8 @@ with tabs[1]:
                     st.write("---")
                 
                 assign_ans = st.text_area("Answer Area", height=250, key=f"assign_ans_{target_unit}")
-                if st.button(T['btn_submit_assign'].format(target_unit), type="primary", disabled=not assign_ans):
+                # [Modified] Simplified button text (no .format needed)
+                if st.button(T['btn_submit_assign'], type="primary", disabled=not assign_ans):
                     with st.spinner("Submitting..."):
                         fb = grade_submission(assignment['description'], assign_ans, target_unit, st.session_state["language"], qtype="Practical (R Code)")
                         log_assignment_submission(assignment['id'], sid, target_unit, assign_ans, fb)
@@ -1171,6 +1172,8 @@ if st.session_state["is_ta"] and len(tabs) > 2:
 
             target_order = ["timestamp", "student_id", "unit_id", "score", "weakness", "answer"]
             display_cols = [c for c in target_order if c in df_sub.columns]
-            st.dataframe(df_sub[display_cols], uFse_container_width=True, hide_index=True, height=300)
+            
+            # [Fix] Corrected typo: use_container_width (was ufse_)
+            st.dataframe(df_sub[display_cols], use_container_width=True, hide_index=True, height=300)
         else:
             st.info(T['msg_no_data'])
