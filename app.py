@@ -188,7 +188,7 @@ SKILLS_DB = {
 # =====================================================
 # 1) Streamlit 基本設定 & CSS 美化
 # =====================================================
-st.set_page_config(page_title="GIS Gym", page_icon="🧪", layout="wide")
+st.set_page_config(page_title="GIS Gym", page_icon="🔮", layout="wide")
 
 # [NEW] CSS 注入：調整側邊欄留白與字體
 st.markdown(
@@ -885,7 +885,7 @@ def display_feedback_ui(fb, t_dict):
 # 11) 助教權限與 Sidebar UI
 # =====================================================
 with st.sidebar:
-    st.header("🌐 Language")
+    st.header("Language")
     lang_choice = st.radio(
         "Select Language:",
         ("繁體中文", "English"),
