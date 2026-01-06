@@ -186,16 +186,28 @@ SKILLS_DB = {
 
 
 # =====================================================
-# 1) Streamlit 基本設定
+# 1) Streamlit 基本設定 & CSS 美化
 # =====================================================
 st.set_page_config(page_title="GIS Gym", page_icon="🧪", layout="wide")
+
+# [NEW] CSS 注入：調整側邊欄留白與字體
+st.markdown(
+    """
+    <style>
+    /* 縮減側邊欄頂部不必要的留白 */
+    section[data-testid="stSidebar"] div.block-container {
+        padding-top: 2rem;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
 if "language" not in st.session_state:
     st.session_state["language"] = "zh"
 
 T = TRANSLATIONS[st.session_state["language"]]
 
-# [修正] 補回這兩行，標題才會出現！
 st.title(f"🔮 {T['page_title']}")
 
 
@@ -429,10 +441,8 @@ def read_submissions_all() -> pd.DataFrame:
     conn.close()
     return df
 
-# [New] Email Sending Function
 def send_backup_email(subject, body, csv_data=None, csv_filename="backup.csv"):
     if "email" not in st.secrets:
-        # 如果沒設定 email secrets，就默默略過
         return False
 
     try:
@@ -449,7 +459,6 @@ def send_backup_email(subject, body, csv_data=None, csv_filename="backup.csv"):
         msg['Subject'] = subject
         msg.attach(MIMEText(body, 'plain'))
 
-        # Attach CSV if provided
         if csv_data:
             part = MIMEApplication(csv_data, Name=csv_filename)
             part['Content-Disposition'] = f'attachment; filename="{csv_filename}"'
@@ -740,10 +749,8 @@ def log_practice(sid, uid, q, fb):
     conn.commit()
     conn.close()
     
-    # [UPDATED] 立即讀取完整資料表並製作 CSV 寄出
     try:
         df = read_history_join_bonus()
-        # 解析 weakness 讓 CSV 好讀
         df["weakness"] = df["feedback_json"].apply(extract_weaknesses)
         csv_data = df.to_csv(index=False).encode('utf-8-sig')
         
@@ -755,7 +762,6 @@ def log_practice(sid, uid, q, fb):
         Question: {q}
         Score: {fb.get('score')}
         """
-        # 檔名加上時間戳記
         ts = datetime.now().strftime('%Y%m%d_%H%M')
         send_backup_email(
             f"GIS Gym Practice: {sid} (Latest CSV)", 
@@ -776,10 +782,8 @@ def log_assignment_submission(assign_id, sid, uid, ans, fb):
     conn.commit()
     conn.close()
 
-    # [UPDATED] 立即讀取完整作業紀錄並製作 CSV 寄出
     try:
         df_sub = read_submissions_all()
-        # 解析 weakness
         df_sub["weakness"] = df_sub["feedback_json"].apply(extract_weaknesses)
         csv_sub = df_sub.to_csv(index=False).encode('utf-8-sig')
         
@@ -881,7 +885,7 @@ def display_feedback_ui(fb, t_dict):
 # 11) 助教權限與 Sidebar UI
 # =====================================================
 with st.sidebar:
-    st.markdown("### 🌐 Language")
+    st.header("🌐 Language")
     lang_choice = st.radio(
         "Select Language:",
         ("繁體中文", "English"),
@@ -895,12 +899,14 @@ with st.sidebar:
 
     ASSIGNMENTS_DB = scan_assignments_from_files(st.session_state["language"])
 
-    st.markdown("---")
+    st.divider()
+    
     st.header(T['sidebar_user'])
     if "student_id" not in st.session_state: st.session_state["student_id"] = ""
     st.session_state["student_id"] = st.text_input(T['label_student_id'], value=st.session_state["student_id"])
     
-    st.markdown("---")
+    st.divider()
+    
     if "is_ta" not in st.session_state: st.session_state["is_ta"] = False
     
     if not st.session_state["is_ta"]:
