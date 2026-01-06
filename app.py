@@ -40,11 +40,12 @@ DEFAULT_DEADLINE = "2025-12-31"
 
 TRANSLATIONS = {
     "zh": {
-        "page_title": "GIS Gym",
-        "sidebar_user": "👤 使用者設定",
+        "page_title": "🔮 GIS Gym",  # [Modified] 精簡標題
+        "caption": "空間分析 AI 助教平台 | 自主練習 (Real Data) | 單元作業 (Assignments)",
+        "sidebar_user": "使用者設定",
         "label_student_id": "輸入學號",
-        "ta_login": "🔒 助教登入",
-        "ta_mode": "👨‍🏫 助教模式",
+        "ta_login": "助教登入",
+        "ta_mode": "助教模式",
         "btn_login": "登入",
         "btn_logout": "登出",
         "tab_practice": "自主練習",
@@ -61,13 +62,13 @@ TRANSLATIONS = {
         "opt_coding": "實作題",
         "btn_generate": "產生題目",
         "header_q": "題目",
-        "expander_hint": "💡 提示 (Hint)",
-        "btn_download_data": "📥 下載練習圖資",
+        "expander_hint": "提示 (Hint)",
+        "btn_download_data": "下載圖資",
         "placeholder_ans": "輸入答案...",
         "btn_submit": "送出批改",
         "expander_feedback": "批改結果",
         
-        "fb_score": "🎯 得分：", 
+        "fb_score": "得分：", 
         "fb_rubric": "評分細項 (Rubric)",
         "fb_strengths": "優點 (Strengths)",
         "fb_weaknesses": "弱點 (Weaknesses)",
@@ -81,30 +82,31 @@ TRANSLATIONS = {
         "no_assign_file": "📂 目前沒有掃描到任何作業檔案。",
         "sel_assign_unit": "選擇作業單元",
         "header_assign_desc": "作業說明",
-        "label_deadline": "📅 截止期限:",
-        "header_assign_data": "📂 相關圖資下載",
+        "label_deadline": "截止期限:",
+        "header_assign_data": "相關圖資下載",
         "no_data_file": "（此單元無實體檔案可供下載）",
-        "msg_submitted": "✅ 已繳交。分數：",
+        "msg_submitted": "已繳交。分數：",
         "btn_submit_assign": "繳交 Unit {} 作業",
         "header_ta_report": "AI 教學顧問報告",
         "btn_gen_report": "生成分析報告",
-        "header_prac_history": "自主練習紀錄 (Practice)",
-        "btn_dl_csv": "📥 下載紀錄 (.csv)",
-        "header_assign_history": "作業繳交檢視 (Submissions)",
+        "header_prac_history": "自主練習紀錄",
+        "btn_dl_csv": "下載紀錄 (.csv)",
+        "header_assign_history": "作業繳交檢視",
         "col_weakness": "弱點摘要",
         "msg_no_data": "無資料",
         "msg_edit_bonus": "編輯加分: ID {} ({})",
         "btn_update": "更新",
-        "btn_email_backup": "📧 將完整 CSV 寄給助教",
-        "msg_email_sent": "✅ 備份信件已寄出！",
-        "msg_email_fail": "❌ 寄信失敗: {}"
+        "btn_email_backup": "將完整 CSV 寄給助教",
+        "msg_email_sent": "備份信件已寄出！",
+        "msg_email_fail": "寄信失敗: {}"
     },
     "en": {
-        "page_title": "GIS Gym",
-        "sidebar_user": "👤 User Settings",
+        "page_title": "🔮 GIS Gym", # [Modified] Simplified Title
+        "caption": "Spatial Analysis AI Tutor | Self-Practice | Assignments",
+        "sidebar_user": "User Settings",
         "label_student_id": "Student ID",
-        "ta_login": "🔒 TA Login",
-        "ta_mode": "👨‍🏫 TA Mode",
+        "ta_login": "TA Login",
+        "ta_mode": "TA Mode",
         "btn_login": "Login",
         "btn_logout": "Logout",
         "tab_practice": "Practice",
@@ -121,41 +123,43 @@ TRANSLATIONS = {
         "opt_coding": "Practical (R Code)",
         "btn_generate": "Generate Question",
         "header_q": "Question",
-        "expander_hint": "💡 Hint",
-        "btn_download_data": "📥 Download Data",
+        "expander_hint": "Hint",
+        "btn_download_data": "Download Data",
         "placeholder_ans": "Your answer...",
         "btn_submit": "Submit for Grading",
         "expander_feedback": "Feedback Result",
-        "fb_score": "🎯 Score:",
-        "fb_rubric": "📝 Rubric",
-        "fb_strengths": "✅ Strengths",
-        "fb_weaknesses": "⚠️ Weaknesses",
-        "fb_missing": "❌ Missing Items",
-        "fb_action": "🚀 Action Items",
+        
+        "fb_score": "Score:",
+        "fb_rubric": "Rubric",
+        "fb_strengths": "Strengths",
+        "fb_weaknesses": "Weaknesses",
+        "fb_missing": "Missing Items",
+        "fb_action": "Action Items",
         "col_crit": "Criterion",
         "col_pts": "Points",
         "col_max": "Max",
         "col_evi": "Evidence",
-        "no_assign_file": "📂 No assignment files found.",
+        
+        "no_assign_file": "No assignment files found.",
         "sel_assign_unit": "Select Unit",
         "header_assign_desc": "Instructions",
-        "label_deadline": "📅 Deadline:",
-        "header_assign_data": "📂 Related Datasets",
+        "label_deadline": "Deadline:",
+        "header_assign_data": "Related Datasets",
         "no_data_file": "(No files available)",
-        "msg_submitted": "✅ Submitted. Score:",
+        "msg_submitted": "Submitted. Score:",
         "btn_submit_assign": "Submit Unit {} Assignment",
         "header_ta_report": "AI Consultant Report",
         "btn_gen_report": "Generate Report",
         "header_prac_history": "Practice History",
-        "btn_dl_csv": "📥 Download (.csv)",
+        "btn_dl_csv": "Download (.csv)",
         "header_assign_history": "Assignment Submissions",
         "col_weakness": "Weaknesses Summary",
         "msg_no_data": "No Data",
         "msg_edit_bonus": "Edit Bonus: ID {} ({})",
         "btn_update": "Update",
-        "btn_email_backup": "📧 Email CSV Backup to TA",
-        "msg_email_sent": "✅ Backup email sent!",
-        "msg_email_fail": "❌ Email failed: {}"
+        "btn_email_backup": "Email CSV Backup to TA",
+        "msg_email_sent": "Backup email sent!",
+        "msg_email_fail": "Email failed: {}"
     }
 }
 
@@ -209,7 +213,8 @@ if "language" not in st.session_state:
 
 T = TRANSLATIONS[st.session_state["language"]]
 
-st.title(f"🔮 {T['page_title']}")
+st.title(f"{T['page_title']}")
+# st.caption(T['caption'])
 
 
 # =====================================================
@@ -477,7 +482,7 @@ def send_backup_email(subject, body, csv_data=None, csv_filename="backup.csv"):
 
 
 # =====================================================
-# 8) AI 功能 (出題)
+# 8) AI 功能
 # =====================================================
 def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | None, specific_topic: str | None, lang: str) -> dict:
     q_str = f"Unit {unit_id}" if unit_id else ""
@@ -905,6 +910,7 @@ def display_feedback_ui(fb, t_dict):
 # 11) 助教權限與 Sidebar UI
 # =====================================================
 with st.sidebar:
+    # st.header("🌐 Language")
     lang_choice = st.radio(
         "Select Language:",
         ("繁體中文", "English"),
@@ -993,7 +999,10 @@ with tabs[0]:
             with st.expander(f"{T['expander_hint']}{suffix}", expanded=False):
                 st.markdown(q_hint)
 
-        if unit_val:
+        # [Modified] Only show files if NOT a short answer question
+        is_short_answer = (type_display in [T['opt_short'], "簡答題", "Short Answer"])
+        
+        if unit_val and not is_short_answer:
             all_unit_files = get_unit_files(unit_val)
             if all_unit_files:
                 with st.expander(f"📂 {T['btn_download_data']} (Unit {unit_val} Files)", expanded=False):
@@ -1009,15 +1018,13 @@ with tabs[0]:
                                     key=f"dl_prac_{f['name']}"
                                 )
             else:
-                if type_display in ["實作題", "Practical (R Code)"]:
-                    st.warning(T['no_data_file'])
+                st.warning(T['no_data_file'])
         
         sid = st.session_state["student_id"]
         ans = st.text_area("Answer", height=150, key="p_ans", disabled=not sid, placeholder=T['placeholder_ans'])
         
         if st.button(T['btn_submit'], key="p_sub", disabled=not ans):
             with st.spinner("Grading..."):
-                # [關鍵修改] 傳入 type_display 以便判斷題型
                 fb = grade_submission(q_content, ans, unit_val, st.session_state["language"], qtype=type_display)
                 log_practice(sid, unit_val, q_content, fb)
                 st.success(f"{T['fb_score']} {fb.get('score')}")
@@ -1067,7 +1074,6 @@ with tabs[1]:
                 assign_ans = st.text_area("Answer Area", height=250, key=f"assign_ans_{target_unit}")
                 if st.button(T['btn_submit_assign'].format(target_unit), type="primary", disabled=not assign_ans):
                     with st.spinner("Submitting..."):
-                        # 作業預設視為實作題 (或可混和)，這裡預設傳入 "Practical" 以保持嚴謹
                         fb = grade_submission(assignment['description'], assign_ans, target_unit, st.session_state["language"], qtype="Practical (R Code)")
                         log_assignment_submission(assignment['id'], sid, target_unit, assign_ans, fb)
                         st.balloons()
