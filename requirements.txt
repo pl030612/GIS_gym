@@ -1,11 +1,11 @@
 streamlit
+pandas
+altair
 openai
-langchain
 langchain-openai
 langchain-community
 faiss-cpu
-pandas
-altair
-pypdf
+gspread
+oauth2client
 docx2txt
-tiktoken
+psutil
