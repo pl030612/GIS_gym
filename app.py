@@ -44,7 +44,7 @@ DEFAULT_DEADLINE = "2025-12-31"
 GOOGLE_SHEET_NAME = "GIS_Gym_Database" 
 GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1n-tYLLiwX1-iewjFJSXii2jfTCS1qyyDoAAQO1PD8-Y/edit?usp=sharing"
 
-# [NEW] 單元圖資編碼與特殊備註
+# [NEW] 單元圖資編碼與特殊備註 (User defined)
 UNIT_NOTES = {
     1: "ℹ️ 本單元圖資編碼為 Big5。",
     2: "ℹ️ 本單元Taiwan_county、Taiwan_temple、Taiwan_town圖資編碼為UTF-8，其餘為 Big5。",
@@ -56,7 +56,6 @@ UNIT_NOTES = {
     8: "ℹ️ 本單元School、Tainan_temple_mazhou圖資編碼為UTF-8，其餘為 Big5。",
     9: "ℹ️ 本單元Dengue_Case、KAOH_toen圖資編碼為UTF-8，其餘為 Big5。",
     10: "ℹ️ 本單元Dengue_Case、KAOH_toen圖資編碼為UTF-8，其餘為 Big5。"
-
 }
 
 TRANSLATIONS = {
@@ -113,7 +112,8 @@ TRANSLATIONS = {
         "header_assign_history": "作業繳交檢視",
         "msg_no_data": "無資料",
         "link_gsheet": "🔗 前往 Google Sheet 查看原始資料",
-        "ta_filter_unit": "篩選單元："
+        "ta_filter_unit": "篩選單元：",
+        "warning_no_id": "⚠️ 請先在左側欄位輸入學號！"
     },
     "en": {
         "page_title": "🔮 GIS Gym",
@@ -168,7 +168,8 @@ TRANSLATIONS = {
         "header_assign_history": "Assignment Submissions",
         "msg_no_data": "No Data",
         "link_gsheet": "🔗 Go to Google Sheet",
-        "ta_filter_unit": "Filter Unit:"
+        "ta_filter_unit": "Filter Unit:",
+        "warning_no_id": "⚠️ Please enter Student ID in sidebar first!"
     }
 }
 
@@ -311,7 +312,7 @@ def get_unit_files(unit_id: int):
     files_list = []
     if os.path.exists(data_dir):
         for f in os.listdir(data_dir):
-            # [FIXED v6.0] Added .sbx, .sbn, .prj, .cpg, .xml to whitelist
+            # [FIXED] Added .sbx, .sbn, .prj, .cpg, .xml to whitelist
             if f.lower().endswith(('.shp', '.shx', '.dbf', '.csv', '.tif', '.geojson', '.zip', '.txt', '.sbx', '.sbn', '.prj', '.cpg', '.xml')):
                 files_list.append({
                     "name": f,
@@ -737,7 +738,6 @@ def display_feedback_ui(fb, t_dict):
 # 9) 主程式 UI
 # =====================================================
 with st.sidebar:
-    st.header("🌐 Language")
     lang_choice = st.radio("Select Language:", ("繁體中文", "English"), index=0 if st.session_state["language"] == "zh" else 1, label_visibility="collapsed")
     new_lang = "zh" if lang_choice == "繁體中文" else "en"
     if new_lang != st.session_state["language"]:
@@ -795,13 +795,17 @@ with tabs[0]:
         type_display = c4.selectbox(T['sel_type'], [T['opt_short'], T['opt_coding']], key="p_qty")
         
         if c5.button(T['btn_generate'], type="primary", use_container_width=True):
-            with st.spinner("AI thinking..."):
-                q_data = generate_practice_question_real_data(lvl_display, type_display, unit_val, topic_display, st.session_state["language"])
-                st.session_state["pq_data"] = q_data
-                st.session_state["pq_meta"] = f"{unit_str} | {lvl_display} | {type_display}"
-                # [Research] Start Timer & Reset Flags
-                st.session_state["q_start_time"] = time.time()
-                st.session_state["hint_viewed"] = False
+            # [FIX] 加上學號卡控：如果沒有填學號，跳出警告並不執行動作
+            if not st.session_state.get("student_id", "").strip():
+                st.warning(T["warning_no_id"])
+            else:
+                with st.spinner("AI thinking..."):
+                    q_data = generate_practice_question_real_data(lvl_display, type_display, unit_val, topic_display, st.session_state["language"])
+                    st.session_state["pq_data"] = q_data
+                    st.session_state["pq_meta"] = f"{unit_str} | {lvl_display} | {type_display}"
+                    # [Research] Start Timer & Reset Flags
+                    st.session_state["q_start_time"] = time.time()
+                    st.session_state["hint_viewed"] = False
 
     if "pq_data" in st.session_state:
         q_data = st.session_state["pq_data"]
