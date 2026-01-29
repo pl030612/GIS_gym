@@ -44,53 +44,20 @@ DEFAULT_DEADLINE = "2025-12-31"
 GOOGLE_SHEET_NAME = "GIS_Gym_Database" 
 GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1n-tYLLiwX1-iewjFJSXii2jfTCS1qyyDoAAQO1PD8-Y/edit?usp=sharing"
 
-# [FUTURE FEATURE] 學生白名單 (開學後請取消註解並填入學號)
-# ALLOWED_STUDENTS = [
-#     "B11204001", "B11204002", "R12204001", "TA001"
-# ]
+# [FUTURE FEATURE] 學生白名單
+# ALLOWED_STUDENTS = ["B11204001", "TA001"]
 
-# [NEW v6.2] 支援雙語的單元備註 (放在下載區內)
 UNIT_NOTES = {
-    1: {
-        "zh": "ℹ️ 本單元圖資編碼為 Big5。",
-        "en": "ℹ️ Data encoding for this unit is Big5."
-    },
-    2: {
-        "zh": "ℹ️ 本單元Taiwan_county、Taiwan_temple、Taiwan_town圖資編碼為UTF-8，其餘為 Big5。",
-        "en": "ℹ️ Taiwan_county, Taiwan_temple, Taiwan_town are UTF-8. Others are Big5."
-    },
-    3: {
-        "zh": "ℹ️ 本單元圖資編碼為 Big5。",
-        "en": "ℹ️ Data encoding for this unit is Big5."
-    },
-    4: {
-        "zh": "ℹ️ 本單元Taiwan_hospital、Taiwan_village、Taiwan_town圖資編碼為UTF-8，其餘為 Big5。",
-        "en": "ℹ️ Taiwan_hospital, Taiwan_village, Taiwan_town are UTF-8. Others are Big5."
-    },
-    5: {
-        "zh": "ℹ️ 本單元圖資編碼為 Big5。",
-        "en": "ℹ️ Data encoding for this unit is Big5."
-    },
-    6: {
-        "zh": "ℹ️ 本單元School、Tainan_temple_mazhou、Taiwan_temple_mazhou、Taiwan_town圖資編碼為UTF-8，其餘為 Big5。",
-        "en": "ℹ️ School, Tainan_temple_mazhou, Taiwan_temple_mazhou, Taiwan_town are UTF-8. Others are Big5."
-    },
-    7: {
-        "zh": "ℹ️ 本單元School、Tainan_temple_mazhou圖資編碼為UTF-8，其餘為 Big5。",
-        "en": "ℹ️ School, Tainan_temple_mazhou are UTF-8. Others are Big5."
-    },
-    8: {
-        "zh": "ℹ️ 本單元School、Tainan_temple_mazhou圖資編碼為UTF-8，其餘為 Big5。",
-        "en": "ℹ️ School, Tainan_temple_mazhou are UTF-8. Others are Big5."
-    },
-    9: {
-        "zh": "ℹ️ 本單元Dengue_Case、KAOH_toen圖資編碼為UTF-8，其餘為 Big5。",
-        "en": "ℹ️ Dengue_Case, KAOH_toen are UTF-8. Others are Big5."
-    },
-    10: {
-        "zh": "ℹ️ 本單元Dengue_Case、KAOH_toen圖資編碼為UTF-8，其餘為 Big5。",
-        "en": "ℹ️ Dengue_Case, KAOH_toen are UTF-8. Others are Big5."
-    }
+    1: {"zh": "ℹ️ 本單元圖資編碼為 Big5。", "en": "ℹ️ Data encoding: Big5."},
+    2: {"zh": "ℹ️ 部分圖資為UTF-8，其餘為 Big5。", "en": "ℹ️ Mixed encoding (UTF-8 & Big5)."},
+    3: {"zh": "ℹ️ 本單元圖資編碼為 Big5。", "en": "ℹ️ Data encoding: Big5."},
+    4: {"zh": "ℹ️ 部分圖資為UTF-8，其餘為 Big5。", "en": "ℹ️ Mixed encoding (UTF-8 & Big5)."},
+    5: {"zh": "ℹ️ 本單元圖資編碼為 Big5。", "en": "ℹ️ Data encoding: Big5."},
+    6: {"zh": "ℹ️ 部分圖資為UTF-8，其餘為 Big5。", "en": "ℹ️ Mixed encoding (UTF-8 & Big5)."},
+    7: {"zh": "ℹ️ 部分圖資為UTF-8，其餘為 Big5。", "en": "ℹ️ Mixed encoding (UTF-8 & Big5)."},
+    8: {"zh": "ℹ️ 部分圖資為UTF-8，其餘為 Big5。", "en": "ℹ️ Mixed encoding (UTF-8 & Big5)."},
+    9: {"zh": "ℹ️ 部分圖資為UTF-8，其餘為 Big5。", "en": "ℹ️ Mixed encoding (UTF-8 & Big5)."},
+    10: {"zh": "ℹ️ 部分圖資為UTF-8，其餘為 Big5。", "en": "ℹ️ Mixed encoding (UTF-8 & Big5)."}
 }
 
 TRANSLATIONS = {
@@ -432,7 +399,7 @@ def _retrieve_context(query: str, unit_id: int | None, k: int = 8) -> str:
 
 
 # =====================================================
-# 6) AI 生成與批改 (Fix: Short Answer Bug)
+# 6) AI 生成與批改
 # =====================================================
 def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | None, specific_topic: str | None, lang: str) -> dict:
     q_str = f"Unit {unit_id}" if unit_id else ""
@@ -447,12 +414,10 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
     ai_files = [f['name'] for f in real_files if f['name'].lower().endswith(ai_visible_extensions)]
     file_names_str = ", ".join(ai_files) if ai_files else "None"
 
-    # [FIX v6.2] Split Logic: "Practical" vs "Short Answer"
     is_short_ans = (qtype in ["簡答題", "Short Answer"])
 
     if lang == "en":
         if is_short_ans:
-            # [Logic A] For Short Answer: No file constraints, pure conceptual
             sys_role = "You are a GIS expert. Ask a Conceptual Question based on the context."
             system_instruction = f"""
             Design a 'Short Answer' question (Difficulty: {level}) about: {selected_method}.
@@ -463,7 +428,6 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
             {{ "question_content": "Write the actual question text here...", "hint": "Explanation of the concept...", "target_filename": "None" }}
             """
         else:
-            # [Logic B] For Practical: Must use files & R code
             sys_role = "You are a GIS TA. Create a Practical R Coding task."
             r_rules = "Hard Constraints: 1. Use **R language** (sf, terra). 2. No ArcGIS/QGIS mentions."
             system_instruction = f"""
@@ -475,7 +439,6 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
             {{ "question_content": "Task description...", "hint": "Step-by-step R guide...", "target_filename": "..." }}
             """
     else:
-        # Traditional Chinese
         if is_short_ans:
             sys_role = "你是 GIS 觀念專家。請根據講義出題。"
             system_instruction = f"""
@@ -566,24 +529,47 @@ def generate_weakness_report(unit_id: int):
     df_a = read_submissions_gsheet()
     
     fb_list = []
+    # Collect weaknesses and low-score questions
+    weaknesses = []
+    low_score_q_p = [] # Practice questions with score < 6
+    low_score_q_a = [] # Assignment questions with score < 6
+    
     if not df_p.empty and 'unit_id' in df_p.columns:
-        fb_list.extend(df_p[df_p['unit_id'] == unit_id]['feedback_json'].dropna().tolist())
-    if not df_a.empty and 'unit_id' in df_a.columns:
-        fb_list.extend(df_a[df_a['unit_id'] == unit_id]['feedback_json'].dropna().tolist())
+        unit_df = df_p[df_p['unit_id'] == unit_id]
+        for _, row in unit_df.iterrows():
+            try:
+                data = json.loads(row['feedback_json'])
+                if 'weaknesses' in data: weaknesses.extend(data['weaknesses'])
+                if row['score'] < 6:
+                    low_score_q_p.append(f"[Score: {row['score']}] {row['question']}")
+            except: pass
 
-    if not fb_list: return "⚠️ No sufficient data."
+    if not df_a.empty and 'unit_id' in df_a.columns:
+        unit_df_a = df_a[df_a['unit_id'] == unit_id]
+        for _, row in unit_df_a.iterrows():
+            try:
+                data = json.loads(row['feedback_json'])
+                if 'weaknesses' in data: weaknesses.extend(data['weaknesses'])
+                if row['score'] < 6:
+                    # Assignments usually have fixed description, so we just note the weakness
+                    pass
+            except: pass
+
+    if not weaknesses: return "⚠️ No sufficient data."
     
-    all_weaknesses = []
-    for json_str in fb_list:
-        try:
-            data = json.loads(json_str)
-            if 'weaknesses' in data: all_weaknesses.extend(data['weaknesses'])
-        except: pass
+    weakness_text = "\n".join(weaknesses[:60])
+    bad_questions = "\n".join(low_score_q_p[:5]) # Top 5 bad questions
     
-    weakness_text = "\n".join(all_weaknesses[:60])
     prompt = f"""
     你是教學顧問。分析 Unit {unit_id} 弱點：\n{weakness_text}
-    請製作 Markdown 報告，包含：1. 常見錯誤模式 2. 概念澄清 3. 教學建議。
+    
+    【格式要求】
+    1. 使用 Markdown (##, ###)。
+    2. **標題字體不要太大**，請從 ### (H3) 開始使用。
+    3. 內容包含：常見錯誤模式、概念澄清、教學建議。
+    4. 最後請附上一個區塊：**「### 🎯 學生答錯率最高的題目範例」**，請參考以下題目列表，挑選 3 題最具代表性的：
+    {bad_questions}
+    
     請務必使用繁體中文。
     """
     with st.spinner("🤖 AI analyzing..."):
@@ -592,9 +578,8 @@ def generate_weakness_report(unit_id: int):
 
 
 # =====================================================
-# 7) 資料庫與日誌系統 (Restore extract_weaknesses)
+# 7) 資料庫與日誌系統
 # =====================================================
-# [FIX v6.2] Restore helper function
 def extract_weaknesses(val):
     try:
         if not val: return ""
@@ -803,10 +788,10 @@ with st.sidebar:
     user_input_id = st.text_input(T['label_student_id'], value=st.session_state["student_id"])
     st.session_state["student_id"] = user_input_id
     
-    # if "ALLOWED_STUDENTS" in globals() and user_input_id:
-    #     if user_input_id not in ALLOWED_STUDENTS:
-    #         st.error(T['warning_not_allowed'])
-    #         st.stop()
+    if "ALLOWED_STUDENTS" in globals() and user_input_id:
+        if user_input_id not in ALLOWED_STUDENTS:
+            st.error(T['warning_not_allowed'])
+            st.stop()
     
     st.divider()
     
@@ -851,7 +836,6 @@ with tabs[0]:
         type_display = c4.selectbox(T['sel_type'], [T['opt_short'], T['opt_coding']], key="p_qty")
         
         if c5.button(T['btn_generate'], type="primary", use_container_width=True):
-            # [FIX] 學號卡控
             if not st.session_state.get("student_id", "").strip():
                 st.warning(T["warning_no_id"])
             else:
@@ -880,9 +864,7 @@ with tabs[0]:
             all_files = get_unit_files(unit_val)
             if all_files:
                 with st.expander(f"📂 {T['btn_download_data']}", expanded=False):
-                    # [NEW v6.2] Unit Notes Moved Inside Expander
                     if unit_val in UNIT_NOTES:
-                        # Auto-select language for note
                         note_lang = st.session_state["language"]
                         st.info(UNIT_NOTES[unit_val][note_lang])
                     
@@ -952,7 +934,7 @@ if st.session_state["is_ta"] and len(tabs) > 2:
     with tabs[2]:
         with st.container(border=True):
             st.markdown(f"### {T['header_ta_report']}") 
-            ana_unit = st.selectbox("Unit", unit_options, key="ana_unit")
+            ana_unit = st.selectbox(T['ta_filter_unit'], unit_options, key="ana_unit")
             if st.button(T['btn_gen_report']):
                 if ana_unit:
                     report = generate_weakness_report(int(ana_unit))
