@@ -6,8 +6,8 @@ import re
 import docx2txt
 import smtplib
 import gspread
-import uuid  # [NEW] 用於產生 Session ID
-import time  # [NEW] 用於計時
+import uuid
+import time
 from oauth2client.service_account import ServiceAccountCredentials
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -44,18 +44,53 @@ DEFAULT_DEADLINE = "2025-12-31"
 GOOGLE_SHEET_NAME = "GIS_Gym_Database" 
 GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1n-tYLLiwX1-iewjFJSXii2jfTCS1qyyDoAAQO1PD8-Y/edit?usp=sharing"
 
-# [NEW] 單元圖資編碼與特殊備註 (User defined)
+# [FUTURE FEATURE] 學生白名單 (開學後請取消註解並填入學號)
+# ALLOWED_STUDENTS = [
+#     "B11204001", "B11204002", "R12204001", "TA001"
+# ]
+
+# [NEW v6.2] 支援雙語的單元備註 (放在下載區內)
 UNIT_NOTES = {
-    1: "ℹ️ 本單元圖資編碼為 Big5。",
-    2: "ℹ️ 本單元Taiwan_county、Taiwan_temple、Taiwan_town圖資編碼為UTF-8，其餘為 Big5。",
-    3: "ℹ️ 本單元圖資編碼為 Big5。",
-    4: "ℹ️ 本單元Taiwan_hospital、Taiwan_village、Taiwan_town圖資編碼為UTF-8，其餘為 Big5。",
-    5: "ℹ️ 本單元圖資編碼為 Big5。",
-    6: "ℹ️ 本單元School、Tainan_temple_mazhou、Taiwan_temple_mazhou、Taiwan_town圖資編碼為UTF-8，其餘為 Big5。",
-    7: "ℹ️ 本單元School、Tainan_temple_mazhou圖資編碼為UTF-8，其餘為 Big5。",
-    8: "ℹ️ 本單元School、Tainan_temple_mazhou圖資編碼為UTF-8，其餘為 Big5。",
-    9: "ℹ️ 本單元Dengue_Case、KAOH_toen圖資編碼為UTF-8，其餘為 Big5。",
-    10: "ℹ️ 本單元Dengue_Case、KAOH_toen圖資編碼為UTF-8，其餘為 Big5。"
+    1: {
+        "zh": "ℹ️ 本單元圖資編碼為 Big5。",
+        "en": "ℹ️ Data encoding for this unit is Big5."
+    },
+    2: {
+        "zh": "ℹ️ 本單元Taiwan_county、Taiwan_temple、Taiwan_town圖資編碼為UTF-8，其餘為 Big5。",
+        "en": "ℹ️ Taiwan_county, Taiwan_temple, Taiwan_town are UTF-8. Others are Big5."
+    },
+    3: {
+        "zh": "ℹ️ 本單元圖資編碼為 Big5。",
+        "en": "ℹ️ Data encoding for this unit is Big5."
+    },
+    4: {
+        "zh": "ℹ️ 本單元Taiwan_hospital、Taiwan_village、Taiwan_town圖資編碼為UTF-8，其餘為 Big5。",
+        "en": "ℹ️ Taiwan_hospital, Taiwan_village, Taiwan_town are UTF-8. Others are Big5."
+    },
+    5: {
+        "zh": "ℹ️ 本單元圖資編碼為 Big5。",
+        "en": "ℹ️ Data encoding for this unit is Big5."
+    },
+    6: {
+        "zh": "ℹ️ 本單元School、Tainan_temple_mazhou、Taiwan_temple_mazhou、Taiwan_town圖資編碼為UTF-8，其餘為 Big5。",
+        "en": "ℹ️ School, Tainan_temple_mazhou, Taiwan_temple_mazhou, Taiwan_town are UTF-8. Others are Big5."
+    },
+    7: {
+        "zh": "ℹ️ 本單元School、Tainan_temple_mazhou圖資編碼為UTF-8，其餘為 Big5。",
+        "en": "ℹ️ School, Tainan_temple_mazhou are UTF-8. Others are Big5."
+    },
+    8: {
+        "zh": "ℹ️ 本單元School、Tainan_temple_mazhou圖資編碼為UTF-8，其餘為 Big5。",
+        "en": "ℹ️ School, Tainan_temple_mazhou are UTF-8. Others are Big5."
+    },
+    9: {
+        "zh": "ℹ️ 本單元Dengue_Case、KAOH_toen圖資編碼為UTF-8，其餘為 Big5。",
+        "en": "ℹ️ Dengue_Case, KAOH_toen are UTF-8. Others are Big5."
+    },
+    10: {
+        "zh": "ℹ️ 本單元Dengue_Case、KAOH_toen圖資編碼為UTF-8，其餘為 Big5。",
+        "en": "ℹ️ Dengue_Case, KAOH_toen are UTF-8. Others are Big5."
+    }
 }
 
 TRANSLATIONS = {
@@ -113,7 +148,8 @@ TRANSLATIONS = {
         "msg_no_data": "無資料",
         "link_gsheet": "🔗 前往 Google Sheet 查看原始資料",
         "ta_filter_unit": "篩選單元：",
-        "warning_no_id": "⚠️ 請先在左側欄位輸入學號！"
+        "warning_no_id": "⚠️ 請先在左側欄位輸入學號！",
+        "warning_not_allowed": "🚫 此學號未授權使用本系統，請聯繫助教。"
     },
     "en": {
         "page_title": "🔮 GIS Gym",
@@ -169,7 +205,8 @@ TRANSLATIONS = {
         "msg_no_data": "No Data",
         "link_gsheet": "🔗 Go to Google Sheet",
         "ta_filter_unit": "Filter Unit:",
-        "warning_no_id": "⚠️ Please enter Student ID in sidebar first!"
+        "warning_no_id": "⚠️ Please enter Student ID in sidebar first!",
+        "warning_not_allowed": "🚫 Access Denied. Please contact TA."
     }
 }
 
@@ -220,7 +257,6 @@ st.markdown(
 if "language" not in st.session_state:
     st.session_state["language"] = "zh"
 
-# [Research Data] Initialize Session ID for this visit
 if "session_id" not in st.session_state:
     st.session_state["session_id"] = str(uuid.uuid4())
 
@@ -312,13 +348,11 @@ def get_unit_files(unit_id: int):
     files_list = []
     if os.path.exists(data_dir):
         for f in os.listdir(data_dir):
-            # [FIXED] Added .sbx, .sbn, .prj, .cpg, .xml to whitelist
             if f.lower().endswith(('.shp', '.shx', '.dbf', '.csv', '.tif', '.geojson', '.zip', '.txt', '.sbx', '.sbn', '.prj', '.cpg', '.xml')):
                 files_list.append({
                     "name": f,
                     "path": os.path.join(data_dir, f)
                 })
-    # [NEW] Sort files alphabetically
     files_list.sort(key=lambda x: x['name'])
     return files_list
 
@@ -398,7 +432,7 @@ def _retrieve_context(query: str, unit_id: int | None, k: int = 8) -> str:
 
 
 # =====================================================
-# 6) AI 生成與批改 (Research & Prompt Optimized)
+# 6) AI 生成與批改 (Fix: Short Answer Bug)
 # =====================================================
 def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | None, specific_topic: str | None, lang: str) -> dict:
     q_str = f"Unit {unit_id}" if unit_id else ""
@@ -413,38 +447,56 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
     ai_files = [f['name'] for f in real_files if f['name'].lower().endswith(ai_visible_extensions)]
     file_names_str = ", ".join(ai_files) if ai_files else "None"
 
-    # [Prompt v6.0] Removed Action Items, Reinforced R Code
+    # [FIX v6.2] Split Logic: "Practical" vs "Short Answer"
+    is_short_ans = (qtype in ["簡答題", "Short Answer"])
+
     if lang == "en":
-        sys_role = "You are an expert GIS Teaching Assistant. Use GPT-4o logic to create questions."
-        r_rules = "Hard Constraints: 1. Use **R language** (sf, terra). 2. No ArcGIS/QGIS mentions."
-        system_instruction = f"""
-        Design a '{qtype}' question (Difficulty: {level}) based on: [{file_names_str}].
-        Core Concept: {selected_method}.
-        
-        {r_rules}
-        
-        In 'question_content': State Goal and Data clearly. Do NOT show steps.
-        In 'hint': Provide detailed steps and R functions.
-        
-        JSON Output format:
-        {{ "question_content": "Markdown...", "hint": "Markdown...", "target_filename": "..." }}
-        """
+        if is_short_ans:
+            # [Logic A] For Short Answer: No file constraints, pure conceptual
+            sys_role = "You are a GIS expert. Ask a Conceptual Question based on the context."
+            system_instruction = f"""
+            Design a 'Short Answer' question (Difficulty: {level}) about: {selected_method}.
+            ❌ Do NOT ask students to load specific files or write code.
+            ✅ Focus on theory, logic, or concept explanation.
+            
+            JSON Output:
+            {{ "question_content": "Write the actual question text here...", "hint": "Explanation of the concept...", "target_filename": "None" }}
+            """
+        else:
+            # [Logic B] For Practical: Must use files & R code
+            sys_role = "You are a GIS TA. Create a Practical R Coding task."
+            r_rules = "Hard Constraints: 1. Use **R language** (sf, terra). 2. No ArcGIS/QGIS mentions."
+            system_instruction = f"""
+            Design a 'Practical' task (Difficulty: {level}) using files: [{file_names_str}].
+            Core Concept: {selected_method}.
+            {r_rules}
+            
+            JSON Output:
+            {{ "question_content": "Task description...", "hint": "Step-by-step R guide...", "target_filename": "..." }}
+            """
     else:
-        sys_role = "你是頂尖的空間分析助教。請使用 GPT-4o 的強大邏輯來出題。"
-        r_rules = "嚴格限制：1. 必須使用 **R 語言**。 2. 禁止提及 ArcGIS/QGIS。 3. 請用繁體中文。"
-        system_instruction = f"""
-        請根據真實檔案列表: [{file_names_str}] 設計一道【{qtype}】(難度：{level})。
-        核心考點：{selected_method}。
-        
-        {r_rules}
-        
-        【出題規範】
-        1. 'question_content' (題目)：只說明任務目標與使用資料，保留思考空間。
-        2. 'hint' (提示)：提供詳細解題步驟與建議函數。
-        
-        請回傳 JSON：
-        {{ "question_content": "題目內容(Markdown)...", "hint": "提示內容...", "target_filename": "..." }}
-        """
+        # Traditional Chinese
+        if is_short_ans:
+            sys_role = "你是 GIS 觀念專家。請根據講義出題。"
+            system_instruction = f"""
+            請設計一道關於「{selected_method}」的【觀念簡答題】(難度：{level})。
+            ❌ 不要要求學生讀取特定檔案或寫程式。
+            ✅ 請專注於測試名詞解釋、分析原理或適用情境。
+            
+            請回傳 JSON：
+            {{ "question_content": "請在此寫下題目敘述...", "hint": "觀念解說...", "target_filename": "None" }}
+            """
+        else:
+            sys_role = "你是頂尖的空間分析助教。請設計 R 語言實作題。"
+            r_rules = "嚴格限制：1. 必須使用 **R 語言**。 2. 禁止提及 ArcGIS/QGIS。"
+            system_instruction = f"""
+            請根據真實檔案列表: [{file_names_str}] 設計一道【實作題】(難度：{level})。
+            核心考點：{selected_method}。
+            {r_rules}
+            
+            請回傳 JSON：
+            {{ "question_content": "任務說明...", "hint": "R 語言解題步驟...", "target_filename": "..." }}
+            """
 
     try:
         response = client.chat.completions.create(
@@ -459,11 +511,9 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
 
 def grade_submission(question_text: str, student_answer: str, hint_text: str, unit_id: int | None, lang: str, qtype: str = "Practical (R Code)") -> dict:
     context = _retrieve_context(question_text, unit_id=unit_id, k=10)
-    is_conceptual = (qtype in ["簡答題", "Short Answer"])
-
-    # [Prompt v6.0] Anti-Cheating & Bias Reduction
+    
     prompt_rules = """
-    【Grading Rules (Research v6.0)】
+    【Grading Rules (Research v6.2)】
     1. **Mandatory R Code**: If the task is Practical/Coding and the student provides NO R code (only text), the maximum score is **4/10**. 
     2. **Anti-Cheating**: Compare student answer with the provided 'Hint'. If the student merely copied the Hint, give a low score (<5) and note it in weaknesses.
     3. **Bias Reduction**: 
@@ -542,8 +592,20 @@ def generate_weakness_report(unit_id: int):
 
 
 # =====================================================
-# 7) 資料庫與日誌系統 (Research Metrics v6.0)
+# 7) 資料庫與日誌系統 (Restore extract_weaknesses)
 # =====================================================
+# [FIX v6.2] Restore helper function
+def extract_weaknesses(val):
+    try:
+        if not val: return ""
+        d = json.loads(val)
+        w = d.get("weaknesses", [])
+        if isinstance(w, list):
+            return "; ".join([f"{i+1}. {x}" for i, x in enumerate(w)])
+        return str(w)
+    except:
+        return ""
+
 def read_history_gsheet() -> pd.DataFrame:
     try:
         ws = get_worksheet("learning_history")
@@ -562,7 +624,6 @@ def read_submissions_gsheet() -> pd.DataFrame:
         st.error(f"❌ 讀取作業紀錄失敗：{e}")
         return pd.DataFrame()
 
-# [NEW v6.0] System Logs (Triggered by Action)
 def log_system_usage(action: str):
     try:
         ws = get_worksheet("system_logs")
@@ -572,9 +633,8 @@ def log_system_usage(action: str):
             ram_gb = round(mem_info.rss / (1024 ** 3), 4)
             row_data = [datetime.now().isoformat(), action, ram_gb]
             ws.append_row(row_data)
-    except: pass # Silent fail
+    except: pass 
 
-# [NEW v6.0] Research Data Logging (Practice)
 def log_practice(sid, uid, q, fb, duration, used_hint):
     try:
         ws = get_worksheet("learning_history")
@@ -582,14 +642,13 @@ def log_practice(sid, uid, q, fb, duration, used_hint):
             weakness_list = fb.get('weaknesses', [])
             weakness_str = "; ".join(weakness_list) if isinstance(weakness_list, list) else str(weakness_list)
             
-            # [Research Columns Added]
             row_data = [
                 datetime.now().isoformat(), 
-                st.session_state["session_id"], # Session ID
+                st.session_state["session_id"],
                 str(sid), 
                 int(uid) if uid else 0,
-                duration,        # Duration (sec)
-                str(used_hint),  # Used Hint?
+                duration,
+                str(used_hint),
                 q, 
                 fb.get('score', 0), 
                 get_level_from_score(fb.get('score', 0)), 
@@ -597,8 +656,6 @@ def log_practice(sid, uid, q, fb, duration, used_hint):
                 json.dumps(fb, ensure_ascii=False)
             ]
             ws.append_row(row_data)
-            
-            # [Trigger System Log]
             log_system_usage(f"Practice_Submit_Unit{uid}")
             
     except Exception as e: st.error(f"Log Error: {e}")
@@ -608,7 +665,6 @@ def log_practice(sid, uid, q, fb, duration, used_hint):
         send_backup_email(f"GIS Gym Practice: {sid}", email_body)
     except: pass
 
-# [NEW v6.0] Research Data Logging (Assignment)
 def log_assignment_submission(assign_id, sid, uid, ans, fb):
     try:
         ws = get_worksheet("submissions")
@@ -616,7 +672,6 @@ def log_assignment_submission(assign_id, sid, uid, ans, fb):
             weakness_list = fb.get('weaknesses', [])
             weakness_str = "; ".join(weakness_list) if isinstance(weakness_list, list) else str(weakness_list)
 
-            # Assignment logs kept simple for now, can extend later
             row_data = [
                 datetime.now().isoformat(), 
                 int(assign_id), 
@@ -628,8 +683,6 @@ def log_assignment_submission(assign_id, sid, uid, ans, fb):
                 json.dumps(fb, ensure_ascii=False)
             ]
             ws.append_row(row_data)
-            
-            # [Trigger System Log]
             log_system_usage(f"Assignment_Submit_Unit{uid}")
 
     except Exception as e: st.error(f"Log Error: {e}")
@@ -670,10 +723,9 @@ def send_backup_email(subject, body):
 
 
 # =====================================================
-# 8) UI Helper (Hardcoded Rubric v6.0)
+# 8) UI Helper
 # =====================================================
 def get_level_from_score(score):
-    # [v6.0] Python-driven Level Logic
     try:
         s = int(score)
         if s == 10: return "優秀 (Excellent)"
@@ -693,7 +745,6 @@ def display_feedback_ui(fb, t_dict):
     
     st.markdown(f"#### {t_dict['fb_rubric']}")
     
-    # [v6.0] Hardcoded Rubric Table
     ai_scores = fb.get('rubric_scores', [0, 0, 0])
     ai_evidence = fb.get('rubric_evidence', ["未提供", "未提供", "未提供"])
     
@@ -730,8 +781,6 @@ def display_feedback_ui(fb, t_dict):
     with c2:
         st.markdown(f"#### {t_dict['fb_weaknesses']}")
         for w in fb.get('weaknesses', []): st.markdown(f"- {w}")
-    
-    # No Action Items
 
 
 # =====================================================
@@ -749,7 +798,15 @@ with st.sidebar:
     
     st.header(T['sidebar_user'])
     if "student_id" not in st.session_state: st.session_state["student_id"] = ""
-    st.session_state["student_id"] = st.text_input(T['label_student_id'], value=st.session_state["student_id"])
+    
+    # [FUTURE FEATURE] Allowlist Check
+    user_input_id = st.text_input(T['label_student_id'], value=st.session_state["student_id"])
+    st.session_state["student_id"] = user_input_id
+    
+    # if "ALLOWED_STUDENTS" in globals() and user_input_id:
+    #     if user_input_id not in ALLOWED_STUDENTS:
+    #         st.error(T['warning_not_allowed'])
+    #         st.stop()
     
     st.divider()
     
@@ -770,7 +827,6 @@ with st.sidebar:
             st.session_state["is_ta"] = False
             st.rerun()
         
-        # Monitor RAM (App Process)
         process = psutil.Process(os.getpid())
         mem_info = process.memory_info()
         app_ram = mem_info.rss / (1024 ** 3)
@@ -795,7 +851,7 @@ with tabs[0]:
         type_display = c4.selectbox(T['sel_type'], [T['opt_short'], T['opt_coding']], key="p_qty")
         
         if c5.button(T['btn_generate'], type="primary", use_container_width=True):
-            # [FIX] 加上學號卡控：如果沒有填學號，跳出警告並不執行動作
+            # [FIX] 學號卡控
             if not st.session_state.get("student_id", "").strip():
                 st.warning(T["warning_no_id"])
             else:
@@ -803,7 +859,6 @@ with tabs[0]:
                     q_data = generate_practice_question_real_data(lvl_display, type_display, unit_val, topic_display, st.session_state["language"])
                     st.session_state["pq_data"] = q_data
                     st.session_state["pq_meta"] = f"{unit_str} | {lvl_display} | {type_display}"
-                    # [Research] Start Timer & Reset Flags
                     st.session_state["q_start_time"] = time.time()
                     st.session_state["hint_viewed"] = False
 
@@ -812,7 +867,6 @@ with tabs[0]:
         st.markdown(f"### {T['header_q']} [{st.session_state['pq_meta']}]") 
         st.info(q_data.get("question_content", ""))
         
-        # [Research] Hint Interaction Tracking
         if st.button(T['btn_show_hint']):
             st.session_state["hint_viewed"] = True
         
@@ -825,10 +879,13 @@ with tabs[0]:
         if unit_val and not is_short_ans:
             all_files = get_unit_files(unit_val)
             if all_files:
-                if unit_val in UNIT_NOTES:
-                    st.warning(UNIT_NOTES[unit_val])
-                    
                 with st.expander(f"📂 {T['btn_download_data']}", expanded=False):
+                    # [NEW v6.2] Unit Notes Moved Inside Expander
+                    if unit_val in UNIT_NOTES:
+                        # Auto-select language for note
+                        note_lang = st.session_state["language"]
+                        st.info(UNIT_NOTES[unit_val][note_lang])
+                    
                     cols = st.columns(3)
                     for i, f in enumerate(all_files):
                         with cols[i % 3]:
@@ -840,15 +897,11 @@ with tabs[0]:
         ans = st.text_area("Answer", height=150, key="p_ans", disabled=not sid, placeholder=T['placeholder_ans'])
         if st.button(T['btn_submit'], key="p_sub", disabled=not ans):
             with st.spinner("Grading..."):
-                # [Research] Calculate Duration
                 duration = 0
                 if "q_start_time" in st.session_state:
                     duration = int(time.time() - st.session_state["q_start_time"])
                 
-                # Pass Hint to grader
                 fb = grade_submission(q_data.get("question_content", ""), ans, q_data.get("hint", ""), unit_val, st.session_state["language"], qtype=type_display)
-                
-                # Log with Research Metrics
                 log_practice(sid, unit_val, q_data.get("question_content", ""), fb, duration, st.session_state.get("hint_viewed", False))
                 
                 display_feedback_ui(fb, T)
@@ -866,10 +919,11 @@ with tabs[1]:
             
             real_files = get_unit_files(target_unit)
             if real_files:
-                if target_unit in UNIT_NOTES:
-                    st.warning(UNIT_NOTES[target_unit])
-                    
                 with st.expander(f"📂 {T['header_assign_data']}", expanded=False):
+                    if target_unit in UNIT_NOTES:
+                        note_lang = st.session_state["language"]
+                        st.info(UNIT_NOTES[target_unit][note_lang])
+                        
                     cols = st.columns(3)
                     for i, f in enumerate(real_files):
                         with cols[i % 3]:
@@ -915,12 +969,10 @@ if st.session_state["is_ta"] and len(tabs) > 2:
             if filter_unit != T['opt_all']:
                 df = df[df['unit_id'] == int(filter_unit)]
             
-            # [Display Research Columns]
             st.download_button(T['btn_dl_csv'], df.to_csv(index=False).encode('utf-8-sig'), "practice.csv", "text/csv")
             if 'feedback_json' in df.columns:
                 df["weakness_parsed"] = df["feedback_json"].apply(extract_weaknesses)
             
-            # Show more columns for TA
             display_cols = [c for c in ['timestamp', 'student_id', 'unit_id', 'score', 'duration_sec', 'used_hint', 'weakness_parsed'] if c in df.columns]
             st.dataframe(df[display_cols], use_container_width=True, hide_index=True, height=300)
         else: st.info(T['msg_no_data'])
