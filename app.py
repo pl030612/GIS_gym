@@ -429,7 +429,7 @@ def _retrieve_context(query: str, unit_id: int | None, k: int = 8) -> str:
 
 
 # =====================================================
-# 6) AI 生成與批改 (Fix: ANTI-CHEAT PRIORITY)
+# 6) AI 生成與批改 (Fix: Heuristic Questioning)
 # =====================================================
 def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | None, specific_topic: str | None, lang: str) -> dict:
     q_str = f"Unit {unit_id}" if unit_id else ""
@@ -460,13 +460,25 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
         else:
             sys_role = "You are a GIS TA. Create a Practical R Coding task."
             r_rules = "Hard Constraints: 1. Use **R language** (sf, terra). 2. No ArcGIS/QGIS mentions."
+            
+            # [FIX v6.8] Enforce Scenario-based Questioning (No Step-by-Step in Question)
             system_instruction = f"""
             Design a 'Practical' task (Difficulty: {level}) using files: [{file_names_str}].
             Core Concept: {selected_method}.
             {r_rules}
             
+            【Question Design Strategy】
+            1. 'question_content':
+               - Provide a **Scenario** or **Analytical Goal** (e.g., "Calculate service coverage", "Identify hotspots").
+               - ❌ **FORBIDDEN**: Do NOT list numbered steps (1. Read file, 2. Transform...).
+               - ❌ **FORBIDDEN**: Do NOT mention specific R function names in the question.
+               - ✅ ALLOWED: Only state the objective. Let the student figure out the workflow.
+            
+            2. 'hint':
+               - Provide the detailed step-by-step guide and suggested R functions here.
+            
             JSON Output:
-            {{ "question_content": "Task description...", "hint": "Step-by-step R guide...", "target_filename": "..." }}
+            {{ "question_content": "Scenario description...", "hint": "Step-by-step R guide...", "target_filename": "..." }}
             """
     else:
         if is_short_ans:
@@ -482,13 +494,25 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
         else:
             sys_role = "你是頂尖的空間分析助教。請設計 R 語言實作題。"
             r_rules = "嚴格限制：1. 必須使用 **R 語言**。 2. 禁止提及 ArcGIS/QGIS。"
+            
+            # [FIX v6.8] 強制啟發式出題 (題目不給步驟)
             system_instruction = f"""
             請根據真實檔案列表: [{file_names_str}] 設計一道【實作題】(難度：{level})。
             核心考點：{selected_method}。
             {r_rules}
             
+            【出題策略】
+            1. 'question_content' (題目)：
+               - 請設計一個「情境」或「分析目標」 (例如：計算某區域的服務範圍、找出分佈熱區)。
+               - ❌ **嚴禁**在題目中列出步驟 (如 1. 讀檔 2. 轉座標...)。
+               - ❌ **嚴禁**在題目中直接提及 R 函數名稱 (讓學生自己想)。
+               - ✅ 只給目標，不給路徑。讓學生自己思考解決方案。
+            
+            2. 'hint' (提示)：
+               - 這裡才需要提供詳細的 Step-by-step 步驟與建議使用的 R 套件/函數。
+            
             請回傳 JSON：
-            {{ "question_content": "任務說明...", "hint": "R 語言解題步驟...", "target_filename": "..." }}
+            {{ "question_content": "情境與任務目標...", "hint": "R 語言詳細解題步驟...", "target_filename": "..." }}
             """
 
     try:
@@ -900,7 +924,6 @@ with tabs[0]:
                     st.session_state["pq_meta"] = f"{unit_str} | {lvl_display} | {type_display}"
                     st.session_state["q_start_time"] = time.time()
                     st.session_state["hint_viewed"] = False
-                    # [FIX v6.7] Force clear input box when generating new question
                     st.session_state["p_ans"] = ""
 
     if "pq_data" in st.session_state:
