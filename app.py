@@ -531,9 +531,9 @@ def grade_submission(question_text: str, student_answer: str, hint_text: str, un
     context = _retrieve_context(question_text, unit_id=unit_id, k=10)
     is_conceptual = (qtype in ["簡答題", "Short Answer"])
     
-    # [FIX v7.1] STRATIFIED GRADING (Exact Copy vs No Code)
+    # [FIX v7.2] ZERO TOLERANCE POLICY
     
-    # 1. 100% Copy Check
+    # 1. 100% Copy Check = 0 Points
     strict_plagiarism_check = """
     【🚨 STEP 1: STRICT PLAGIARISM CHECK】
     Compare [Student Answer] vs [Hint Provided].
@@ -542,7 +542,8 @@ def grade_submission(question_text: str, student_answer: str, hint_text: str, un
     2. AND the student added **NO** original text/explanation.
     
     If Plagiarism (100% Copy) is detected:
-    - Total Score = 1.
+    - **Total Score = 0**. (Zero Tolerance).
+    - **Rubric Scores = [0, 0, 0]**.
     - Weakness: "⚠️ 嚴重違規：檢測到完全複製提示內容."
     - STOP GRADING HERE.
     """
@@ -558,18 +559,18 @@ def grade_submission(question_text: str, student_answer: str, hint_text: str, un
            - **Completeness (完整性與關鍵細節)** [Max 3]
         """
     else:
-        # [FIX v7.1] NO CODE PENALTY (Score <= 4)
+        # [v7.2] NO CODE PENALTY (Score <= 4)
         grading_logic = """
         【🚨 STEP 2: MANDATORY CODE CHECK (For Practical Tasks)】
         Check if the student answer contains actual R code syntax (e.g., `library`, `st_read`, `<-`, `function`).
         
         **CASE A: NO R CODE FOUND (Only text descriptions/plans)**:
-        - **Total Score MUST be <= 4**. (Do not give 0, give partial credit for logic).
+        - **Total Score MUST be <= 4**.
         - **Rubric Guide**:
-          * Requirement: 1 (Failed to write code).
-          * Spatial Logic: 1-2 (Depending on if their text description is logically correct).
+          * Requirement: 1-2 (Depending on textual understanding).
+          * Spatial Logic: 1-2 (Depending on logic).
           * Code Rigor: 0 (No code).
-        - Weakness: "嚴重缺失：僅有文字敘述，未撰寫 R 程式碼."
+        - Weakness: "嚴重缺失：僅有文字敘述，未撰寫 R 程式碼 (No R code provided)."
         
         **CASE B: CODE FOUND (Normal Grading)**:
         - **Rubric** (Total 10):
