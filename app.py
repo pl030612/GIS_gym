@@ -29,16 +29,16 @@ from langchain_community.vectorstores import FAISS
 # 0) 參數設定 & 語言包 & 單元備註
 # =====================================================
 UNIT_DEADLINES = {
-    1: "2025-09-30",
-    2: "2025-10-07",
-    3: "2025-10-14",
-    4: "2025-10-21",
-    5: "2025-10-28",
-    6: "2025-11-04",
-    7: "2025-11-11",
-    8: "2025-11-18",
-    9: "2025-11-25",
-    10: "2025-12-02"
+    1: "2026-03-08",
+    2: "2026-03-15",
+    3: "2026-03-22",
+    4: "2026-03-29",
+    5: "2026-04-05",
+    6: "2026-04-19",
+    7: "2026-04-26",
+    8: "2026-05-03",
+    9: "2026-05-10",
+    10: "2026-05-17"
 }
 DEFAULT_DEADLINE = "2025-12-31"
 GOOGLE_SHEET_NAME = "GIS_Gym_Database" 
@@ -430,7 +430,7 @@ def _retrieve_context(query: str, unit_id: int | None, k: int = 8) -> str:
 
 
 # =====================================================
-# 6) AI 生成與批改 (Fix: Heuristic & Relaxed Anti-Cheat)
+# 6) AI 生成與批改 (Fix: ANTI-CHEAT & NO CODE PENALTY)
 # =====================================================
 def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | None, specific_topic: str | None, lang: str) -> dict:
     q_str = f"Unit {unit_id}" if unit_id else ""
@@ -531,20 +531,18 @@ def grade_submission(question_text: str, student_answer: str, hint_text: str, un
     context = _retrieve_context(question_text, unit_id=unit_id, k=10)
     is_conceptual = (qtype in ["簡答題", "Short Answer"])
     
-    # [FIX v6.9] RELAXED ANTI-CHEAT POLICY
+    # [v6.9 ANTI-CHEAT LAYER - Relaxed]
     anti_cheat_policy = """
-    【🚨 PLAGIARISM CHECK (Refined)】
+    【🚨 PLAGIARISM CHECK】
     Before checking for correctness, compare [Student Answer] with [Hint Provided].
     
     CRITERIA for Plagiarism (Flag ONLY if):
-    1. **Textual Copying**: The student has copied the *instructional text/explanations* of the hint verbatim (word-for-word).
+    1. **Textual Copying**: The student has copied the *instructional text/explanations* of the hint verbatim.
     2. **Zero Effort**: The answer is purely the hint content with no attempt to solve.
     
-    **CRUCIAL EXCEPTION (Do NOT Flag)**:
-    - **Code Similarity**: Do **NOT** flag as plagiarism if the student writes the same R code functions (e.g., st_read, st_buffer) as the hint. R syntax is standard; using the same functions is expected and correct. 
-    - Unless the student copies the *comments* and *variable names* exactly without understanding, do not penalize code similarity.
+    **EXCEPTION**: Do **NOT** flag as plagiarism if the student writes similar R code functions. R syntax is standard.
     
-    IF Plagiarism Detected (based on Textual Copying):
+    IF Plagiarism Detected (Textual):
     1. Total Score = 1.
     2. Weakness: "⚠️ 嚴重違規：檢測到直接複製提示文字說明."
     """
@@ -560,11 +558,19 @@ def grade_submission(question_text: str, student_answer: str, hint_text: str, un
            - **Completeness (完整性與關鍵細節)** [Max 3]
         """
     else:
+        # [FIX v7.0] STRICT CODE REQUIREMENT
         specific_rules = """
         【Grading Rules (Practical/Coding)】
         (Only if no textual plagiarism detected)
-        1. **Mandatory R Code**: If the task is Practical and the student provides NO R code, max score is **4/10**.
-        2. **Rubric** (Total 10):
+        
+        🚨 **CRITICAL RULE: MANDATORY R CODE** 🚨
+        Check if the student answer contains actual R code blocks or snippets.
+        **IF NO R CODE IS FOUND (Only text descriptions):**
+        1. **Total Score MUST be <= 4**. (Strict Cap).
+        2. **Code Rigor (R 程式嚴謹度)** MUST be 0.
+        3. You must state in weaknesses: "嚴重缺失：實作題未提供任何 R 程式碼，無法評分程式能力。"
+        
+        **Rubric** (Total 10) [Only if code IS present]:
            - **Requirement Coverage (需求覆蓋)** [Max 3]
            - **Spatial Logic (空間邏輯)** [Max 4]
            - **Code Rigor (R 程式嚴謹度)** [Max 3]
