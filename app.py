@@ -514,7 +514,7 @@ def grade_submission(question_text: str, student_answer: str, hint_text: str, un
     IF the student has merely copied/pasted the Hint (or translated it slightly, or paraphrased >80%):
     1. **Total Score MUST be 1**. (Do NOT give points for correctness if copied).
     2. **All Rubric Scores MUST be 0**.
-    3. You **MUST** include this exact sentence in 'weaknesses': "⚠️ 嚴重違規：檢測到直接複製提示內容，請自行撰寫答案 (Plagiarism detected)."
+    3. You **MUST** include this exact sentence in 'weaknesses': "⚠️ 嚴重違規：檢測到直接複製提示內容，請自行撰寫答案."
     4. Ignore all other grading criteria below.
     """
 
