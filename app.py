@@ -47,7 +47,7 @@ GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1n-tYLLiwX1-iewjFJSXi
 # [FUTURE FEATURE] 學生白名單
 # ALLOWED_STUDENTS = ["B11204001", "TA001"]
 
-# [RESTORED v6.5] 完整雙語單元備註
+# [RESTORED v6.6] 完整雙語單元備註
 UNIT_NOTES = {
     1: {
         "zh": "ℹ️ 本單元圖資編碼為 Big5。",
@@ -430,7 +430,7 @@ def _retrieve_context(query: str, unit_id: int | None, k: int = 8) -> str:
 
 
 # =====================================================
-# 6) AI 生成與批改 (Dynamic Rubric Fix)
+# 6) AI 生成與批改 (Fix: ANTI-CHEAT PRIORITY)
 # =====================================================
 def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | None, specific_topic: str | None, lang: str) -> dict:
     q_str = f"Unit {unit_id}" if unit_id else ""
@@ -507,38 +507,56 @@ def grade_submission(question_text: str, student_answer: str, hint_text: str, un
     context = _retrieve_context(question_text, unit_id=unit_id, k=10)
     is_conceptual = (qtype in ["簡答題", "Short Answer"])
     
+    # [FIX v6.6] CRITICAL ANTI-CHEAT LAYER
+    # We define a "Zero Tolerance" policy block that sits at the top of the prompt.
+    
+    anti_cheat_policy = """
+    【🚨 CRITICAL: PLAGIARISM CHECK (Top Priority)】
+    Before checking for correctness, you MUST compare [Student Answer] with [Hint Provided].
+    
+    IF the student has merely copied/pasted the Hint (or translated it slightly, or paraphrased >80%):
+    1. **Total Score MUST be 1**. (Do NOT give points for correctness if copied).
+    2. **All Rubric Scores MUST be 0**.
+    3. You **MUST** include this exact sentence in 'weaknesses': "⚠️ 嚴重違規：檢測到直接複製提示內容，請自行撰寫答案 (Plagiarism detected)."
+    4. Ignore all other grading criteria below.
+    """
+
     if is_conceptual:
-        # [NEW v6.5] Rubric for Conceptual/Short Answer
-        prompt_rules = """
+        specific_rules = """
         【Grading Rules (Conceptual/Short Answer)】
+        (Only if no plagiarism detected)
         1. **No Code Required**: Focus on text explanation and logic.
         2. **Rubric** (Total 10):
-           - **Conceptual Accuracy (概念正確性)** [Max 3]: Accuracy of definitions, no factual errors.
-           - **Analytical Logic (分析邏輯與解釋)** [Max 4]: Explains 'Why', coherent logic.
-           - **Completeness (完整性與關鍵細節)** [Max 3]: Answers all parts, mentions key premises.
-        3. **Language**: MUST use Traditional Chinese (繁體中文).
+           - **Conceptual Accuracy (概念正確性)** [Max 3]
+           - **Analytical Logic (分析邏輯與解釋)** [Max 4]
+           - **Completeness (完整性與關鍵細節)** [Max 3]
         """
     else:
-        # Rubric for Practical/Coding
-        prompt_rules = """
+        specific_rules = """
         【Grading Rules (Practical/Coding)】
+        (Only if no plagiarism detected)
         1. **Mandatory R Code**: If the task is Practical and the student provides NO R code, max score is **4/10**.
         2. **Rubric** (Total 10):
-           - **Requirement Coverage (需求覆蓋)** [Max 3]: Meets all task requirements.
-           - **Spatial Logic (空間邏輯)** [Max 4]: Uses correct spatial functions/workflow.
-           - **Code Rigor (R 程式嚴謹度)** [Max 3]: Syntax correct, reproducible.
-        3. **Language**: MUST use Traditional Chinese (繁體中文).
+           - **Requirement Coverage (需求覆蓋)** [Max 3]
+           - **Spatial Logic (空間邏輯)** [Max 4]
+           - **Code Rigor (R 程式嚴謹度)** [Max 3]
         """
 
-    json_structure = """
+    final_prompt = f"""
+    You are a strict but fair GIS TA. 
+    {anti_cheat_policy}
+    {specific_rules}
+    
+    **Language**: MUST use Traditional Chinese (繁體中文).
+    
     Response Format (JSON):
-    {
+    {{
         "score": int (0-10),
         "strengths": ["point 1", "point 2"],
         "weaknesses": ["point 1", "point 2"],
         "rubric_scores": [score_1, score_2, score_3], 
         "rubric_evidence": ["evidence_1", "evidence_2", "evidence_3"]
-    }
+    }}
     """
 
     user_content = f"""
@@ -550,13 +568,11 @@ def grade_submission(question_text: str, student_answer: str, hint_text: str, un
     Please grade this submission.
     """
 
-    system_prompt = f"You are a strict but fair GIS TA. {prompt_rules} {json_structure}"
-
     try:
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=[
-                {"role": "system", "content": system_prompt},
+                {"role": "system", "content": final_prompt},
                 {"role": "user", "content": user_content}
             ],
             response_format={"type": "json_object"}
@@ -746,7 +762,7 @@ def send_backup_email(subject, body):
 
 
 # =====================================================
-# 8) UI Helper (Hardcoded Dynamic Rubric v6.5)
+# 8) UI Helper (Hardcoded Dynamic Rubric v6.6)
 # =====================================================
 def get_level_from_score(score):
     try:
@@ -771,11 +787,9 @@ def display_feedback_ui(fb, t_dict, qtype="Practical"):
     ai_scores = fb.get('rubric_scores', [0, 0, 0])
     ai_evidence = fb.get('rubric_evidence', ["未提供", "未提供", "未提供"])
     
-    # Safety padding
     while len(ai_scores) < 3: ai_scores.append(0)
     while len(ai_evidence) < 3: ai_evidence.append("未提供")
 
-    # [FIX v6.5] Hardcoded Labels for Both Types
     is_conceptual = qtype in ["簡答題", "Short Answer"]
     
     if is_conceptual:
@@ -793,7 +807,6 @@ def display_feedback_ui(fb, t_dict, qtype="Practical"):
             ("R 程式嚴謹度 (Code Rigor)", 3)
         ]
 
-    # Build table dynamically based on the hardcoded criteria
     rubric_data = []
     for i in range(3):
         rubric_data.append({
@@ -830,7 +843,6 @@ with st.sidebar:
     st.header(T['sidebar_user'])
     if "student_id" not in st.session_state: st.session_state["student_id"] = ""
     
-    # [FUTURE FEATURE] Allowlist Check
     user_input_id = st.text_input(T['label_student_id'], value=st.session_state["student_id"])
     st.session_state["student_id"] = user_input_id
     
@@ -966,7 +978,6 @@ with tabs[1]:
                 if prev:
                     st.success(f"{T['msg_submitted']} {prev[0]}")
                     with st.expander(T['expander_feedback']): 
-                        # Assignments default to Practical Rubric
                         display_feedback_ui(json.loads(prev[1]), T, qtype="Practical")
                 
                 assign_ans = st.text_area("Answer Area", height=250, key=f"assign_ans_{target_unit}", placeholder="Please paste your R code and explanation here...")
