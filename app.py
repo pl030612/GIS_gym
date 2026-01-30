@@ -47,6 +47,7 @@ GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1n-tYLLiwX1-iewjFJSXi
 # [FUTURE FEATURE] 學生白名單
 # ALLOWED_STUDENTS = ["B11204001", "TA001"]
 
+# 完整雙語單元備註
 UNIT_NOTES = {
     1: {
         "zh": "ℹ️ 本單元圖資編碼為 Big5。",
@@ -429,7 +430,7 @@ def _retrieve_context(query: str, unit_id: int | None, k: int = 8) -> str:
 
 
 # =====================================================
-# 6) AI 生成與批改 (Fix: Heuristic Questioning)
+# 6) AI 生成與批改 (Fix: Heuristic & Relaxed Anti-Cheat)
 # =====================================================
 def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | None, specific_topic: str | None, lang: str) -> dict:
     q_str = f"Unit {unit_id}" if unit_id else ""
@@ -461,7 +462,7 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
             sys_role = "You are a GIS TA. Create a Practical R Coding task."
             r_rules = "Hard Constraints: 1. Use **R language** (sf, terra). 2. No ArcGIS/QGIS mentions."
             
-            # [FIX v6.8] Enforce Scenario-based Questioning (No Step-by-Step in Question)
+            # [FIX v6.9] Enforce File Specification + No Steps
             system_instruction = f"""
             Design a 'Practical' task (Difficulty: {level}) using files: [{file_names_str}].
             Core Concept: {selected_method}.
@@ -469,16 +470,16 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
             
             【Question Design Strategy】
             1. 'question_content':
-               - Provide a **Scenario** or **Analytical Goal** (e.g., "Calculate service coverage", "Identify hotspots").
+               - Provide a **Scenario** or **Analytical Goal**.
+               - ✅ **MANDATORY**: You MUST explicitly state the filenames to be used (e.g., "Please use 'A.shp' and 'B.csv' to...").
                - ❌ **FORBIDDEN**: Do NOT list numbered steps (1. Read file, 2. Transform...).
                - ❌ **FORBIDDEN**: Do NOT mention specific R function names in the question.
-               - ✅ ALLOWED: Only state the objective. Let the student figure out the workflow.
             
             2. 'hint':
                - Provide the detailed step-by-step guide and suggested R functions here.
             
             JSON Output:
-            {{ "question_content": "Scenario description...", "hint": "Step-by-step R guide...", "target_filename": "..." }}
+            {{ "question_content": "Scenario description with filenames...", "hint": "Step-by-step R guide...", "target_filename": "..." }}
             """
     else:
         if is_short_ans:
@@ -495,7 +496,7 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
             sys_role = "你是頂尖的空間分析助教。請設計 R 語言實作題。"
             r_rules = "嚴格限制：1. 必須使用 **R 語言**。 2. 禁止提及 ArcGIS/QGIS。"
             
-            # [FIX v6.8] 強制啟發式出題 (題目不給步驟)
+            # [FIX v6.9] 強制指定檔案 + 不給步驟
             system_instruction = f"""
             請根據真實檔案列表: [{file_names_str}] 設計一道【實作題】(難度：{level})。
             核心考點：{selected_method}。
@@ -503,16 +504,16 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
             
             【出題策略】
             1. 'question_content' (題目)：
-               - 請設計一個「情境」或「分析目標」 (例如：計算某區域的服務範圍、找出分佈熱區)。
+               - 請設計一個「情境」或「分析目標」。
+               - ✅ **必須明確指出要使用的檔案名稱** (例如：請使用 'Taipei.shp' 進行分析...)。
                - ❌ **嚴禁**在題目中列出步驟 (如 1. 讀檔 2. 轉座標...)。
                - ❌ **嚴禁**在題目中直接提及 R 函數名稱 (讓學生自己想)。
-               - ✅ 只給目標，不給路徑。讓學生自己思考解決方案。
             
             2. 'hint' (提示)：
                - 這裡才需要提供詳細的 Step-by-step 步驟與建議使用的 R 套件/函數。
             
             請回傳 JSON：
-            {{ "question_content": "情境與任務目標...", "hint": "R 語言詳細解題步驟...", "target_filename": "..." }}
+            {{ "question_content": "包含檔案名稱的情境與目標...", "hint": "R 語言詳細解題步驟...", "target_filename": "..." }}
             """
 
     try:
@@ -530,22 +531,28 @@ def grade_submission(question_text: str, student_answer: str, hint_text: str, un
     context = _retrieve_context(question_text, unit_id=unit_id, k=10)
     is_conceptual = (qtype in ["簡答題", "Short Answer"])
     
-    # [CRITICAL ANTI-CHEAT LAYER]
+    # [FIX v6.9] RELAXED ANTI-CHEAT POLICY
     anti_cheat_policy = """
-    【🚨 CRITICAL: PLAGIARISM CHECK (Top Priority)】
-    Before checking for correctness, you MUST compare [Student Answer] with [Hint Provided].
+    【🚨 PLAGIARISM CHECK (Refined)】
+    Before checking for correctness, compare [Student Answer] with [Hint Provided].
     
-    IF the student has merely copied/pasted the Hint (or translated it slightly, or paraphrased >80%):
-    1. **Total Score MUST be 1**. (Do NOT give points for correctness if copied).
-    2. **All Rubric Scores MUST be 0**.
-    3. You **MUST** include this exact sentence in 'weaknesses': "⚠️ 嚴重違規：檢測到直接複製提示內容，請自行撰寫答案."
-    4. Ignore all other grading criteria below.
+    CRITERIA for Plagiarism (Flag ONLY if):
+    1. **Textual Copying**: The student has copied the *instructional text/explanations* of the hint verbatim (word-for-word).
+    2. **Zero Effort**: The answer is purely the hint content with no attempt to solve.
+    
+    **CRUCIAL EXCEPTION (Do NOT Flag)**:
+    - **Code Similarity**: Do **NOT** flag as plagiarism if the student writes the same R code functions (e.g., st_read, st_buffer) as the hint. R syntax is standard; using the same functions is expected and correct. 
+    - Unless the student copies the *comments* and *variable names* exactly without understanding, do not penalize code similarity.
+    
+    IF Plagiarism Detected (based on Textual Copying):
+    1. Total Score = 1.
+    2. Weakness: "⚠️ 嚴重違規：檢測到直接複製提示文字說明."
     """
 
     if is_conceptual:
         specific_rules = """
         【Grading Rules (Conceptual/Short Answer)】
-        (Only if no plagiarism detected)
+        (Only if no textual plagiarism detected)
         1. **No Code Required**: Focus on text explanation and logic.
         2. **Rubric** (Total 10):
            - **Conceptual Accuracy (概念正確性)** [Max 3]
@@ -555,7 +562,7 @@ def grade_submission(question_text: str, student_answer: str, hint_text: str, un
     else:
         specific_rules = """
         【Grading Rules (Practical/Coding)】
-        (Only if no plagiarism detected)
+        (Only if no textual plagiarism detected)
         1. **Mandatory R Code**: If the task is Practical and the student provides NO R code, max score is **4/10**.
         2. **Rubric** (Total 10):
            - **Requirement Coverage (需求覆蓋)** [Max 3]
