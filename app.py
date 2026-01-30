@@ -430,7 +430,7 @@ def _retrieve_context(query: str, unit_id: int | None, k: int = 8) -> str:
 
 
 # =====================================================
-# 6) AI 生成與批改 (Fix: ANTI-CHEAT & NO CODE PENALTY)
+# 6) AI 生成與批改 (Fix: Heuristic & Relaxed Anti-Cheat)
 # =====================================================
 def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | None, specific_topic: str | None, lang: str) -> dict:
     q_str = f"Unit {unit_id}" if unit_id else ""
@@ -462,7 +462,7 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
             sys_role = "You are a GIS TA. Create a Practical R Coding task."
             r_rules = "Hard Constraints: 1. Use **R language** (sf, terra). 2. No ArcGIS/QGIS mentions."
             
-            # [FIX v6.9] Enforce File Specification + No Steps
+            # [v6.9] Enforce File Specification + No Steps
             system_instruction = f"""
             Design a 'Practical' task (Difficulty: {level}) using files: [{file_names_str}].
             Core Concept: {selected_method}.
@@ -496,7 +496,7 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
             sys_role = "你是頂尖的空間分析助教。請設計 R 語言實作題。"
             r_rules = "嚴格限制：1. 必須使用 **R 語言**。 2. 禁止提及 ArcGIS/QGIS。"
             
-            # [FIX v6.9] 強制指定檔案 + 不給步驟
+            # [v6.9] 強制指定檔案 + 不給步驟
             system_instruction = f"""
             請根據真實檔案列表: [{file_names_str}] 設計一道【實作題】(難度：{level})。
             核心考點：{selected_method}。
@@ -531,26 +531,26 @@ def grade_submission(question_text: str, student_answer: str, hint_text: str, un
     context = _retrieve_context(question_text, unit_id=unit_id, k=10)
     is_conceptual = (qtype in ["簡答題", "Short Answer"])
     
-    # [v6.9 ANTI-CHEAT LAYER - Relaxed]
-    anti_cheat_policy = """
-    【🚨 PLAGIARISM CHECK】
-    Before checking for correctness, compare [Student Answer] with [Hint Provided].
+    # [FIX v7.1] STRATIFIED GRADING (Exact Copy vs No Code)
     
-    CRITERIA for Plagiarism (Flag ONLY if):
-    1. **Textual Copying**: The student has copied the *instructional text/explanations* of the hint verbatim.
-    2. **Zero Effort**: The answer is purely the hint content with no attempt to solve.
+    # 1. 100% Copy Check
+    strict_plagiarism_check = """
+    【🚨 STEP 1: STRICT PLAGIARISM CHECK】
+    Compare [Student Answer] vs [Hint Provided].
+    Flag as plagiarism ONLY IF:
+    1. The text is an **EXACT VERBATIM COPY (100% match)** of the Hint's text instructions.
+    2. AND the student added **NO** original text/explanation.
     
-    **EXCEPTION**: Do **NOT** flag as plagiarism if the student writes similar R code functions. R syntax is standard.
-    
-    IF Plagiarism Detected (Textual):
-    1. Total Score = 1.
-    2. Weakness: "⚠️ 嚴重違規：檢測到直接複製提示文字說明 (Textual plagiarism detected)."
+    If Plagiarism (100% Copy) is detected:
+    - Total Score = 1.
+    - Weakness: "⚠️ 嚴重違規：檢測到完全複製提示內容."
+    - STOP GRADING HERE.
     """
 
     if is_conceptual:
-        specific_rules = """
+        grading_logic = """
         【Grading Rules (Conceptual/Short Answer)】
-        (Only if no textual plagiarism detected)
+        (Only if no 100% plagiarism detected)
         1. **No Code Required**: Focus on text explanation and logic.
         2. **Rubric** (Total 10):
            - **Conceptual Accuracy (概念正確性)** [Max 3]
@@ -558,19 +558,21 @@ def grade_submission(question_text: str, student_answer: str, hint_text: str, un
            - **Completeness (完整性與關鍵細節)** [Max 3]
         """
     else:
-        # [FIX v7.0] STRICT CODE REQUIREMENT
-        specific_rules = """
-        【Grading Rules (Practical/Coding)】
-        (Only if no textual plagiarism detected)
+        # [FIX v7.1] NO CODE PENALTY (Score <= 4)
+        grading_logic = """
+        【🚨 STEP 2: MANDATORY CODE CHECK (For Practical Tasks)】
+        Check if the student answer contains actual R code syntax (e.g., `library`, `st_read`, `<-`, `function`).
         
-        🚨 **CRITICAL RULE: MANDATORY R CODE** 🚨
-        Check if the student answer contains actual R code blocks or snippets.
-        **IF NO R CODE IS FOUND (Only text descriptions):**
-        1. **Total Score MUST be <= 4**. (Strict Cap).
-        2. **Code Rigor (R 程式嚴謹度)** MUST be 0.
-        3. You must state in weaknesses: "嚴重缺失：實作題未提供任何 R 程式碼，無法評分程式能力。"
+        **CASE A: NO R CODE FOUND (Only text descriptions/plans)**:
+        - **Total Score MUST be <= 4**. (Do not give 0, give partial credit for logic).
+        - **Rubric Guide**:
+          * Requirement: 1 (Failed to write code).
+          * Spatial Logic: 1-2 (Depending on if their text description is logically correct).
+          * Code Rigor: 0 (No code).
+        - Weakness: "嚴重缺失：僅有文字敘述，未撰寫 R 程式碼."
         
-        **Rubric** (Total 10) [Only if code IS present]:
+        **CASE B: CODE FOUND (Normal Grading)**:
+        - **Rubric** (Total 10):
            - **Requirement Coverage (需求覆蓋)** [Max 3]
            - **Spatial Logic (空間邏輯)** [Max 4]
            - **Code Rigor (R 程式嚴謹度)** [Max 3]
@@ -578,8 +580,8 @@ def grade_submission(question_text: str, student_answer: str, hint_text: str, un
 
     final_prompt = f"""
     You are a strict but fair GIS TA. 
-    {anti_cheat_policy}
-    {specific_rules}
+    {strict_plagiarism_check}
+    {grading_logic}
     
     **Language**: MUST use Traditional Chinese (繁體中文).
     
