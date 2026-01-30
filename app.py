@@ -544,7 +544,7 @@ def grade_submission(question_text: str, student_answer: str, hint_text: str, un
     
     IF Plagiarism Detected (Textual):
     1. Total Score = 1.
-    2. Weakness: "⚠️ 嚴重違規：檢測到直接複製提示文字說明."
+    2. Weakness: "⚠️ 嚴重違規：檢測到直接複製提示文字說明 (Textual plagiarism detected)."
     """
 
     if is_conceptual:
