@@ -47,7 +47,6 @@ GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1n-tYLLiwX1-iewjFJSXi
 # [FUTURE FEATURE] 學生白名單
 # ALLOWED_STUDENTS = ["B11204001", "TA001"]
 
-# [RESTORED v6.6] 完整雙語單元備註
 UNIT_NOTES = {
     1: {
         "zh": "ℹ️ 本單元圖資編碼為 Big5。",
@@ -507,9 +506,7 @@ def grade_submission(question_text: str, student_answer: str, hint_text: str, un
     context = _retrieve_context(question_text, unit_id=unit_id, k=10)
     is_conceptual = (qtype in ["簡答題", "Short Answer"])
     
-    # [FIX v6.6] CRITICAL ANTI-CHEAT LAYER
-    # We define a "Zero Tolerance" policy block that sits at the top of the prompt.
-    
+    # [CRITICAL ANTI-CHEAT LAYER]
     anti_cheat_policy = """
     【🚨 CRITICAL: PLAGIARISM CHECK (Top Priority)】
     Before checking for correctness, you MUST compare [Student Answer] with [Hint Provided].
@@ -517,7 +514,7 @@ def grade_submission(question_text: str, student_answer: str, hint_text: str, un
     IF the student has merely copied/pasted the Hint (or translated it slightly, or paraphrased >80%):
     1. **Total Score MUST be 1**. (Do NOT give points for correctness if copied).
     2. **All Rubric Scores MUST be 0**.
-    3. You **MUST** include this exact sentence in 'weaknesses': "⚠️ 嚴重違規：檢測到直接複製提示內容，請自行撰寫答案。"
+    3. You **MUST** include this exact sentence in 'weaknesses': "⚠️ 嚴重違規：檢測到直接複製提示內容，請自行撰寫答案 (Plagiarism detected)."
     4. Ignore all other grading criteria below.
     """
 
@@ -903,6 +900,8 @@ with tabs[0]:
                     st.session_state["pq_meta"] = f"{unit_str} | {lvl_display} | {type_display}"
                     st.session_state["q_start_time"] = time.time()
                     st.session_state["hint_viewed"] = False
+                    # [FIX v6.7] Force clear input box when generating new question
+                    st.session_state["p_ans"] = ""
 
     if "pq_data" in st.session_state:
         q_data = st.session_state["pq_data"]
