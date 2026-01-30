@@ -47,17 +47,48 @@ GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1n-tYLLiwX1-iewjFJSXi
 # [FUTURE FEATURE] 學生白名單
 # ALLOWED_STUDENTS = ["B11204001", "TA001"]
 
+# [RESTORED v6.5] 完整雙語單元備註
 UNIT_NOTES = {
-    1: {"zh": "ℹ️ 本單元圖資編碼為 Big5。", "en": "ℹ️ Data encoding: Big5."},
-    2: {"zh": "ℹ️ 部分圖資為UTF-8，其餘為 Big5。", "en": "ℹ️ Mixed encoding (UTF-8 & Big5)."},
-    3: {"zh": "ℹ️ 本單元圖資編碼為 Big5。", "en": "ℹ️ Data encoding: Big5."},
-    4: {"zh": "ℹ️ 部分圖資為UTF-8，其餘為 Big5。", "en": "ℹ️ Mixed encoding (UTF-8 & Big5)."},
-    5: {"zh": "ℹ️ 本單元圖資編碼為 Big5。", "en": "ℹ️ Data encoding: Big5."},
-    6: {"zh": "ℹ️ 部分圖資為UTF-8，其餘為 Big5。", "en": "ℹ️ Mixed encoding (UTF-8 & Big5)."},
-    7: {"zh": "ℹ️ 部分圖資為UTF-8，其餘為 Big5。", "en": "ℹ️ Mixed encoding (UTF-8 & Big5)."},
-    8: {"zh": "ℹ️ 部分圖資為UTF-8，其餘為 Big5。", "en": "ℹ️ Mixed encoding (UTF-8 & Big5)."},
-    9: {"zh": "ℹ️ 部分圖資為UTF-8，其餘為 Big5。", "en": "ℹ️ Mixed encoding (UTF-8 & Big5)."},
-    10: {"zh": "ℹ️ 部分圖資為UTF-8，其餘為 Big5。", "en": "ℹ️ Mixed encoding (UTF-8 & Big5)."}
+    1: {
+        "zh": "ℹ️ 本單元圖資編碼為 Big5。",
+        "en": "ℹ️ Data encoding for this unit is Big5."
+    },
+    2: {
+        "zh": "ℹ️ 本單元Taiwan_county、Taiwan_temple、Taiwan_town圖資編碼為UTF-8，其餘為 Big5。",
+        "en": "ℹ️ Taiwan_county, Taiwan_temple, Taiwan_town are UTF-8. Others are Big5."
+    },
+    3: {
+        "zh": "ℹ️ 本單元圖資編碼為 Big5。",
+        "en": "ℹ️ Data encoding for this unit is Big5."
+    },
+    4: {
+        "zh": "ℹ️ 本單元Taiwan_hospital、Taiwan_village、Taiwan_town圖資編碼為UTF-8，其餘為 Big5。",
+        "en": "ℹ️ Taiwan_hospital, Taiwan_village, Taiwan_town are UTF-8. Others are Big5."
+    },
+    5: {
+        "zh": "ℹ️ 本單元圖資編碼為 Big5。",
+        "en": "ℹ️ Data encoding for this unit is Big5."
+    },
+    6: {
+        "zh": "ℹ️ 本單元School、Tainan_temple_mazhou、Taiwan_temple_mazhou、Taiwan_town圖資編碼為UTF-8，其餘為 Big5。",
+        "en": "ℹ️ School, Tainan_temple_mazhou, Taiwan_temple_mazhou, Taiwan_town are UTF-8. Others are Big5."
+    },
+    7: {
+        "zh": "ℹ️ 本單元School、Tainan_temple_mazhou圖資編碼為UTF-8，其餘為 Big5。",
+        "en": "ℹ️ School, Tainan_temple_mazhou are UTF-8. Others are Big5."
+    },
+    8: {
+        "zh": "ℹ️ 本單元School、Tainan_temple_mazhou圖資編碼為UTF-8，其餘為 Big5。",
+        "en": "ℹ️ School, Tainan_temple_mazhou are UTF-8. Others are Big5."
+    },
+    9: {
+        "zh": "ℹ️ 本單元Dengue_Case、KAOH_toen圖資編碼為UTF-8，其餘為 Big5。",
+        "en": "ℹ️ Dengue_Case, KAOH_toen are UTF-8. Others are Big5."
+    },
+    10: {
+        "zh": "ℹ️ 本單元Dengue_Case、KAOH_toen圖資編碼為UTF-8，其餘為 Big5。",
+        "en": "ℹ️ Dengue_Case, KAOH_toen are UTF-8. Others are Big5."
+    }
 }
 
 TRANSLATIONS = {
@@ -399,7 +430,7 @@ def _retrieve_context(query: str, unit_id: int | None, k: int = 8) -> str:
 
 
 # =====================================================
-# 6) AI 生成與批改
+# 6) AI 生成與批改 (Dynamic Rubric Fix)
 # =====================================================
 def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | None, specific_topic: str | None, lang: str) -> dict:
     q_str = f"Unit {unit_id}" if unit_id else ""
@@ -474,17 +505,30 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
 
 def grade_submission(question_text: str, student_answer: str, hint_text: str, unit_id: int | None, lang: str, qtype: str = "Practical (R Code)") -> dict:
     context = _retrieve_context(question_text, unit_id=unit_id, k=10)
+    is_conceptual = (qtype in ["簡答題", "Short Answer"])
     
-    prompt_rules = """
-    【Grading Rules (Research v6.2)】
-    1. **Mandatory R Code**: If the task is Practical/Coding and the student provides NO R code (only text), the maximum score is **4/10**. 
-    2. **Anti-Cheating**: Compare student answer with the provided 'Hint'. If the student merely copied the Hint, give a low score (<5) and note it in weaknesses.
-    3. **Bias Reduction**: 
-       - Do NOT deduct points if math formulas are written in plain text (e.g., x^2) instead of LaTeX. Treat them equally.
-       - Do NOT deduct points for missing comments (#) or specific CRS checks unless the code fails without them. Focus on logic.
-    4. **No Action Items**: Do not generate an 'action_items' field.
-    5. **Language**: MUST use Traditional Chinese (繁體中文) for all feedback.
-    """
+    if is_conceptual:
+        # [NEW v6.5] Rubric for Conceptual/Short Answer
+        prompt_rules = """
+        【Grading Rules (Conceptual/Short Answer)】
+        1. **No Code Required**: Focus on text explanation and logic.
+        2. **Rubric** (Total 10):
+           - **Conceptual Accuracy (概念正確性)** [Max 3]: Accuracy of definitions, no factual errors.
+           - **Analytical Logic (分析邏輯與解釋)** [Max 4]: Explains 'Why', coherent logic.
+           - **Completeness (完整性與關鍵細節)** [Max 3]: Answers all parts, mentions key premises.
+        3. **Language**: MUST use Traditional Chinese (繁體中文).
+        """
+    else:
+        # Rubric for Practical/Coding
+        prompt_rules = """
+        【Grading Rules (Practical/Coding)】
+        1. **Mandatory R Code**: If the task is Practical and the student provides NO R code, max score is **4/10**.
+        2. **Rubric** (Total 10):
+           - **Requirement Coverage (需求覆蓋)** [Max 3]: Meets all task requirements.
+           - **Spatial Logic (空間邏輯)** [Max 4]: Uses correct spatial functions/workflow.
+           - **Code Rigor (R 程式嚴謹度)** [Max 3]: Syntax correct, reproducible.
+        3. **Language**: MUST use Traditional Chinese (繁體中文).
+        """
 
     json_structure = """
     Response Format (JSON):
@@ -492,10 +536,9 @@ def grade_submission(question_text: str, student_answer: str, hint_text: str, un
         "score": int (0-10),
         "strengths": ["point 1", "point 2"],
         "weaknesses": ["point 1", "point 2"],
-        "rubric_scores": [score_req, score_logic, score_rigor], 
-        "rubric_evidence": ["evidence_req", "evidence_logic", "evidence_rigor"]
+        "rubric_scores": [score_1, score_2, score_3], 
+        "rubric_evidence": ["evidence_1", "evidence_2", "evidence_3"]
     }
-    * Note: rubric_scores is a list of 3 integers corresponding to: 1.Requirement(Max 3), 2.Logic(Max 4), 3.Rigor(Max 3).
     """
 
     user_content = f"""
@@ -529,10 +572,8 @@ def generate_weakness_report(unit_id: int):
     df_a = read_submissions_gsheet()
     
     fb_list = []
-    # Collect weaknesses and low-score questions
     weaknesses = []
-    low_score_q_p = [] # Practice questions with score < 6
-    low_score_q_a = [] # Assignment questions with score < 6
+    low_score_q_p = []
     
     if not df_p.empty and 'unit_id' in df_p.columns:
         unit_df = df_p[df_p['unit_id'] == unit_id]
@@ -550,15 +591,12 @@ def generate_weakness_report(unit_id: int):
             try:
                 data = json.loads(row['feedback_json'])
                 if 'weaknesses' in data: weaknesses.extend(data['weaknesses'])
-                if row['score'] < 6:
-                    # Assignments usually have fixed description, so we just note the weakness
-                    pass
             except: pass
 
     if not weaknesses: return "⚠️ No sufficient data."
     
     weakness_text = "\n".join(weaknesses[:60])
-    bad_questions = "\n".join(low_score_q_p[:5]) # Top 5 bad questions
+    bad_questions = "\n".join(low_score_q_p[:5])
     
     prompt = f"""
     你是教學顧問。分析 Unit {unit_id} 弱點：\n{weakness_text}
@@ -708,7 +746,7 @@ def send_backup_email(subject, body):
 
 
 # =====================================================
-# 8) UI Helper
+# 8) UI Helper (Hardcoded Dynamic Rubric v6.5)
 # =====================================================
 def get_level_from_score(score):
     try:
@@ -719,7 +757,7 @@ def get_level_from_score(score):
         else: return "待加強 (Needs Improvement)"
     except: return "N/A"
 
-def display_feedback_ui(fb, t_dict):
+def display_feedback_ui(fb, t_dict, qtype="Practical"):
     if not fb: return
     
     score = fb.get('score', 0)
@@ -733,29 +771,37 @@ def display_feedback_ui(fb, t_dict):
     ai_scores = fb.get('rubric_scores', [0, 0, 0])
     ai_evidence = fb.get('rubric_evidence', ["未提供", "未提供", "未提供"])
     
+    # Safety padding
     while len(ai_scores) < 3: ai_scores.append(0)
     while len(ai_evidence) < 3: ai_evidence.append("未提供")
 
-    rubric_data = [
-        {
-            t_dict['col_crit']: "需求覆蓋 (Requirement)",
-            t_dict['col_pts']: ai_scores[0],
-            t_dict['col_max']: 3,
-            t_dict['col_evi']: ai_evidence[0]
-        },
-        {
-            t_dict['col_crit']: "空間邏輯 (Spatial Logic)",
-            t_dict['col_pts']: ai_scores[1],
-            t_dict['col_max']: 4,
-            t_dict['col_evi']: ai_evidence[1]
-        },
-        {
-            t_dict['col_crit']: "R 程式嚴謹度 (Code Rigor)",
-            t_dict['col_pts']: ai_scores[2],
-            t_dict['col_max']: 3,
-            t_dict['col_evi']: ai_evidence[2]
-        }
-    ]
+    # [FIX v6.5] Hardcoded Labels for Both Types
+    is_conceptual = qtype in ["簡答題", "Short Answer"]
+    
+    if is_conceptual:
+        # 簡答題 (Conceptual) 固定標準
+        criteria = [
+            ("概念正確性 (Conceptual Accuracy)", 3),
+            ("分析邏輯與解釋 (Analytical Logic)", 4),
+            ("完整性與關鍵細節 (Completeness)", 3)
+        ]
+    else:
+        # 實作題 (Practical) 固定標準
+        criteria = [
+            ("需求覆蓋 (Requirement)", 3),
+            ("空間邏輯 (Spatial Logic)", 4),
+            ("R 程式嚴謹度 (Code Rigor)", 3)
+        ]
+
+    # Build table dynamically based on the hardcoded criteria
+    rubric_data = []
+    for i in range(3):
+        rubric_data.append({
+            t_dict['col_crit']: criteria[i][0],
+            t_dict['col_pts']: ai_scores[i],
+            t_dict['col_max']: criteria[i][1],
+            t_dict['col_evi']: ai_evidence[i]
+        })
     
     st.table(pd.DataFrame(rubric_data))
     
@@ -886,7 +932,7 @@ with tabs[0]:
                 fb = grade_submission(q_data.get("question_content", ""), ans, q_data.get("hint", ""), unit_val, st.session_state["language"], qtype=type_display)
                 log_practice(sid, unit_val, q_data.get("question_content", ""), fb, duration, st.session_state.get("hint_viewed", False))
                 
-                display_feedback_ui(fb, T)
+                display_feedback_ui(fb, T, qtype=type_display)
 
 # --- Tab 2: Assignment ---
 with tabs[1]:
@@ -919,7 +965,9 @@ with tabs[1]:
                 prev = get_student_submission(sid, assignment['id'])
                 if prev:
                     st.success(f"{T['msg_submitted']} {prev[0]}")
-                    with st.expander(T['expander_feedback']): display_feedback_ui(json.loads(prev[1]), T)
+                    with st.expander(T['expander_feedback']): 
+                        # Assignments default to Practical Rubric
+                        display_feedback_ui(json.loads(prev[1]), T, qtype="Practical")
                 
                 assign_ans = st.text_area("Answer Area", height=250, key=f"assign_ans_{target_unit}", placeholder="Please paste your R code and explanation here...")
                 if st.button(T['btn_submit_assign'], type="primary", disabled=not assign_ans):
