@@ -32,7 +32,7 @@ from langchain_community.vectorstores import FAISS
 GOOGLE_SHEET_NAME = "GIS_Gym_Database" 
 GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1n-tYLLiwX1-iewjFJSXii2jfTCS1qyyDoAAQO1PD8-Y/edit?usp=sharing"
 
-# [NEW v7.4] 啟動學生白名單
+# 學生白名單
 ALLOWED_STUDENTS = [
     "D14228004", "R14228004", "R14228008", "R14228016", "R14228022", 
     "R14228023", "R11228022", "R13228003", "R13228021", "R13341004", 
@@ -429,7 +429,7 @@ def _retrieve_context(query: str, unit_id: int | None, k: int = 8) -> str:
 
 
 # =====================================================
-# 6) AI 生成與批改 (Fix: Heuristic & Relaxed Anti-Cheat)
+# 6) AI 生成與批改 (Fix: Foolproof Plagiarism Logic)
 # =====================================================
 def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | None, specific_topic: str | None, lang: str) -> dict:
     q_str = f"Unit {unit_id}" if unit_id else ""
@@ -528,44 +528,44 @@ def grade_submission(question_text: str, student_answer: str, hint_text: str, un
     context = _retrieve_context(question_text, unit_id=unit_id, k=10)
     is_conceptual = (qtype in ["簡答題", "Short Answer"])
     
-    # 1. 100% Copy Check = 0 Points
-    strict_plagiarism_check = """
-    【🚨 STEP 1: STRICT PLAGIARISM CHECK】
-    Compare [Student Answer] vs [Hint Provided].
-    Flag as plagiarism ONLY IF:
-    1. The text is an **EXACT VERBATIM COPY (100% match)** of the Hint's text instructions.
-    2. AND the student added **NO** original text/explanation.
+    # [FIX v7.5] FOOLPROOF PLAGIARISM LOGIC
+    # Removed vague "copy" wording. Replaced with absolute logical rules to prevent hallucinations.
+    anti_cheat_policy = """
+    【🚨 STEP 1: EXTREMELY STRICT PLAGIARISM CHECK】
+    You must ONLY flag as plagiarism if the student literally copy-pasted the Hint.
     
-    If Plagiarism (100% Copy) is detected:
-    - **Total Score = 0**. (Zero Tolerance).
-    - **Rubric Scores = [0, 0, 0]**.
-    - Weakness: "⚠️ 嚴重違規：檢測到完全複製提示內容."
-    - STOP GRADING HERE.
+    Rule: IF [Student Answer] is EXACTLY the same string as [Hint Provided] (100% word-for-word match):
+    - Score = 0
+    - rubric_scores = [0, 0, 0]
+    - weaknesses MUST include: "⚠️ 嚴重違規：檢測到完全複製提示內容"
+    - Stop grading here.
+
+    Rule: IF the student wrote their own words (even if their answer is completely wrong, off-topic, or logically flawed):
+    - DO NOT FLAG AS PLAGIARISM.
+    - Grade it normally based on the rubric (Step 2). A wrong answer should get a low score via the rubric, NOT a plagiarism 0.
     """
 
     if is_conceptual:
         grading_logic = """
-        【Grading Rules (Conceptual/Short Answer)】
-        (Only if no 100% plagiarism detected)
-        1. **No Code Required**: Focus on text explanation and logic.
-        2. **Rubric** (Total 10):
-           - **Conceptual Accuracy (概念正確性)** [Max 3]
-           - **Analytical Logic (分析邏輯與解釋)** [Max 4]
-           - **Completeness (完整性與關鍵細節)** [Max 3]
+        【STEP 2: NORMAL GRADING (Conceptual/Short Answer)】
+        If the answer is NOT a 100% copy-paste of the hint, grade it using this rubric (Total 10):
+        1. **Conceptual Accuracy (概念正確性)** [Max 3]: Is the concept correct?
+        2. **Analytical Logic (分析邏輯與解釋)** [Max 4]: Does the reasoning make sense?
+        3. **Completeness (完整性與關鍵細節)** [Max 3]: Are key details provided?
         """
     else:
         # NO CODE PENALTY (Score <= 4)
         grading_logic = """
-        【🚨 STEP 2: MANDATORY CODE CHECK (For Practical Tasks)】
-        Check if the student answer contains actual R code syntax (e.g., `library`, `st_read`, `<-`, `function`).
+        【STEP 2: NORMAL GRADING & CODE CHECK (Practical Tasks)】
+        If the answer is NOT a 100% copy-paste, you must check for R code.
         
-        **CASE A: NO R CODE FOUND (Only text descriptions/plans)**:
-        - **Total Score MUST be <= 4**.
+        **CASE A: NO R CODE AT ALL (Only text descriptions/plans)**:
+        - **Total Score MUST be <= 4**. (Strict Cap).
         - **Rubric Guide**:
-          * Requirement: 1-2 (Depending on textual understanding).
-          * Spatial Logic: 1-2 (Depending on logic).
-          * Code Rigor: 0 (No code).
-        - Weakness: "嚴重缺失：僅有文字敘述，未撰寫 R 程式碼 (No R code provided)."
+          * Requirement: 1-2 (Depending on text).
+          * Spatial Logic: 1-2 (Depending on text).
+          * Code Rigor: 0 (Because there is no code).
+        - Weakness MUST include: "嚴重缺失：僅有文字敘述，未撰寫 R 程式碼 (No R code provided)."
         
         **CASE B: CODE FOUND (Normal Grading)**:
         - **Rubric** (Total 10):
@@ -576,7 +576,7 @@ def grade_submission(question_text: str, student_answer: str, hint_text: str, un
 
     final_prompt = f"""
     You are a strict but fair GIS TA. 
-    {strict_plagiarism_check}
+    {anti_cheat_policy}
     {grading_logic}
     
     **Language**: MUST use Traditional Chinese (繁體中文).
@@ -614,7 +614,6 @@ def grade_submission(question_text: str, student_answer: str, hint_text: str, un
         return {"score": 0, "strengths": [], "weaknesses": ["System Error"], "rubric_scores": [0,0,0], "rubric_evidence": [str(e), "", ""]}
 
 def generate_weakness_report(unit_id: int):
-    # Same as before
     lang = st.session_state["language"]
     df_p = read_history_gsheet()
     df_a = read_submissions_gsheet()
@@ -623,10 +622,10 @@ def generate_weakness_report(unit_id: int):
     weaknesses = []
     low_score_q_p = []
     
-    # [FIX v7.4] Filter out extremely low scores (Score < 2) to focus on meaningful mistakes
+    # Filter out extremely low scores (Score < 2) to focus on meaningful mistakes
     if not df_p.empty and 'unit_id' in df_p.columns:
         df_p['score'] = pd.to_numeric(df_p['score'], errors='coerce').fillna(0)
-        # Filter: Unit match AND Score >= 2 (Allows 2-10 scores to be analyzed)
+        # Filter: Unit match AND Score >= 2
         unit_df = df_p[(df_p['unit_id'] == unit_id) & (df_p['score'] >= 2)]
         for _, row in unit_df.iterrows():
             try:
@@ -881,7 +880,6 @@ with st.sidebar:
     user_input_id = st.text_input(T['label_student_id'], value=st.session_state["student_id"])
     st.session_state["student_id"] = user_input_id
     
-    # [FIX v7.4] 執行白名單檢查
     if "ALLOWED_STUDENTS" in globals() and user_input_id:
         if user_input_id not in ALLOWED_STUDENTS:
             st.error(T['warning_not_allowed'])
@@ -991,6 +989,7 @@ with tabs[1]:
         assignment = ASSIGNMENTS_DB.get(target_unit)
         if assignment:
             st.markdown(f"### {T['header_assign_desc']}") 
+            # [FIX v7.5] Removed Deadline display
             st.markdown(assignment['description'])
             
             real_files = get_unit_files(target_unit)
