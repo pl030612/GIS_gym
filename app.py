@@ -28,24 +28,27 @@ from langchain_community.vectorstores import FAISS
 # =====================================================
 # 0) 參數設定 & 語言包 & 單元備註
 # =====================================================
-UNIT_DEADLINES = {
-    1: "2026-03-08",
-    2: "2026-03-15",
-    3: "2026-03-22",
-    4: "2026-03-29",
-    5: "2026-04-05",
-    6: "2026-04-19",
-    7: "2026-04-26",
-    8: "2026-05-03",
-    9: "2026-05-10",
-    10: "2026-05-17"
-}
-DEFAULT_DEADLINE = "2025-12-31"
+
 GOOGLE_SHEET_NAME = "GIS_Gym_Database" 
 GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1n-tYLLiwX1-iewjFJSXii2jfTCS1qyyDoAAQO1PD8-Y/edit?usp=sharing"
 
-# [FUTURE FEATURE] 學生白名單
-# ALLOWED_STUDENTS = ["B11204001", "TA001"]
+# [NEW v7.4] 啟動學生白名單
+ALLOWED_STUDENTS = [
+    "D14228004", "R14228004", "R14228008", "R14228016", "R14228022", 
+    "R14228023", "R11228022", "R13228003", "R13228021", "R13341004", 
+    "R13343001", "R14521610", "R14521813", "R14622035", "R13847026", 
+    "B11103010", "B11106012", "B10107021", "B12204023", "B12204038", 
+    "B11204022", "B12208025", "B13208001", "B13208002", "B13208004", 
+    "B13208006", "B13208007", "B13208008", "B13208009", "B13208011", 
+    "B13208012", "B13208013", "B13208014", "B13208015", "B13208016", 
+    "B13208017", "B13208018", "B13208019", "B13208020", "B13208022", 
+    "B13208023", "B13208025", "B13208027", "B13208028", "B13208029", 
+    "B13208030", "B13208031", "B13208032", "B13208033", "B13208034", 
+    "B13208035", "B13208036", "B13208037", "B13208038", "B13208039", 
+    "B13302311", "B11103052", "B11208021", "B12103013", "B12208011", 
+    "B12208036", "B12208042", "B12208043", "B11208028", "41144042S", 
+    "41123113L", "TA2026"
+]
 
 # 完整雙語單元備註
 UNIT_NOTES = {
@@ -133,7 +136,6 @@ TRANSLATIONS = {
         "no_assign_file": "📂 目前沒有掃描到任何作業檔案。",
         "sel_assign_unit": "選擇作業單元",
         "header_assign_desc": "作業說明",
-        "label_deadline": "截止期限:",
         "header_assign_data": "下載圖資",
         "no_data_file": "（此單元無實體檔案可供下載）",
         "msg_submitted": "已繳交。分數：",
@@ -190,7 +192,6 @@ TRANSLATIONS = {
         "no_assign_file": "No assignment files found.",
         "sel_assign_unit": "Select Unit",
         "header_assign_desc": "Instructions",
-        "label_deadline": "Deadline:",
         "header_assign_data": "Download Data",
         "no_data_file": "(No files available)",
         "msg_submitted": "Submitted. Score:",
@@ -391,12 +392,10 @@ def scan_assignments_from_files(lang_code):
         if target_file:
             try:
                 content = docx2txt.process(target_file)
-                deadline = UNIT_DEADLINES.get(unit_id, DEFAULT_DEADLINE)
                 assignments_db[unit_id] = {
                     "id": 1000 + unit_id,
                     "title": f"Unit {unit_id}", 
-                    "description": content if content.strip() else "(Empty File)",
-                    "deadline": deadline 
+                    "description": content if content.strip() else "(Empty File)"
                 }
             except Exception as e:
                 print(f"Error reading docx {target_file}: {e}")
@@ -462,7 +461,6 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
             sys_role = "You are a GIS TA. Create a Practical R Coding task."
             r_rules = "Hard Constraints: 1. Use **R language** (sf, terra). 2. No ArcGIS/QGIS mentions."
             
-            # [v6.9] Enforce File Specification + No Steps
             system_instruction = f"""
             Design a 'Practical' task (Difficulty: {level}) using files: [{file_names_str}].
             Core Concept: {selected_method}.
@@ -496,7 +494,6 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
             sys_role = "你是頂尖的空間分析助教。請設計 R 語言實作題。"
             r_rules = "嚴格限制：1. 必須使用 **R 語言**。 2. 禁止提及 ArcGIS/QGIS。"
             
-            # [v6.9] 強制指定檔案 + 不給步驟
             system_instruction = f"""
             請根據真實檔案列表: [{file_names_str}] 設計一道【實作題】(難度：{level})。
             核心考點：{selected_method}。
@@ -531,8 +528,6 @@ def grade_submission(question_text: str, student_answer: str, hint_text: str, un
     context = _retrieve_context(question_text, unit_id=unit_id, k=10)
     is_conceptual = (qtype in ["簡答題", "Short Answer"])
     
-    # [FIX v7.2] ZERO TOLERANCE POLICY
-    
     # 1. 100% Copy Check = 0 Points
     strict_plagiarism_check = """
     【🚨 STEP 1: STRICT PLAGIARISM CHECK】
@@ -559,7 +554,7 @@ def grade_submission(question_text: str, student_answer: str, hint_text: str, un
            - **Completeness (完整性與關鍵細節)** [Max 3]
         """
     else:
-        # [v7.2] NO CODE PENALTY (Score <= 4)
+        # NO CODE PENALTY (Score <= 4)
         grading_logic = """
         【🚨 STEP 2: MANDATORY CODE CHECK (For Practical Tasks)】
         Check if the student answer contains actual R code syntax (e.g., `library`, `st_read`, `<-`, `function`).
@@ -628,18 +623,23 @@ def generate_weakness_report(unit_id: int):
     weaknesses = []
     low_score_q_p = []
     
+    # [FIX v7.4] Filter out extremely low scores (Score < 2) to focus on meaningful mistakes
     if not df_p.empty and 'unit_id' in df_p.columns:
-        unit_df = df_p[df_p['unit_id'] == unit_id]
+        df_p['score'] = pd.to_numeric(df_p['score'], errors='coerce').fillna(0)
+        # Filter: Unit match AND Score >= 2 (Allows 2-10 scores to be analyzed)
+        unit_df = df_p[(df_p['unit_id'] == unit_id) & (df_p['score'] >= 2)]
         for _, row in unit_df.iterrows():
             try:
                 data = json.loads(row['feedback_json'])
                 if 'weaknesses' in data: weaknesses.extend(data['weaknesses'])
-                if row['score'] < 6:
+                if row['score'] < 8:
                     low_score_q_p.append(f"[Score: {row['score']}] {row['question']}")
             except: pass
 
     if not df_a.empty and 'unit_id' in df_a.columns:
-        unit_df_a = df_a[df_a['unit_id'] == unit_id]
+        df_a['score'] = pd.to_numeric(df_a['score'], errors='coerce').fillna(0)
+        # Filter: Unit match AND Score >= 2
+        unit_df_a = df_a[(df_a['unit_id'] == unit_id) & (df_a['score'] >= 2)]
         for _, row in unit_df_a.iterrows():
             try:
                 data = json.loads(row['feedback_json'])
@@ -799,7 +799,7 @@ def send_backup_email(subject, body):
 
 
 # =====================================================
-# 8) UI Helper (Hardcoded Dynamic Rubric v6.6)
+# 8) UI Helper
 # =====================================================
 def get_level_from_score(score):
     try:
@@ -830,14 +830,12 @@ def display_feedback_ui(fb, t_dict, qtype="Practical"):
     is_conceptual = qtype in ["簡答題", "Short Answer"]
     
     if is_conceptual:
-        # 簡答題 (Conceptual) 固定標準
         criteria = [
             ("概念正確性 (Conceptual Accuracy)", 3),
             ("分析邏輯與解釋 (Analytical Logic)", 4),
             ("完整性與關鍵細節 (Completeness)", 3)
         ]
     else:
-        # 實作題 (Practical) 固定標準
         criteria = [
             ("需求覆蓋 (Requirement)", 3),
             ("空間邏輯 (Spatial Logic)", 4),
@@ -883,6 +881,7 @@ with st.sidebar:
     user_input_id = st.text_input(T['label_student_id'], value=st.session_state["student_id"])
     st.session_state["student_id"] = user_input_id
     
+    # [FIX v7.4] 執行白名單檢查
     if "ALLOWED_STUDENTS" in globals() and user_input_id:
         if user_input_id not in ALLOWED_STUDENTS:
             st.error(T['warning_not_allowed'])
@@ -992,7 +991,6 @@ with tabs[1]:
         assignment = ASSIGNMENTS_DB.get(target_unit)
         if assignment:
             st.markdown(f"### {T['header_assign_desc']}") 
-            st.caption(f"{T['label_deadline']} {assignment['deadline']}")
             st.markdown(assignment['description'])
             
             real_files = get_unit_files(target_unit)
