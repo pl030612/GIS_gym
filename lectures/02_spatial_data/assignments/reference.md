@@ -1,19 +1,4 @@
----
-title: "作業單元 2 參考解答"
-output:
-  html_document:
-    toc: true
-    toc_depth: '3'
-    df_print: paged
-  html_notebook:
-    toc: true
-    toc_depth: 3
-    toc_float:
-      collapsed: false
-      smooth_scroll: true
----
-
-# 作業：繪製人口老化地圖與統計圖表
+## 作業：繪製人口老化地圖與統計圖表
 
 ```{r message=FALSE, warning=FALSE}
 rm(list=ls())

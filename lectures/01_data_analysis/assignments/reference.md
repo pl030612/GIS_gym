@@ -1,17 +1,3 @@
----
-title: "作業單元 1 參考解答"
-output:
-  html_document:
-    toc: true
-    toc_depth: '3'
-    df_print: paged
-  html_notebook:
-    toc: true
-    toc_depth: 3
-    toc_float: true
----
-
-
 ## 1. 機率分布 
 
 #### a. 某一都市有10萬人口，假設流行一種新興疾病，每人每年被感染機率 p = 0.01，沒有免疫與任何預防措施。請繪製該市的每年感染人數頻率分布圖。  

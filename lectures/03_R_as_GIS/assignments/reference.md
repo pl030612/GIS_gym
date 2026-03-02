@@ -1,19 +1,4 @@
----
-title: "作業單元 3 參考解答"
-output:
-  html_document:
-    toc: true
-    toc_depth: '3'
-    df_print: paged
-  html_notebook:
-    toc: true
-    toc_depth: 3
-    toc_float:
-      collapsed: false
-      smooth_scroll: true
----
-
-# Question 1
+## Question 1
 
 將實習所定義麥當勞的連鎖密度，建立chainstore(d)的自訂函數，可繪製服務半徑(d) vs.麥當勞的關係圖表。
 
@@ -90,7 +75,7 @@ ggplot(plot_df, aes(x, y)) +
 
 ```
 
-# Question 2
+## Question 2
 
 比較A區(文山+大安+中正)與B區(信義+南港+松山)的麥當勞連鎖密度：
 利用統計檢定方法，評估A區的平均每家麥當勞連鎖密度是否顯著高於B區。(服務半徑(d) = 1.5 km)

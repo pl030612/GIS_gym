@@ -1,18 +1,3 @@
----
-title: "作業單元 4 參考解答"
-output:
-  html_document:
-    toc: true
-    toc_depth: '3'
-    df_print: paged
-  html_notebook:
-    toc: true
-    toc_depth: 3
-    toc_float:
-      collapsed: false
-      smooth_scroll: true
----
-
 ## 計算環域涵蓋人數的自訂函數
 
 建立自訂函數，回傳使用者設定某捷運站在特定距離方圓內涵蓋的人數。   建立自訂函數STN_POP(id,dist)，其中id代表捷運站的編號，dist代表離捷運站的距離。該函數能回傳「編號id車站」在方圓距離「dist公尺」內涵蓋的人數（回傳整數格式），以涵蓋村里的面積加權計算人口數。 例如：STN_POP (38,500) 表示該函數回傳編號38的捷運站在500公尺方圓內所涵蓋的人口數。  
