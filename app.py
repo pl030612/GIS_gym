@@ -404,6 +404,42 @@ def scan_assignments_from_files(lang_code):
 
 ASSIGNMENTS_DB = scan_assignments_from_files(st.session_state["language"])
 
+# [NEW v7.6] 取得參考答案的輔助函數
+def get_reference_answer(unit_id: int, lang_code: str):
+    if not os.path.exists(LECTURES_DIR): return None
+    folders = sorted([f for f in os.listdir(LECTURES_DIR) if os.path.isdir(os.path.join(LECTURES_DIR, f))])
+    target_folder = None
+    for folder in folders:
+        match = re.match(r"^(\d+)[_]", folder)
+        if match and int(match.group(1)) == unit_id:
+            target_folder = folder
+            break
+    if not target_folder: return None
+    
+    sub_assign_dir = os.path.join(LECTURES_DIR, target_folder, "assignments")
+    search_dirs = [sub_assign_dir] if os.path.exists(sub_assign_dir) else [os.path.join(LECTURES_DIR, target_folder)]
+    
+    for d in search_dirs:
+        if not os.path.exists(d): continue
+        files = os.listdir(d)
+        target_file = None
+        if lang_code == 'en':
+            for f in files:
+                if f.lower() in ["reference_en.md", "reference_en.txt"]:
+                    target_file = os.path.join(d, f)
+                    break
+        if not target_file:
+            for f in files:
+                if f.lower() in ["reference.md", "reference.txt"]:
+                    target_file = os.path.join(d, f)
+                    break
+        
+        if target_file:
+            try:
+                with open(target_file, "r", encoding="utf-8") as fh:
+                    return fh.read()
+            except: pass
+    return None
 
 # =====================================================
 # 5) RAG 核心
@@ -429,7 +465,7 @@ def _retrieve_context(query: str, unit_id: int | None, k: int = 8) -> str:
 
 
 # =====================================================
-# 6) AI 生成與批改 (Fix: Foolproof Plagiarism Logic)
+# 6) AI 生成與批改
 # =====================================================
 def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | None, specific_topic: str | None, lang: str) -> dict:
     q_str = f"Unit {unit_id}" if unit_id else ""
@@ -528,44 +564,39 @@ def grade_submission(question_text: str, student_answer: str, hint_text: str, un
     context = _retrieve_context(question_text, unit_id=unit_id, k=10)
     is_conceptual = (qtype in ["簡答題", "Short Answer"])
     
-    # [FIX v7.5] FOOLPROOF PLAGIARISM LOGIC
-    # Removed vague "copy" wording. Replaced with absolute logical rules to prevent hallucinations.
-    anti_cheat_policy = """
-    【🚨 STEP 1: EXTREMELY STRICT PLAGIARISM CHECK】
-    You must ONLY flag as plagiarism if the student literally copy-pasted the Hint.
-    
-    Rule: IF [Student Answer] is EXACTLY the same string as [Hint Provided] (100% word-for-word match):
-    - Score = 0
-    - rubric_scores = [0, 0, 0]
-    - weaknesses MUST include: "⚠️ 嚴重違規：檢測到完全複製提示內容"
-    - Stop grading here.
-
-    Rule: IF the student wrote their own words (even if their answer is completely wrong, off-topic, or logically flawed):
-    - DO NOT FLAG AS PLAGIARISM.
-    - Grade it normally based on the rubric (Step 2). A wrong answer should get a low score via the rubric, NOT a plagiarism 0.
-    """
+    # [FIX v7.6] PYTHON-LEVEL PLAGIARISM CHECK (Foolproof)
+    # 完全拔除 AI 判斷抄襲的權力，改用後台強制比對，避免 AI 產生「答錯等於抄襲」的幻覺。
+    if hint_text and hint_text.strip() and student_answer.strip() == hint_text.strip():
+        return {
+            "score": 0,
+            "strengths": [],
+            "weaknesses": ["⚠️ 嚴重違規：檢測到完全複製提示內容，請自行撰寫答案。"],
+            "rubric_scores": [0, 0, 0],
+            "rubric_evidence": ["未提供", "未提供", "未提供"]
+        }
 
     if is_conceptual:
         grading_logic = """
-        【STEP 2: NORMAL GRADING (Conceptual/Short Answer)】
-        If the answer is NOT a 100% copy-paste of the hint, grade it using this rubric (Total 10):
-        1. **Conceptual Accuracy (概念正確性)** [Max 3]: Is the concept correct?
-        2. **Analytical Logic (分析邏輯與解釋)** [Max 4]: Does the reasoning make sense?
-        3. **Completeness (完整性與關鍵細節)** [Max 3]: Are key details provided?
+        【Grading Rules (Conceptual/Short Answer)】
+        1. **No Code Required**: Focus on text explanation and logic.
+        2. **Rubric** (Total 10):
+           - **Conceptual Accuracy (概念正確性)** [Max 3]
+           - **Analytical Logic (分析邏輯與解釋)** [Max 4]
+           - **Completeness (完整性與關鍵細節)** [Max 3]
         """
     else:
         # NO CODE PENALTY (Score <= 4)
         grading_logic = """
-        【STEP 2: NORMAL GRADING & CODE CHECK (Practical Tasks)】
-        If the answer is NOT a 100% copy-paste, you must check for R code.
+        【🚨 STEP 1: MANDATORY CODE CHECK (For Practical Tasks)】
+        Check if the student answer contains actual R code syntax (e.g., `library`, `st_read`, `<-`, `function`).
         
-        **CASE A: NO R CODE AT ALL (Only text descriptions/plans)**:
-        - **Total Score MUST be <= 4**. (Strict Cap).
+        **CASE A: NO R CODE FOUND (Only text descriptions/plans)**:
+        - **Total Score MUST be <= 4**.
         - **Rubric Guide**:
-          * Requirement: 1-2 (Depending on text).
-          * Spatial Logic: 1-2 (Depending on text).
-          * Code Rigor: 0 (Because there is no code).
-        - Weakness MUST include: "嚴重缺失：僅有文字敘述，未撰寫 R 程式碼 (No R code provided)."
+          * Requirement: 1-2 (Depending on textual understanding).
+          * Spatial Logic: 1-2 (Depending on logic).
+          * Code Rigor: 0 (No code).
+        - Weakness: "嚴重缺失：僅有文字敘述，未撰寫 R 程式碼 (No R code provided)."
         
         **CASE B: CODE FOUND (Normal Grading)**:
         - **Rubric** (Total 10):
@@ -576,7 +607,9 @@ def grade_submission(question_text: str, student_answer: str, hint_text: str, un
 
     final_prompt = f"""
     You are a strict but fair GIS TA. 
-    {anti_cheat_policy}
+    Evaluate the [Student Answer] against the [Question].
+    NOTE: Assume the student DID NOT plagiarize. Just grade the content based on the rules below.
+    
     {grading_logic}
     
     **Language**: MUST use Traditional Chinese (繁體中文).
@@ -622,7 +655,6 @@ def generate_weakness_report(unit_id: int):
     weaknesses = []
     low_score_q_p = []
     
-    # Filter out extremely low scores (Score < 2) to focus on meaningful mistakes
     if not df_p.empty and 'unit_id' in df_p.columns:
         df_p['score'] = pd.to_numeric(df_p['score'], errors='coerce').fillna(0)
         # Filter: Unit match AND Score >= 2
@@ -721,7 +753,7 @@ def log_practice(sid, uid, q, fb, duration, used_hint):
                 datetime.now().isoformat(), 
                 st.session_state["session_id"],
                 str(sid), 
-                int(uid) if uid else 0,
+                int(uid) if uid is not None else 0, # [FIX v7.6] Ensuring safe parsing for None (Option "All")
                 duration,
                 str(used_hint),
                 q, 
@@ -751,7 +783,7 @@ def log_assignment_submission(assign_id, sid, uid, ans, fb):
                 datetime.now().isoformat(), 
                 int(assign_id), 
                 str(sid), 
-                int(uid) if uid else 0, 
+                int(uid) if uid is not None else 0, 
                 ans, 
                 fb.get('score', 0), 
                 weakness_str,
@@ -989,7 +1021,6 @@ with tabs[1]:
         assignment = ASSIGNMENTS_DB.get(target_unit)
         if assignment:
             st.markdown(f"### {T['header_assign_desc']}") 
-            # [FIX v7.5] Removed Deadline display
             st.markdown(assignment['description'])
             
             real_files = get_unit_files(target_unit)
@@ -1014,6 +1045,12 @@ with tabs[1]:
                     st.success(f"{T['msg_submitted']} {prev[0]}")
                     with st.expander(T['expander_feedback']): 
                         display_feedback_ui(json.loads(prev[1]), T, qtype="Practical")
+                    
+                    # [NEW v7.6] 顯示參考答案折疊面板
+                    ref_ans = get_reference_answer(target_unit, st.session_state["language"])
+                    if ref_ans:
+                        with st.expander("📝 查看參考解答 (Reference Answer)"):
+                            st.markdown(ref_ans)
                 
                 assign_ans = st.text_area("Answer Area", height=250, key=f"assign_ans_{target_unit}", placeholder="Please paste your R code and explanation here...")
                 if st.button(T['btn_submit_assign'], type="primary", disabled=not assign_ans):
