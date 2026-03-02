@@ -404,7 +404,6 @@ def scan_assignments_from_files(lang_code):
 
 ASSIGNMENTS_DB = scan_assignments_from_files(st.session_state["language"])
 
-# [NEW v7.6] 取得參考答案的輔助函數
 def get_reference_answer(unit_id: int, lang_code: str):
     if not os.path.exists(LECTURES_DIR): return None
     folders = sorted([f for f in os.listdir(LECTURES_DIR) if os.path.isdir(os.path.join(LECTURES_DIR, f))])
@@ -564,8 +563,7 @@ def grade_submission(question_text: str, student_answer: str, hint_text: str, un
     context = _retrieve_context(question_text, unit_id=unit_id, k=10)
     is_conceptual = (qtype in ["簡答題", "Short Answer"])
     
-    # [FIX v7.6] PYTHON-LEVEL PLAGIARISM CHECK (Foolproof)
-    # 完全拔除 AI 判斷抄襲的權力，改用後台強制比對，避免 AI 產生「答錯等於抄襲」的幻覺。
+    # 1. 絕對的防呆防弊：Python 後台直接比對，防止 AI 幻覺
     if hint_text and hint_text.strip() and student_answer.strip() == hint_text.strip():
         return {
             "score": 0,
@@ -574,6 +572,17 @@ def grade_submission(question_text: str, student_answer: str, hint_text: str, un
             "rubric_scores": [0, 0, 0],
             "rubric_evidence": ["未提供", "未提供", "未提供"]
         }
+
+    # [FIX v7.7] 新增無效答案檢測 (Garbage Input Check)
+    garbage_check_logic = """
+    【🚨 STEP 0: GARBAGE/IRRELEVANT INPUT CHECK】
+    First, evaluate if the [Student Answer] is a genuine attempt to answer the [Question].
+    If the answer is a meaningless placeholder (e.g., "測試", "123", "不知道", "test", "none"), completely off-topic, or lacks any substantive GIS/R content related to the question:
+    - Total Score MUST be 0.
+    - All rubric_scores MUST be 0.
+    - Weakness MUST state: "⚠️ 嚴重缺失：作答內容無意義或與題目完全無關，請認真作答。"
+    - STOP GRADING HERE. Do not apply further rubrics.
+    """
 
     if is_conceptual:
         grading_logic = """
@@ -585,7 +594,6 @@ def grade_submission(question_text: str, student_answer: str, hint_text: str, un
            - **Completeness (完整性與關鍵細節)** [Max 3]
         """
     else:
-        # NO CODE PENALTY (Score <= 4)
         grading_logic = """
         【🚨 STEP 1: MANDATORY CODE CHECK (For Practical Tasks)】
         Check if the student answer contains actual R code syntax (e.g., `library`, `st_read`, `<-`, `function`).
@@ -609,6 +617,8 @@ def grade_submission(question_text: str, student_answer: str, hint_text: str, un
     You are a strict but fair GIS TA. 
     Evaluate the [Student Answer] against the [Question].
     NOTE: Assume the student DID NOT plagiarize. Just grade the content based on the rules below.
+    
+    {garbage_check_logic}
     
     {grading_logic}
     
@@ -657,7 +667,6 @@ def generate_weakness_report(unit_id: int):
     
     if not df_p.empty and 'unit_id' in df_p.columns:
         df_p['score'] = pd.to_numeric(df_p['score'], errors='coerce').fillna(0)
-        # Filter: Unit match AND Score >= 2
         unit_df = df_p[(df_p['unit_id'] == unit_id) & (df_p['score'] >= 2)]
         for _, row in unit_df.iterrows():
             try:
@@ -669,7 +678,6 @@ def generate_weakness_report(unit_id: int):
 
     if not df_a.empty and 'unit_id' in df_a.columns:
         df_a['score'] = pd.to_numeric(df_a['score'], errors='coerce').fillna(0)
-        # Filter: Unit match AND Score >= 2
         unit_df_a = df_a[(df_a['unit_id'] == unit_id) & (df_a['score'] >= 2)]
         for _, row in unit_df_a.iterrows():
             try:
@@ -753,7 +761,7 @@ def log_practice(sid, uid, q, fb, duration, used_hint):
                 datetime.now().isoformat(), 
                 st.session_state["session_id"],
                 str(sid), 
-                int(uid) if uid is not None else 0, # [FIX v7.6] Ensuring safe parsing for None (Option "All")
+                int(uid) if uid is not None else 0,
                 duration,
                 str(used_hint),
                 q, 
@@ -1046,7 +1054,6 @@ with tabs[1]:
                     with st.expander(T['expander_feedback']): 
                         display_feedback_ui(json.loads(prev[1]), T, qtype="Practical")
                     
-                    # [NEW v7.6] 顯示參考答案折疊面板
                     ref_ans = get_reference_answer(target_unit, st.session_state["language"])
                     if ref_ans:
                         with st.expander("📝 查看參考解答 (Reference Answer)"):
