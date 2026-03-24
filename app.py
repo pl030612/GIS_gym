@@ -34,22 +34,20 @@ GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1n-tYLLiwX1-iewjFJSXi
 
 # 學生白名單
 ALLOWED_STUDENTS = [
-    "B11103010", "B11106012", "B10107021", "B12204023", "B12204038",
-    "B11204022", "B12208025", "B13208001", "B13208002", "B13208004",
-    "B13208006", "B13208007", "B13208008", "B13208009", "B13208011",
-    "B13208012", "B13208013", "B13208014", "B13208015", "B13208016",
-    "B13208017", "B13208018", "B13208019", "B13208020", "B13208023",
-    "B13208025", "B13208027", "B13208028", "B13208029", "B13208030",
-    "B13208031", "B13208032", "B13208033", "B13208034", "B13208035",
-    "B13208036", "B13208037", "B13208038", "B13208039", "B11103052",
-    "B11208021", "B12103013", "B12208011", "B12208035", "B12208036",
-    "B12208042", "B12208043", "B11208028", "B12B01022",
-    "ntnu_41123113L", "ntnu_41144042S",
-    "D14228004", "R14228004", "R14228008", "R14228016", "R14228022",
-    "R14228023", "R11228022", "R13228003", "R13228021", "R13228022",
-    "R13341004", "R13343001", "R14521610", "R14521705", "R14521813",
-    "R14622016", "R14622035", "R14627005", "R13847026",
-    "external_LINYOUNGYAN","B11208033","R04521118","B14801003","R13228018","TA2026"
+    "D14228004", "R14228004", "R14228008", "R14228016", "R14228022", 
+    "R14228023", "R11228022", "R13228003", "R13228021", "R13341004", 
+    "R13343001", "R14521610", "R14521813", "R14622035", "R13847026", 
+    "B11103010", "B11106012", "B10107021", "B12204023", "B12204038", 
+    "B11204022", "B12208025", "B13208001", "B13208002", "B13208004", 
+    "B13208006", "B13208007", "B13208008", "B13208009", "B13208011", 
+    "B13208012", "B13208013", "B13208014", "B13208015", "B13208016", 
+    "B13208017", "B13208018", "B13208019", "B13208020", "B13208022", 
+    "B13208023", "B13208025", "B13208027", "B13208028", "B13208029", 
+    "B13208030", "B13208031", "B13208032", "B13208033", "B13208034", 
+    "B13208035", "B13208036", "B13208037", "B13208038", "B13208039", 
+    "B13302311", "B11103052", "B11208021", "B12103013", "B12208011", 
+    "B12208036", "B12208042", "B12208043", "B11208028", "41144042S", 
+    "41123113L", "TA2026"
 ]
 
 # 完整雙語單元備註
@@ -575,7 +573,7 @@ def grade_submission(question_text: str, student_answer: str, hint_text: str, un
             "rubric_evidence": ["未提供", "未提供", "未提供"]
         }
 
-    # [FIX v7.7] 新增無效答案檢測 (Garbage Input Check)
+    # 2. [FIX v7.7] 新增無效答案檢測 (Garbage Input Check)
     garbage_check_logic = """
     【🚨 STEP 0: GARBAGE/IRRELEVANT INPUT CHECK】
     First, evaluate if the [Student Answer] is a genuine attempt to answer the [Question].
@@ -752,7 +750,8 @@ def log_system_usage(action: str):
             ws.append_row(row_data)
     except: pass 
 
-def log_practice(sid, uid, q, fb, duration, used_hint):
+# [FIX v7.8] Added qtype logging support to log_practice
+def log_practice(sid, uid, qtype, q, fb, duration, used_hint):
     try:
         ws = get_worksheet("learning_history")
         if ws:
@@ -770,7 +769,8 @@ def log_practice(sid, uid, q, fb, duration, used_hint):
                 fb.get('score', 0), 
                 get_level_from_score(fb.get('score', 0)), 
                 weakness_str,
-                json.dumps(fb, ensure_ascii=False)
+                json.dumps(fb, ensure_ascii=False),
+                str(qtype)  # 新增：題型欄位 (Column L)
             ]
             ws.append_row(row_data)
             log_system_usage(f"Practice_Submit_Unit{uid}")
@@ -1019,7 +1019,8 @@ with tabs[0]:
                     duration = int(time.time() - st.session_state["q_start_time"])
                 
                 fb = grade_submission(q_data.get("question_content", ""), ans, q_data.get("hint", ""), unit_val, st.session_state["language"], qtype=type_display)
-                log_practice(sid, unit_val, q_data.get("question_content", ""), fb, duration, st.session_state.get("hint_viewed", False))
+                # [FIX v7.8] Pass type_display (qtype) to log_practice
+                log_practice(sid, unit_val, type_display, q_data.get("question_content", ""), fb, duration, st.session_state.get("hint_viewed", False))
                 
                 display_feedback_ui(fb, T, qtype=type_display)
 
@@ -1095,7 +1096,8 @@ if st.session_state["is_ta"] and len(tabs) > 2:
             if 'feedback_json' in df.columns:
                 df["weakness_parsed"] = df["feedback_json"].apply(extract_weaknesses)
             
-            display_cols = [c for c in ['timestamp', 'student_id', 'unit_id', 'score', 'duration_sec', 'used_hint', 'weakness_parsed'] if c in df.columns]
+            # [FIX v7.8] Added 'qtype' to the display columns
+            display_cols = [c for c in ['timestamp', 'student_id', 'unit_id', 'qtype', 'score', 'duration_sec', 'used_hint', 'weakness_parsed'] if c in df.columns]
             st.dataframe(df[display_cols], use_container_width=True, hide_index=True, height=300)
         else: st.info(T['msg_no_data'])
 
