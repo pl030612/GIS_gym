@@ -50,162 +50,25 @@ ALLOWED_STUDENTS = [
     "41123113L", "TA2026"
 ]
 
-# 完整雙語單元備註
 UNIT_NOTES = {
-    1: {
-        "zh": "ℹ️ 本單元圖資編碼為 Big5。",
-        "en": "ℹ️ Data encoding for this unit is Big5."
-    },
-    2: {
-        "zh": "ℹ️ 本單元Taiwan_county、Taiwan_temple、Taiwan_town圖資編碼為UTF-8，其餘為 Big5。",
-        "en": "ℹ️ Taiwan_county, Taiwan_temple, Taiwan_town are UTF-8. Others are Big5."
-    },
-    3: {
-        "zh": "ℹ️ 本單元圖資編碼為 Big5。",
-        "en": "ℹ️ Data encoding for this unit is Big5."
-    },
-    4: {
-        "zh": "ℹ️ 本單元Taiwan_hospital、Taiwan_village、Taiwan_town圖資編碼為UTF-8，其餘為 Big5。",
-        "en": "ℹ️ Taiwan_hospital, Taiwan_village, Taiwan_town are UTF-8. Others are Big5."
-    },
-    5: {
-        "zh": "ℹ️ 本單元圖資編碼為 Big5。",
-        "en": "ℹ️ Data encoding for this unit is Big5."
-    },
-    6: {
-        "zh": "ℹ️ 本單元School、Tainan_temple_mazhou、Taiwan_temple_mazhou、Taiwan_town圖資編碼為UTF-8，其餘為 Big5。",
-        "en": "ℹ️ School, Tainan_temple_mazhou, Taiwan_temple_mazhou, Taiwan_town are UTF-8. Others are Big5."
-    },
-    7: {
-        "zh": "ℹ️ 本單元School、Tainan_temple_mazhou圖資編碼為UTF-8，其餘為 Big5。",
-        "en": "ℹ️ School, Tainan_temple_mazhou are UTF-8. Others are Big5."
-    },
-    8: {
-        "zh": "ℹ️ 本單元School、Tainan_temple_mazhou圖資編碼為UTF-8，其餘為 Big5。",
-        "en": "ℹ️ School, Tainan_temple_mazhou are UTF-8. Others are Big5."
-    },
-    9: {
-        "zh": "ℹ️ 本單元Dengue_Case、KAOH_toen圖資編碼為UTF-8，其餘為 Big5。",
-        "en": "ℹ️ Dengue_Case, KAOH_toen are UTF-8. Others are Big5."
-    },
-    10: {
-        "zh": "ℹ️ 本單元Dengue_Case、KAOH_toen圖資編碼為UTF-8，其餘為 Big5。",
-        "en": "ℹ️ Dengue_Case, KAOH_toen are UTF-8. Others are Big5."
-    }
+    1: {"zh": "ℹ️ 本單元圖資編碼為 Big5。", "en": "ℹ️ Data encoding for this unit is Big5."},
+    2: {"zh": "ℹ️ 本單元Taiwan_county、Taiwan_temple、Taiwan_town圖資編碼為UTF-8，其餘為 Big5。", "en": "ℹ️ Taiwan_county, Taiwan_temple, Taiwan_town are UTF-8. Others are Big5."},
+    3: {"zh": "ℹ️ 本單元圖資編碼為 Big5。", "en": "ℹ️ Data encoding for this unit is Big5."},
+    4: {"zh": "ℹ️ 本單元Taiwan_hospital、Taiwan_village、Taiwan_town圖資編碼為UTF-8，其餘為 Big5。", "en": "ℹ️ Taiwan_hospital, Taiwan_village, Taiwan_town are UTF-8. Others are Big5."},
+    5: {"zh": "ℹ️ 本單元圖資編碼為 Big5。", "en": "ℹ️ Data encoding for this unit is Big5."},
+    6: {"zh": "ℹ️ 本單元School、Tainan_temple_mazhou、Taiwan_temple_mazhou、Taiwan_town圖資編碼為UTF-8，其餘為 Big5。", "en": "ℹ️ School, Tainan_temple_mazhou, Taiwan_temple_mazhou, Taiwan_town are UTF-8. Others are Big5."},
+    7: {"zh": "ℹ️ 本單元School、Tainan_temple_mazhou圖資編碼為UTF-8，其餘為 Big5。", "en": "ℹ️ School, Tainan_temple_mazhou are UTF-8. Others are Big5."},
+    8: {"zh": "ℹ️ 本單元School、Tainan_temple_mazhou圖資編碼為UTF-8，其餘為 Big5。", "en": "ℹ️ School, Tainan_temple_mazhou are UTF-8. Others are Big5."},
+    9: {"zh": "ℹ️ 本單元Dengue_Case、KAOH_toen圖資編碼為UTF-8，其餘為 Big5。", "en": "ℹ️ Dengue_Case, KAOH_toen are UTF-8. Others are Big5."},
+    10: {"zh": "ℹ️ 本單元Dengue_Case、KAOH_toen圖資編碼為UTF-8，其餘為 Big5。", "en": "ℹ️ Dengue_Case, KAOH_toen are UTF-8. Others are Big5."}
 }
 
 TRANSLATIONS = {
     "zh": {
-        "page_title": "🔮 GIS Gym",
-        "sidebar_user": "使用者設定",
-        "label_student_id": "輸入學號",
-        "ta_login": "助教登入",
-        "ta_mode": "助教模式",
-        "btn_login": "登入",
-        "btn_logout": "登出",
-        "tab_practice": "自主練習",
-        "tab_assignment": "單元作業",
-        "tab_ta": "助教後台",
-        "sel_unit": "選擇單元",
-        "sel_topic": "主題",
-        "sel_level": "難度",
-        "sel_type": "題型",
-        "opt_all": "全部",
-        "opt_intro": "入門",
-        "opt_adv": "進階",
-        "opt_short": "簡答題",
-        "opt_coding": "實作題",
-        "btn_generate": "產生題目",
-        "header_q": "題目",
-        "btn_show_hint": "🔍 查看提示",
-        "header_hint": "提示內容",
-        "btn_download_data": "下載圖資",
-        "placeholder_ans": "輸入答案 (若是實作題請務必包含 R code)...",
-        "btn_submit": "送出批改",
-        "expander_feedback": "批改結果",
-        
-        "fb_score": "得分：", 
-        "fb_rubric": "評分細項",
-        "fb_strengths": "優點 ",
-        "fb_weaknesses": "弱點",
-        "col_crit": "評分標準",
-        "col_pts": "得分",
-        "col_max": "配分",
-        "col_evi": "評語",
-        
-        "no_assign_file": "📂 目前沒有掃描到任何作業檔案。",
-        "sel_assign_unit": "選擇作業單元",
-        "header_assign_desc": "作業說明",
-        "header_assign_data": "下載圖資",
-        "no_data_file": "（此單元無實體檔案可供下載）",
-        "msg_submitted": "已繳交。分數：",
-        "btn_submit_assign": "繳交作業",
-        "header_ta_report": "AI 教學顧問報告",
-        "btn_gen_report": "生成分析報告",
-        "header_prac_history": "自主練習紀錄",
-        "btn_dl_csv": "下載紀錄 (.csv)",
-        "header_assign_history": "作業繳交檢視",
-        "msg_no_data": "無資料",
-        "link_gsheet": "🔗 前往 Google Sheet 查看原始資料",
-        "ta_filter_unit": "篩選單元：",
-        "warning_no_id": "⚠️ 請先在左側欄位輸入學號！",
-        "warning_not_allowed": "🚫 此學號未授權使用本系統，請聯繫助教。"
+        "page_title": "🔮 GIS Gym", "sidebar_user": "使用者設定", "label_student_id": "輸入學號", "ta_login": "助教登入", "ta_mode": "助教模式", "btn_login": "登入", "btn_logout": "登出", "tab_practice": "自主練習", "tab_assignment": "單元作業", "tab_ta": "助教後台", "sel_unit": "選擇單元", "sel_topic": "主題", "sel_level": "難度", "sel_type": "題型", "opt_all": "全部", "opt_intro": "入門", "opt_adv": "進階", "opt_short": "簡答題", "opt_coding": "實作題", "btn_generate": "產生題目", "header_q": "題目", "btn_show_hint": "🔍 查看提示", "header_hint": "提示內容", "btn_download_data": "下載圖資", "placeholder_ans": "輸入答案 (若是實作題請務必包含 R code)...", "btn_submit": "送出批改", "expander_feedback": "批改結果", "fb_score": "得分：", "fb_rubric": "評分細項", "fb_strengths": "優點 ", "fb_weaknesses": "弱點", "col_crit": "評分標準", "col_pts": "得分", "col_max": "配分", "col_evi": "評語", "no_assign_file": "📂 目前沒有掃描到任何作業檔案。", "sel_assign_unit": "選擇作業單元", "header_assign_desc": "作業說明", "header_assign_data": "下載圖資", "no_data_file": "（此單元無實體檔案可供下載）", "msg_submitted": "已繳交。分數：", "btn_submit_assign": "繳交作業", "header_ta_report": "AI 教學顧問報告", "btn_gen_report": "生成分析報告", "header_prac_history": "自主練習紀錄", "btn_dl_csv": "下載紀錄 (.csv)", "header_assign_history": "作業繳交檢視", "msg_no_data": "無資料", "link_gsheet": "🔗 前往 Google Sheet 查看原始資料", "ta_filter_unit": "篩選單元：", "warning_no_id": "⚠️ 請先在左側欄位輸入學號！", "warning_not_allowed": "🚫 此學號未授權使用本系統，請聯繫助教。"
     },
     "en": {
-        "page_title": "🔮 GIS Gym",
-        "sidebar_user": "User Settings",
-        "label_student_id": "Student ID",
-        "ta_login": "TA Login",
-        "ta_mode": "TA Mode",
-        "btn_login": "Login",
-        "btn_logout": "Logout",
-        "tab_practice": "Practice",
-        "tab_assignment": "Assignments",
-        "tab_ta": "TA Dashboard",
-        "sel_unit": "Unit",
-        "sel_topic": "Topic",
-        "sel_level": "Level",
-        "sel_type": "Type",
-        "opt_all": "All",
-        "opt_intro": "Introductory",
-        "opt_adv": "Advanced",
-        "opt_short": "Short Answer",
-        "opt_coding": "Practical (R Code)",
-        "btn_generate": "Generate Question",
-        "header_q": "Question",
-        "btn_show_hint": "🔍 Show Hint",
-        "header_hint": "Hint Content",
-        "btn_download_data": "Download Data",
-        "placeholder_ans": "Your answer (Must include R code for practical tasks)...",
-        "btn_submit": "Submit for Grading",
-        "expander_feedback": "Feedback Result",
-        
-        "fb_score": "Score:",
-        "fb_rubric": "Rubric",
-        "fb_strengths": "Strengths",
-        "fb_weaknesses": "Weaknesses",
-        "col_crit": "Criterion",
-        "col_pts": "Points",
-        "col_max": "Max",
-        "col_evi": "Evidence",
-        
-        "no_assign_file": "No assignment files found.",
-        "sel_assign_unit": "Select Unit",
-        "header_assign_desc": "Instructions",
-        "header_assign_data": "Download Data",
-        "no_data_file": "(No files available)",
-        "msg_submitted": "Submitted. Score:",
-        "btn_submit_assign": "Submit Assignment",
-        "header_ta_report": "AI Consultant Report",
-        "btn_gen_report": "Generate Report",
-        "header_prac_history": "Practice History",
-        "btn_dl_csv": "Download (.csv)",
-        "header_assign_history": "Assignment Submissions",
-        "msg_no_data": "No Data",
-        "link_gsheet": "🔗 Go to Google Sheet",
-        "ta_filter_unit": "Filter Unit:",
-        "warning_no_id": "⚠️ Please enter Student ID in sidebar first!",
-        "warning_not_allowed": "🚫 Access Denied. Please contact TA."
+        "page_title": "🔮 GIS Gym", "sidebar_user": "User Settings", "label_student_id": "Student ID", "ta_login": "TA Login", "ta_mode": "TA Mode", "btn_login": "Login", "btn_logout": "Logout", "tab_practice": "Practice", "tab_assignment": "Assignments", "tab_ta": "TA Dashboard", "sel_unit": "Unit", "sel_topic": "Topic", "sel_level": "Level", "sel_type": "Type", "opt_all": "All", "opt_intro": "Introductory", "opt_adv": "Advanced", "opt_short": "Short Answer", "opt_coding": "Practical (R Code)", "btn_generate": "Generate Question", "header_q": "Question", "btn_show_hint": "🔍 Show Hint", "header_hint": "Hint Content", "btn_download_data": "Download Data", "placeholder_ans": "Your answer (Must include R code for practical tasks)...", "btn_submit": "Submit for Grading", "expander_feedback": "Feedback Result", "fb_score": "Score:", "fb_rubric": "Rubric", "fb_strengths": "Strengths", "fb_weaknesses": "Weaknesses", "col_crit": "Criterion", "col_pts": "Points", "col_max": "Max", "col_evi": "Evidence", "no_assign_file": "No assignment files found.", "sel_assign_unit": "Select Unit", "header_assign_desc": "Instructions", "header_assign_data": "Download Data", "no_data_file": "(No files available)", "msg_submitted": "Submitted. Score:", "btn_submit_assign": "Submit Assignment", "header_ta_report": "AI Consultant Report", "btn_gen_report": "Generate Report", "header_prac_history": "Practice History", "btn_dl_csv": "Download (.csv)", "header_assign_history": "Assignment Submissions", "msg_no_data": "No Data", "link_gsheet": "🔗 Go to Google Sheet", "ta_filter_unit": "Filter Unit:", "warning_no_id": "⚠️ Please enter Student ID in sidebar first!", "warning_not_allowed": "🚫 Access Denied. Please contact TA."
     }
 }
 
@@ -361,7 +224,6 @@ def scan_assignments_from_files(lang_code):
     if not os.path.exists(LECTURES_DIR): return {}
 
     folders = sorted([f for f in os.listdir(LECTURES_DIR) if os.path.isdir(os.path.join(LECTURES_DIR, f))])
-    
     for folder in folders:
         match = re.match(r"^(\d+)[_]", folder)
         if not match: continue
@@ -369,8 +231,7 @@ def scan_assignments_from_files(lang_code):
         
         folder_path = os.path.join(LECTURES_DIR, folder)
         sub_assign_dir = os.path.join(folder_path, "assignments")
-        search_dirs = []
-        if os.path.exists(sub_assign_dir): search_dirs.append(sub_assign_dir)
+        search_dirs = [sub_assign_dir] if os.path.exists(sub_assign_dir) else []
         search_dirs.append(folder_path)
         
         target_file = None
@@ -399,7 +260,6 @@ def scan_assignments_from_files(lang_code):
                 }
             except Exception as e:
                 print(f"Error reading docx {target_file}: {e}")
-                
     return assignments_db
 
 ASSIGNMENTS_DB = scan_assignments_from_files(st.session_state["language"])
@@ -495,7 +355,6 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
         else:
             sys_role = "You are a GIS TA. Create a Practical R Coding task."
             r_rules = "Hard Constraints: 1. Use **R language** (sf, terra). 2. No ArcGIS/QGIS mentions."
-            
             system_instruction = f"""
             Design a 'Practical' task (Difficulty: {level}) using files: [{file_names_str}].
             Core Concept: {selected_method}.
@@ -504,15 +363,14 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
             【Question Design Strategy】
             1. 'question_content':
                - Provide a **Scenario** or **Analytical Goal**.
-               - ✅ **MANDATORY**: You MUST explicitly state the filenames to be used (e.g., "Please use 'A.shp' and 'B.csv' to...").
-               - ❌ **FORBIDDEN**: Do NOT list numbered steps (1. Read file, 2. Transform...).
+               - ✅ **MANDATORY**: You MUST explicitly state the filenames to be used.
+               - ❌ **FORBIDDEN**: Do NOT list numbered steps.
                - ❌ **FORBIDDEN**: Do NOT mention specific R function names in the question.
             
-            2. 'hint':
-               - Provide the detailed step-by-step guide and suggested R functions here.
+            2. 'hint': Provide detailed step-by-step guide and suggested R functions here.
             
             JSON Output:
-            {{ "question_content": "Scenario description with filenames...", "hint": "Step-by-step R guide...", "target_filename": "..." }}
+            {{ "question_content": "Scenario description...", "hint": "Step-by-step...", "target_filename": "..." }}
             """
     else:
         if is_short_ans:
@@ -528,7 +386,6 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
         else:
             sys_role = "你是頂尖的空間分析助教。請設計 R 語言實作題。"
             r_rules = "嚴格限制：1. 必須使用 **R 語言**。 2. 禁止提及 ArcGIS/QGIS。"
-            
             system_instruction = f"""
             請根據真實檔案列表: [{file_names_str}] 設計一道【實作題】(難度：{level})。
             核心考點：{selected_method}。
@@ -537,12 +394,11 @@ def generate_practice_question_real_data(level: str, qtype: str, unit_id: int | 
             【出題策略】
             1. 'question_content' (題目)：
                - 請設計一個「情境」或「分析目標」。
-               - ✅ **必須明確指出要使用的檔案名稱** (例如：請使用 'Taipei.shp' 進行分析...)。
-               - ❌ **嚴禁**在題目中列出步驟 (如 1. 讀檔 2. 轉座標...)。
+               - ✅ **必須明確指出要使用的檔案名稱**。
+               - ❌ **嚴禁**在題目中列出步驟。
                - ❌ **嚴禁**在題目中直接提及 R 函數名稱 (讓學生自己想)。
             
-            2. 'hint' (提示)：
-               - 這裡才需要提供詳細的 Step-by-step 步驟與建議使用的 R 套件/函數。
+            2. 'hint' (提示)：這裡才提供詳細的 Step-by-step 步驟與建議的 R 套件/函數。
             
             請回傳 JSON：
             {{ "question_content": "包含檔案名稱的情境與目標...", "hint": "R 語言詳細解題步驟...", "target_filename": "..." }}
@@ -563,17 +419,12 @@ def grade_submission(question_text: str, student_answer: str, hint_text: str, un
     context = _retrieve_context(question_text, unit_id=unit_id, k=10)
     is_conceptual = (qtype in ["簡答題", "Short Answer"])
     
-    # 1. 絕對的防呆防弊：Python 後台直接比對
     if hint_text and hint_text.strip() and student_answer.strip() == hint_text.strip():
         return {
-            "score": 0,
-            "strengths": [],
-            "weaknesses": ["⚠️ 嚴重違規：檢測到完全複製提示內容，請自行撰寫答案。"],
-            "rubric_scores": [0, 0, 0],
-            "rubric_evidence": ["未提供", "未提供", "未提供"]
+            "score": 0, "strengths": [], "weaknesses": ["⚠️ 嚴重違規：檢測到完全複製提示內容，請自行撰寫答案。"],
+            "rubric_scores": [0, 0, 0], "rubric_evidence": ["未提供", "未提供", "未提供"]
         }
 
-    # 2. 無效答案檢測 (Garbage Input Check)
     garbage_check_logic = """
     【🚨 STEP 0: GARBAGE/IRRELEVANT INPUT CHECK】
     First, evaluate if the [Student Answer] is a genuine attempt to answer the [Question].
@@ -596,27 +447,21 @@ def grade_submission(question_text: str, student_answer: str, hint_text: str, un
     else:
         grading_logic = """
         【🚨 STEP 1: MANDATORY CODE CHECK (For Practical Tasks)】
-        Check if the student answer contains actual R code syntax (e.g., `library`, `st_read`, `<-`, `function`).
+        Check if the student answer contains actual R code syntax.
         
         **CASE A: NO R CODE FOUND (Only text descriptions/plans)**:
         - **Total Score MUST be <= 4**.
-        - **Rubric Guide**:
-          * Requirement: 1-2 (Depending on textual understanding).
-          * Spatial Logic: 1-2 (Depending on logic).
-          * Code Rigor: 0 (No code).
+        - **Rubric Guide**: Requirement: 1-2, Spatial Logic: 1-2, Code Rigor: 0 (No code).
         - Weakness: "嚴重缺失：僅有文字敘述，未撰寫 R 程式碼 (No R code provided)."
         
         **CASE B: CODE FOUND (Normal Grading)**:
-        - **Rubric** (Total 10):
-           - **Requirement Coverage (需求覆蓋)** [Max 3]
-           - **Spatial Logic (空間邏輯)** [Max 4]
-           - **Code Rigor (R 程式嚴謹度)** [Max 3]
+        - **Rubric** (Total 10): Requirement Coverage [Max 3], Spatial Logic [Max 4], Code Rigor [Max 3]
         """
 
     final_prompt = f"""
     You are a strict but fair GIS TA. 
     Evaluate the [Student Answer] against the [Question].
-    NOTE: Assume the student DID NOT plagiarize. Just grade the content based on the rules below.
+    NOTE: Assume the student DID NOT plagiarize.
     
     {garbage_check_logic}
     
@@ -626,11 +471,8 @@ def grade_submission(question_text: str, student_answer: str, hint_text: str, un
     
     Response Format (JSON):
     {{
-        "score": int (0-10),
-        "strengths": ["point 1", "point 2"],
-        "weaknesses": ["point 1", "point 2"],
-        "rubric_scores": [score_1, score_2, score_3], 
-        "rubric_evidence": ["evidence_1", "evidence_2", "evidence_3"]
+        "score": int (0-10), "strengths": ["point 1"], "weaknesses": ["point 1"],
+        "rubric_scores": [s1, s2, s3], "rubric_evidence": ["ev1", "ev2", "ev3"]
     }}
     """
 
@@ -639,17 +481,13 @@ def grade_submission(question_text: str, student_answer: str, hint_text: str, un
     [Hint Provided] {hint_text}
     [Student Answer] {student_answer}
     [Context] {context}
-    
     Please grade this submission.
     """
 
     try:
         response = client.chat.completions.create(
             model="gpt-4o",
-            messages=[
-                {"role": "system", "content": final_prompt},
-                {"role": "user", "content": user_content}
-            ],
+            messages=[{"role": "system", "content": final_prompt}, {"role": "user", "content": user_content}],
             response_format={"type": "json_object"}
         )
         return json.loads(response.choices[0].message.content)
@@ -661,7 +499,6 @@ def generate_weakness_report(unit_id: int):
     df_p = read_history_gsheet()
     df_a = read_submissions_gsheet()
     
-    fb_list = []
     weaknesses = []
     low_score_q_p = []
     
@@ -672,8 +509,7 @@ def generate_weakness_report(unit_id: int):
             try:
                 data = json.loads(row['feedback_json'])
                 if 'weaknesses' in data: weaknesses.extend(data['weaknesses'])
-                if row['score'] < 8:
-                    low_score_q_p.append(f"[Score: {row['score']}] {row['question']}")
+                if row['score'] < 8: low_score_q_p.append(f"[Score: {row['score']}] {row['question']}")
             except: pass
 
     if not df_a.empty and 'unit_id' in df_a.columns:
@@ -692,15 +528,8 @@ def generate_weakness_report(unit_id: int):
     
     prompt = f"""
     你是教學顧問。分析 Unit {unit_id} 弱點：\n{weakness_text}
-    
-    【格式要求】
-    1. 使用 Markdown (##, ###)。
-    2. **標題字體不要太大**，請從 ### (H3) 開始使用。
-    3. 內容包含：常見錯誤模式、概念澄清、教學建議。
-    4. 最後請附上一個區塊：**「### 🎯 學生答錯率最高的題目範例」**，請參考以下題目列表，挑選 3 題最具代表性的：
-    {bad_questions}
-    
-    請務必使用繁體中文。
+    【格式要求】使用 Markdown。包含：常見錯誤模式、概念澄清、教學建議。
+    附上「### 🎯 學生答錯率最高的題目範例」(挑3題):\n{bad_questions}
     """
     with st.spinner("🤖 AI analyzing..."):
         r = client.chat.completions.create(model="gpt-4o", messages=[{"role": "user", "content": prompt}])
@@ -708,19 +537,19 @@ def generate_weakness_report(unit_id: int):
 
 
 # =====================================================
-# 7) 資料庫與日誌系統
+# 7) 資料庫與日誌系統 (加入 Cache 防爆機制)
 # =====================================================
 def extract_weaknesses(val):
     try:
         if not val: return ""
         d = json.loads(val)
         w = d.get("weaknesses", [])
-        if isinstance(w, list):
-            return "; ".join([f"{i+1}. {x}" for i, x in enumerate(w)])
+        if isinstance(w, list): return "; ".join([f"{i+1}. {x}" for i, x in enumerate(w)])
         return str(w)
-    except:
-        return ""
+    except: return ""
 
+# [FIX v7.12] Add Cache to prevent Google API 429 Quota Exceeded Error
+@st.cache_data(ttl=60, show_spinner=False)
 def read_history_gsheet() -> pd.DataFrame:
     try:
         ws = get_worksheet("learning_history")
@@ -730,6 +559,8 @@ def read_history_gsheet() -> pd.DataFrame:
         st.error(f"❌ 讀取歷史紀錄失敗：{e}")
         return pd.DataFrame()
 
+# [FIX v7.12] Add Cache to prevent Google API 429 Quota Exceeded Error
+@st.cache_data(ttl=60, show_spinner=False)
 def read_submissions_gsheet() -> pd.DataFrame:
     try:
         ws = get_worksheet("submissions")
@@ -746,11 +577,9 @@ def log_system_usage(action: str):
             process = psutil.Process(os.getpid())
             mem_info = process.memory_info()
             ram_gb = round(mem_info.rss / (1024 ** 3), 4)
-            row_data = [datetime.now().isoformat(), action, ram_gb]
-            ws.append_row(row_data)
+            ws.append_row([datetime.now().isoformat(), action, ram_gb])
     except: pass 
 
-# [FIX v7.11] 重新排序欄位順序: qtype (E), topic (F), difficulty (G)
 def log_practice(sid, uid, qtype, topic, difficulty, q, fb, duration, used_hint):
     try:
         ws = get_worksheet("learning_history")
@@ -763,19 +592,21 @@ def log_practice(sid, uid, qtype, topic, difficulty, q, fb, duration, used_hint)
                 st.session_state["session_id"],           # B: session_id
                 str(sid),                                 # C: student_id
                 int(uid) if uid is not None else 0,       # D: unit_id
-                str(qtype),                               # E: qtype
-                str(topic),                               # F: topic (移到這裡)
-                str(difficulty),                          # G: difficulty (移到這裡)
+                str(qtype),                               # E: qtype 
+                str(topic),                               # F: topic 
+                str(difficulty),                          # G: difficulty 
                 duration,                                 # H: duration_sec
                 str(used_hint),                           # I: used_hint
                 q,                                        # J: question
                 fb.get('score', 0),                       # K: score
-                get_level_from_score(fb.get('score', 0)), # L: level (成績評價)
+                get_level_from_score(fb.get('score', 0)), # L: level
                 weakness_str,                             # M: weakness_parsed
                 json.dumps(fb, ensure_ascii=False)        # N: feedback_json
             ]
             ws.append_row(row_data)
             log_system_usage(f"Practice_Submit_Unit{uid}")
+            # [FIX v7.12] Clear cache after writing so new data shows immediately
+            read_history_gsheet.clear() 
             
     except Exception as e: st.error(f"Log Error: {e}")
 
@@ -803,6 +634,8 @@ def log_assignment_submission(assign_id, sid, uid, ans, fb):
             ]
             ws.append_row(row_data)
             log_system_usage(f"Assignment_Submit_Unit{uid}")
+            # [FIX v7.12] Clear cache after writing so new data shows immediately
+            read_submissions_gsheet.clear() 
 
     except Exception as e: st.error(f"Log Error: {e}")
 
@@ -855,45 +688,25 @@ def get_level_from_score(score):
 
 def display_feedback_ui(fb, t_dict, qtype="Practical"):
     if not fb: return
-    
     score = fb.get('score', 0)
     level = get_level_from_score(score)
     
     st.markdown(f"### {t_dict['fb_score']} {score} / 10")
     st.caption(f"等級評價: {level}")
-    
     st.markdown(f"#### {t_dict['fb_rubric']}")
     
     ai_scores = fb.get('rubric_scores', [0, 0, 0])
     ai_evidence = fb.get('rubric_evidence', ["未提供", "未提供", "未提供"])
-    
     while len(ai_scores) < 3: ai_scores.append(0)
     while len(ai_evidence) < 3: ai_evidence.append("未提供")
 
     is_conceptual = qtype in ["簡答題", "Short Answer"]
-    
     if is_conceptual:
-        criteria = [
-            ("概念正確性 (Conceptual Accuracy)", 3),
-            ("分析邏輯與解釋 (Analytical Logic)", 4),
-            ("完整性與關鍵細節 (Completeness)", 3)
-        ]
+        criteria = [("概念正確性 (Conceptual Accuracy)", 3), ("分析邏輯與解釋 (Analytical Logic)", 4), ("完整性與關鍵細節 (Completeness)", 3)]
     else:
-        criteria = [
-            ("需求覆蓋 (Requirement)", 3),
-            ("空間邏輯 (Spatial Logic)", 4),
-            ("R 程式嚴謹度 (Code Rigor)", 3)
-        ]
+        criteria = [("需求覆蓋 (Requirement)", 3), ("空間邏輯 (Spatial Logic)", 4), ("R 程式嚴謹度 (Code Rigor)", 3)]
 
-    rubric_data = []
-    for i in range(3):
-        rubric_data.append({
-            t_dict['col_crit']: criteria[i][0],
-            t_dict['col_pts']: ai_scores[i],
-            t_dict['col_max']: criteria[i][1],
-            t_dict['col_evi']: ai_evidence[i]
-        })
-    
+    rubric_data = [{t_dict['col_crit']: criteria[i][0], t_dict['col_pts']: ai_scores[i], t_dict['col_max']: criteria[i][1], t_dict['col_evi']: ai_evidence[i]} for i in range(3)]
     st.table(pd.DataFrame(rubric_data))
     
     c1, c2 = st.columns(2)
@@ -988,8 +801,7 @@ with tabs[0]:
         st.markdown(f"### {T['header_q']} [{st.session_state['pq_meta']}]") 
         st.info(q_data.get("question_content", ""))
         
-        if st.button(T['btn_show_hint']):
-            st.session_state["hint_viewed"] = True
+        if st.button(T['btn_show_hint']): st.session_state["hint_viewed"] = True
         
         if st.session_state.get("hint_viewed", False):
             with st.container(border=True):
@@ -1001,10 +813,7 @@ with tabs[0]:
             all_files = get_unit_files(unit_val)
             if all_files:
                 with st.expander(f"📂 {T['btn_download_data']}", expanded=False):
-                    if unit_val in UNIT_NOTES:
-                        note_lang = st.session_state["language"]
-                        st.info(UNIT_NOTES[unit_val][note_lang])
-                    
+                    if unit_val in UNIT_NOTES: st.info(UNIT_NOTES[unit_val][st.session_state["language"]])
                     cols = st.columns(3)
                     for i, f in enumerate(all_files):
                         with cols[i % 3]:
@@ -1016,14 +825,9 @@ with tabs[0]:
         ans = st.text_area("Answer", height=150, key="p_ans", disabled=not sid, placeholder=T['placeholder_ans'])
         if st.button(T['btn_submit'], key="p_sub", disabled=not ans):
             with st.spinner("Grading..."):
-                duration = 0
-                if "q_start_time" in st.session_state:
-                    duration = int(time.time() - st.session_state["q_start_time"])
-                
+                duration = int(time.time() - st.session_state["q_start_time"]) if "q_start_time" in st.session_state else 0
                 fb = grade_submission(q_data.get("question_content", ""), ans, q_data.get("hint", ""), unit_val, st.session_state["language"], qtype=type_display)
-                
                 log_practice(sid, unit_val, type_display, topic_display, lvl_display, q_data.get("question_content", ""), fb, duration, st.session_state.get("hint_viewed", False))
-                
                 display_feedback_ui(fb, T, qtype=type_display)
 
 # --- Tab 2: Assignment ---
@@ -1039,10 +843,7 @@ with tabs[1]:
             real_files = get_unit_files(target_unit)
             if real_files:
                 with st.expander(f"📂 {T['header_assign_data']}", expanded=False):
-                    if target_unit in UNIT_NOTES:
-                        note_lang = st.session_state["language"]
-                        st.info(UNIT_NOTES[target_unit][note_lang])
-                        
+                    if target_unit in UNIT_NOTES: st.info(UNIT_NOTES[target_unit][st.session_state["language"]])
                     cols = st.columns(3)
                     for i, f in enumerate(real_files):
                         with cols[i % 3]:
@@ -1085,20 +886,14 @@ if st.session_state["is_ta"] and len(tabs) > 2:
         
         st.markdown("---")
         st.link_button(T['link_gsheet'], GOOGLE_SHEET_URL)
-        
         filter_unit = st.selectbox(T['ta_filter_unit'], [T['opt_all']] + unit_options, key="hist_filter")
         
         st.markdown(f"### {T['header_prac_history']}") 
         df = read_history_gsheet()
         if not df.empty:
-            if filter_unit != T['opt_all']:
-                df = df[df['unit_id'] == int(filter_unit)]
-            
+            if filter_unit != T['opt_all']: df = df[df['unit_id'] == int(filter_unit)]
             st.download_button(T['btn_dl_csv'], df.to_csv(index=False).encode('utf-8-sig'), "practice.csv", "text/csv")
-            if 'feedback_json' in df.columns:
-                df["weakness_parsed"] = df["feedback_json"].apply(extract_weaknesses)
-            
-            # [FIX v7.11] 同步更新 TA Dashboard 顯示順序
+            if 'feedback_json' in df.columns: df["weakness_parsed"] = df["feedback_json"].apply(extract_weaknesses)
             display_cols = [c for c in ['timestamp', 'student_id', 'unit_id', 'qtype', 'topic', 'difficulty', 'score', 'level', 'duration_sec', 'used_hint', 'weakness_parsed'] if c in df.columns]
             st.dataframe(df[display_cols], use_container_width=True, hide_index=True, height=300)
         else: st.info(T['msg_no_data'])
@@ -1107,12 +902,9 @@ if st.session_state["is_ta"] and len(tabs) > 2:
         st.markdown(f"### {T['header_assign_history']}") 
         df_sub = read_submissions_gsheet()
         if not df_sub.empty:
-            if filter_unit != T['opt_all']:
-                df_sub = df_sub[df_sub['unit_id'] == int(filter_unit)]
-                
+            if filter_unit != T['opt_all']: df_sub = df_sub[df_sub['unit_id'] == int(filter_unit)]
             st.download_button(T['btn_dl_csv'], df_sub.to_csv(index=False).encode('utf-8-sig'), "submissions.csv", "text/csv")
-            if 'feedback_json' in df_sub.columns: 
-                df_sub["weakness_parsed"] = df_sub["feedback_json"].apply(extract_weaknesses)
+            if 'feedback_json' in df_sub.columns: df_sub["weakness_parsed"] = df_sub["feedback_json"].apply(extract_weaknesses)
             display_cols_sub = [c for c in ['timestamp', 'student_id', 'unit_id', 'score', 'weakness_parsed', 'answer'] if c in df_sub.columns]
             st.dataframe(df_sub[display_cols_sub], use_container_width=True, hide_index=True, height=300)
         else: st.info(T['msg_no_data'])
