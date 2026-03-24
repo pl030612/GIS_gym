@@ -424,12 +424,12 @@ def get_reference_answer(unit_id: int, lang_code: str):
         target_file = None
         if lang_code == 'en':
             for f in files:
-                if f.lower() in ["reference_en.md", "reference_en.txt"]:
+                if f.lower() in ["reference_en.md", "reference_en.txt", "reference_en.rmd"]:
                     target_file = os.path.join(d, f)
                     break
         if not target_file:
             for f in files:
-                if f.lower() in ["reference.md", "reference.txt"]:
+                if f.lower() in ["reference.md", "reference.txt", "reference.rmd"]:
                     target_file = os.path.join(d, f)
                     break
         
@@ -563,7 +563,7 @@ def grade_submission(question_text: str, student_answer: str, hint_text: str, un
     context = _retrieve_context(question_text, unit_id=unit_id, k=10)
     is_conceptual = (qtype in ["簡答題", "Short Answer"])
     
-    # 1. 絕對的防呆防弊：Python 後台直接比對，防止 AI 幻覺
+    # 1. 絕對的防呆防弊：Python 後台直接比對
     if hint_text and hint_text.strip() and student_answer.strip() == hint_text.strip():
         return {
             "score": 0,
@@ -573,7 +573,7 @@ def grade_submission(question_text: str, student_answer: str, hint_text: str, un
             "rubric_evidence": ["未提供", "未提供", "未提供"]
         }
 
-    # 2. [FIX v7.7] 新增無效答案檢測 (Garbage Input Check)
+    # 2. 無效答案檢測 (Garbage Input Check)
     garbage_check_logic = """
     【🚨 STEP 0: GARBAGE/IRRELEVANT INPUT CHECK】
     First, evaluate if the [Student Answer] is a genuine attempt to answer the [Question].
@@ -750,8 +750,8 @@ def log_system_usage(action: str):
             ws.append_row(row_data)
     except: pass 
 
-# [FIX v7.8] Added qtype logging support to log_practice
-def log_practice(sid, uid, qtype, q, fb, duration, used_hint):
+# [FIX v7.11] 重新排序欄位順序: qtype (E), topic (F), difficulty (G)
+def log_practice(sid, uid, qtype, topic, difficulty, q, fb, duration, used_hint):
     try:
         ws = get_worksheet("learning_history")
         if ws:
@@ -759,18 +759,20 @@ def log_practice(sid, uid, qtype, q, fb, duration, used_hint):
             weakness_str = "; ".join(weakness_list) if isinstance(weakness_list, list) else str(weakness_list)
             
             row_data = [
-                datetime.now().isoformat(), 
-                st.session_state["session_id"],
-                str(sid), 
-                int(uid) if uid is not None else 0,
-                duration,
-                str(used_hint),
-                q, 
-                fb.get('score', 0), 
-                get_level_from_score(fb.get('score', 0)), 
-                weakness_str,
-                json.dumps(fb, ensure_ascii=False),
-                str(qtype)  # 新增：題型欄位 (Column L)
+                datetime.now().isoformat(),               # A: timestamp
+                st.session_state["session_id"],           # B: session_id
+                str(sid),                                 # C: student_id
+                int(uid) if uid is not None else 0,       # D: unit_id
+                str(qtype),                               # E: qtype
+                str(topic),                               # F: topic (移到這裡)
+                str(difficulty),                          # G: difficulty (移到這裡)
+                duration,                                 # H: duration_sec
+                str(used_hint),                           # I: used_hint
+                q,                                        # J: question
+                fb.get('score', 0),                       # K: score
+                get_level_from_score(fb.get('score', 0)), # L: level (成績評價)
+                weakness_str,                             # M: weakness_parsed
+                json.dumps(fb, ensure_ascii=False)        # N: feedback_json
             ]
             ws.append_row(row_data)
             log_system_usage(f"Practice_Submit_Unit{uid}")
@@ -1019,8 +1021,8 @@ with tabs[0]:
                     duration = int(time.time() - st.session_state["q_start_time"])
                 
                 fb = grade_submission(q_data.get("question_content", ""), ans, q_data.get("hint", ""), unit_val, st.session_state["language"], qtype=type_display)
-                # [FIX v7.8] Pass type_display (qtype) to log_practice
-                log_practice(sid, unit_val, type_display, q_data.get("question_content", ""), fb, duration, st.session_state.get("hint_viewed", False))
+                
+                log_practice(sid, unit_val, type_display, topic_display, lvl_display, q_data.get("question_content", ""), fb, duration, st.session_state.get("hint_viewed", False))
                 
                 display_feedback_ui(fb, T, qtype=type_display)
 
@@ -1096,8 +1098,8 @@ if st.session_state["is_ta"] and len(tabs) > 2:
             if 'feedback_json' in df.columns:
                 df["weakness_parsed"] = df["feedback_json"].apply(extract_weaknesses)
             
-            # [FIX v7.8] Added 'qtype' to the display columns
-            display_cols = [c for c in ['timestamp', 'student_id', 'unit_id', 'qtype', 'score', 'duration_sec', 'used_hint', 'weakness_parsed'] if c in df.columns]
+            # [FIX v7.11] 同步更新 TA Dashboard 顯示順序
+            display_cols = [c for c in ['timestamp', 'student_id', 'unit_id', 'qtype', 'topic', 'difficulty', 'score', 'level', 'duration_sec', 'used_hint', 'weakness_parsed'] if c in df.columns]
             st.dataframe(df[display_cols], use_container_width=True, hide_index=True, height=300)
         else: st.info(T['msg_no_data'])
 
