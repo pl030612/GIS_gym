@@ -57,8 +57,8 @@ UNIT_NOTES = {
     3: {"zh": "ℹ️ 本單元圖資編碼為 Big5。", "en": "ℹ️ Data encoding for this unit is Big5."},
     4: {"zh": "ℹ️ 本單元Taiwan_hospital、Taiwan_village、Taiwan_town圖資編碼為UTF-8，其餘為 Big5。", "en": "ℹ️ Taiwan_hospital, Taiwan_village, Taiwan_town are UTF-8. Others are Big5."},
     5: {"zh": "ℹ️ 本單元圖資編碼為 Big5。", "en": "ℹ️ Data encoding for this unit is Big5."},
-    6: {"zh": "ℹ️ 本單元School、Tainan_temple_mazhou、Taiwan_temple_mazhou、Taiwan_town圖資編碼為UTF-8，其餘為 Big5。", "en": "ℹ️ School, Tainan_temple_mazhou, Taiwan_temple_mazhou, Taiwan_town are UTF-8. Others are Big5."},
-    7: {"zh": "ℹ️ 本單元School、Tainan_temple_mazhou圖資編碼為UTF-8，其餘為 Big5。", "en": "ℹ️ School, Tainan_temple_mazhou are UTF-8. Others are Big5."},
+    6: {"zh": "ℹ️ 本單元School、Tainan_temple、Tainan_temple_mazhou、Taiwan_temple_mazhou、Taiwan_town圖資編碼為UTF-8，其餘為 Big5。", "en": "ℹ️ School, Tainan_temple, Tainan_temple_mazhou, Taiwan_temple_mazhou, Taiwan_town are UTF-8. Others are Big5."},
+    7: {"zh": "ℹ️ 本單元School、Tempcycle、Tainan_temple_mazhou圖資編碼為UTF-8，其餘為 Big5。", "en": "ℹ️ School, Tempcycle, Tainan_temple_mazhou are UTF-8. Others are Big5."},
     8: {"zh": "ℹ️ 本單元School、Tainan_temple_mazhou圖資編碼為UTF-8，其餘為 Big5。", "en": "ℹ️ School, Tainan_temple_mazhou are UTF-8. Others are Big5."},
     9: {"zh": "ℹ️ 本單元Dengue_Case、KAOH_toen圖資編碼為UTF-8，其餘為 Big5。", "en": "ℹ️ Dengue_Case, KAOH_toen are UTF-8. Others are Big5."},
     10: {"zh": "ℹ️ 本單元Dengue_Case、KAOH_toen圖資編碼為UTF-8，其餘為 Big5。", "en": "ℹ️ Dengue_Case, KAOH_toen are UTF-8. Others are Big5."}
