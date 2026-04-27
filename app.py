@@ -33,6 +33,7 @@ GOOGLE_SHEET_NAME = "GIS_Gym_Database"
 GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1n-tYLLiwX1-iewjFJSXii2jfTCS1qyyDoAAQO1PD8-Y/edit?usp=sharing"
 
 # 學生白名單
+# 學生白名單 
 ALLOWED_STUDENTS = [
     "D14228004", "R14228004", "R14228008", "R14228016", "R14228022", 
     "R14228023", "R11228022", "R13228003", "R13228021", "R13341004", 
@@ -48,7 +49,19 @@ ALLOWED_STUDENTS = [
     "B13302311", "B11103052", "B11208021", "B12103013", "B12208011", 
     "B12208036", "B12208042", "B12208043", "B11208028", "41144042S", 
     "41123113L", "R13228018", "B11208033", "R04521118", "B14801003",
-    "TA2026"
+    "R04521118", "TA2026",
+
+    # Excel 名單新增
+    "B12B01022",
+    "ntnu_41123113L",
+    "ntnu_41144042S",
+    "R13228022",
+    "R14521705",
+    "R14622016",
+    "R14625031",
+    "R14627005",
+    "external_112207411",
+    "external_LINYOUNGYAN"
 ]
 
 UNIT_NOTES = {
